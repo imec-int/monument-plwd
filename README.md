@@ -16,7 +16,7 @@ You need to have an Auth0 domain registered. See [Auth0](./docs/auth0.md) for mo
 
 ### Web
 
-See [](./web/README.MD) to set up and start the web application
+See [README.MD](./web/README.MD) to set up and start the web application
 
 ### API
 
