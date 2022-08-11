@@ -28,6 +28,11 @@ variables:
     value: 0.29.2
 
 jobs:
+  - task: CmdLine@2
+    inputs:
+      script: |        
+        cd web
+
   - job: variables
     displayName: 'Add Variables'
     steps:
