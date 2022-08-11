@@ -28,11 +28,6 @@ variables:
     value: 0.29.2
 
 jobs:
-  - task: CmdLine@2
-    inputs:
-      script: |        
-        cd web
-
   - job: variables
     displayName: 'Add Variables'
     steps:
@@ -41,7 +36,7 @@ jobs:
       #
       # Read more here: https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
       #
-      - bash: echo "##vso[task.setvariable variable=output;isOutput=true]$(cat .nvmrc)"
+      - bash: echo "##vso[task.setvariable variable=output;isOutput=true]$(cat web/.nvmrc)"
         name: setNodeVersionVariable
 
   - job: build
@@ -55,6 +50,12 @@ jobs:
       # https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/git-commands?view=azure-devops&tabs=yaml
       - checkout: self
         persistCredentials: true
+
+      - task: CmdLine@2
+        inputs:
+          script: |
+            cd web
+
       - task: NodeTool@0
         displayName: Install NodeJS
         inputs:
