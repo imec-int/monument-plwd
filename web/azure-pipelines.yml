@@ -1,0 +1,122 @@
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+pool:
+  vmImage: 'ubuntu-20.04'
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+      - main
+      - develop
+      - feature/*
+      - hotfix/*
+      - support/*
+      - issue/*
+      - release/*
+
+variables:
+  - group: 'monument-activity-dev'
+  - name: containerRegistry
+    value: 'Monument Activity - Docker container registry'
+  - name: imageRepository
+    value: 'monument-activity-web-app'
+  - name: 'loginServer'
+    value: 'monumentactivity.azurecr.io'
+  - name: trivyVersion
+    value: 0.29.2
+
+jobs:
+  - job: variables
+    displayName: 'Add Variables'
+    steps:
+      # Read .nvmrc value and assign it as the nodeVersion variable in the pipeline
+      # so it can be used in the upcoming jobs as an input.
+      #
+      # Read more here: https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
+      #
+      - bash: echo "##vso[task.setvariable variable=output;isOutput=true]$(cat .nvmrc)"
+        name: setNodeVersionVariable
+
+  - job: build
+    displayName: 'Build'
+    dependsOn: variables
+    variables:
+      - name: nodeVersion
+        value: $[ dependencies.variables.outputs['setNodeVersionVariable.output'] ]
+
+    steps:
+      # https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/git-commands?view=azure-devops&tabs=yaml
+      - checkout: self
+        persistCredentials: true
+      - task: NodeTool@0
+        displayName: Install NodeJS
+        inputs:
+          # nodeVersion variable is set in the previous job
+          versionSpec: $(nodeVersion)
+
+      - task: Npm@1
+        displayName: Install dependencies
+        inputs:
+          command: 'install'
+
+      - task: Npm@1
+        displayName: Lint
+        inputs:
+          command: 'custom'
+          customCommand: 'run lint'
+
+      - template: .azure-devops/gitversion.yml
+
+      # This .env file contains all necessary environment variables
+      # for the NextJS build process. This circumvents the issue that
+      # the Docker task's "buildAndPush" command does not allow for providing arguments...
+      - task: Bash@3
+        displayName: Make .env file for Docker Build
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$(NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)" > .env.local
+            echo "NEXT_PUBLIC_MAPBOX_TOKEN=$(NEXT_PUBLIC_MAPBOX_TOKEN)" >> .env.local
+
+      - task: Docker@2
+        displayName: Docker Build and Push Image
+        inputs:
+          containerRegistry: $(containerRegistry)
+          repository: $(imageRepository)
+          command: 'buildAndPush'
+          tags: |
+            $(GitVersion.SemVer)
+            $(Build.BuildId)
+          Dockerfile: 'Dockerfile'
+
+      - task: Bash@3
+        # This will also create a Github release
+        displayName: 'Git tag'
+        # Only make a tag/release for the master branch
+        condition: eq(variables['Build.SourceBranchName'], 'master')
+        inputs:
+          filePath: './.azure-devops/tag.sh'
+
+      - script: |
+          sudo apt-get install rpm
+          wget https://github.com/aquasecurity/trivy/releases/download/v$(trivyVersion)/trivy_$(trivyVersion)_Linux-64bit.deb
+          sudo dpkg -i trivy_$(trivyVersion)_Linux-64bit.deb
+          trivy -v
+        displayName: 'Download and install Trivy'
+
+      - task: Docker@2
+        displayName: Login to ACR
+        inputs:
+          command: login
+          containerRegistry: $(containerRegistry)
+
+      - task: CmdLine@2
+        displayName: 'Run trivy scan'
+        # In case this causes concerns: read https://lgulliver.github.io/container-security-scanning-with-trivy-in-azure-devops/
+        # and know that a file .trivyignore can be used to ignore risks. Please be careful with this...
+        inputs:
+          script: |
+            trivy image --exit-code 0 --severity LOW,MEDIUM $(loginServer)/$(imageRepository):$(Build.BuildId)
+            trivy image --exit-code 1 --severity HIGH,CRITICAL $(loginServer)/$(imageRepository):$(Build.BuildId)

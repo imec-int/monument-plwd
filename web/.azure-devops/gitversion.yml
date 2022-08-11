@@ -1,0 +1,12 @@
+steps:
+  - task: gitVersion/setup@0
+    displayName: Setup gitversion
+    inputs:
+      versionSpec: "5.*"
+
+  - task: gitVersion/execute@0
+    displayName: Execute gitversion
+    name: gitversion
+    inputs:
+        useConfigFile: true
+        configFilePath: './GitVersion.yml'

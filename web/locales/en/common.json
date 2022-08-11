@@ -1,0 +1,15 @@
+{
+  "loginTitle": "Welcome",
+  "loginDescription": "This website is usable for caretakers of persons living with dementia (PLWD). This app can help you to improve the independence of a PLWD.",
+  "loginDescription2": "Please click on the button below to login or make an account.",
+  "loginButton": "Login",
+  "signUpButton": "Sign Up",
+  "logoutButton": "Logout",
+  "home": "Home",
+  "calendar": "Calendar",
+  "location": "Location",
+  "carecircle": "Carecircle",
+  "simulation": "Simulation",
+  "help": "Help",
+  "yearsOld": "Years Old"
+}
