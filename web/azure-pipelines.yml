@@ -50,7 +50,6 @@ jobs:
       # https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/git-commands?view=azure-devops&tabs=yaml
       - checkout: self
         persistCredentials: true
-        path: web/
 
       - task: NodeTool@0
         displayName: Install NodeJS
@@ -61,15 +60,17 @@ jobs:
       - task: Npm@1
         displayName: Install dependencies
         inputs:
+          workingDir: 'web'
           command: 'install'
 
       - task: Npm@1
         displayName: Lint
         inputs:
           command: 'custom'
+          workingDir: 'web'
           customCommand: 'run lint'
 
-      - template: .azure-devops/gitversion.yml
+      - template: ../.azure-devops/gitversion.yml
 
       # This .env file contains all necessary environment variables
       # for the NextJS build process. This circumvents the issue that
@@ -79,19 +80,20 @@ jobs:
         inputs:
           targetType: 'inline'
           script: |
-            echo "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$(NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)" > .env.local
-            echo "NEXT_PUBLIC_MAPBOX_TOKEN=$(NEXT_PUBLIC_MAPBOX_TOKEN)" >> .env.local
+            echo "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$(NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)" > web/.env.local
+            echo "NEXT_PUBLIC_MAPBOX_TOKEN=$(NEXT_PUBLIC_MAPBOX_TOKEN)" >> web/.env.local
 
       - task: Docker@2
         displayName: Docker Build and Push Image
         inputs:
+          workingDir: 'web'
           containerRegistry: $(containerRegistry)
           repository: $(imageRepository)
           command: 'buildAndPush'
           tags: |
             $(GitVersion.SemVer)
             $(Build.BuildId)
-          Dockerfile: 'Dockerfile'
+          Dockerfile: 'web/Dockerfile'
 
       - task: Bash@3
         # This will also create a Github release
@@ -99,6 +101,7 @@ jobs:
         # Only make a tag/release for the master branch
         condition: eq(variables['Build.SourceBranchName'], 'master')
         inputs:
+          workingDir: 'web'
           filePath: './.azure-devops/tag.sh'
 
       - script: |
