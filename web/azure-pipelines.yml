@@ -50,11 +50,7 @@ jobs:
       # https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/git-commands?view=azure-devops&tabs=yaml
       - checkout: self
         persistCredentials: true
-
-      - task: CmdLine@2
-        inputs:
-          script: |
-            cd web
+        path: web/
 
       - task: NodeTool@0
         displayName: Install NodeJS
