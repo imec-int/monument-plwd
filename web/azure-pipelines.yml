@@ -99,7 +99,7 @@ jobs:
         # This will also create a Github release
         displayName: 'Git tag'
         # Only make a tag/release for the master branch
-        condition: eq(variables['Build.SourceBranchName'], 'master')
+        condition: eq(variables['Build.SourceBranchName'], 'main')
         inputs:
           workingDir: 'web'
           filePath: './.azure-devops/tag.sh'
