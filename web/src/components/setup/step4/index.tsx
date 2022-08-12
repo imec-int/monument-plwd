@@ -3,9 +3,11 @@ import { InfoIcon } from '@components/icons/InfoIcon';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ISetupStep } from '@interfaces';
 import { Tooltip } from '@mui/material';
+import { fetchWrapper } from 'lib/fetch';
+import { useSnackbar } from 'notistack';
 import { ChangeEvent, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
-import { useWatchVerification } from 'src/hooks/useWatchVerification';
+import { mutate } from 'swr';
 import * as yup from 'yup';
 
 const watchSetupSchema = yup
@@ -21,13 +23,15 @@ const watchSetupSchema = yup
   })
   .required();
 
-export const SetupStep4: React.FC<ISetupStep> = ({ nextStep }) => {
+type IWatchSetupSchema = yup.InferType<typeof watchSetupSchema>;
+
+export const SetupStep4: React.FC<ISetupStep> = ({ userData }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const {
-    formState: { errors, isValid },
+    formState: { isValid, isSubmitting },
     handleSubmit,
     register,
     setValue,
-    watch,
   } = useForm({
     defaultValues: {
       imei: '',
@@ -36,16 +40,30 @@ export const SetupStep4: React.FC<ISetupStep> = ({ nextStep }) => {
     mode: 'onChange',
   });
 
-  const imei = watch('imei');
-
-  const { data, error, loading } = useWatchVerification(
-    isValid ? imei : undefined
+  const [carecircle] = userData.currentUser.carecircles.filter(
+    (c) => !c.plwd.watchId
   );
 
-  console.warn({ data, error, loading, isValid, errors });
+  const onSubmit = async (data: IWatchSetupSchema) => {
+    try {
+      await fetchWrapper(`/api/plwd/${carecircle.plwd.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          ...carecircle.plwd,
+          watchId: data.imei,
+        }),
+      });
 
-  const onSubmit = (data: any) => {
-    console.warn(data);
+      enqueueSnackbar('Successfully registered the watch!', {
+        variant: 'success',
+      });
+
+      await mutate(`/api/user/${userData.currentUser.auth0Id}`);
+    } catch (error) {
+      enqueueSnackbar('Failed to register the watch, please try again.', {
+        variant: 'error',
+      });
+    }
   };
 
   const { onChange, ...rest } = register('imei');
@@ -90,8 +108,12 @@ export const SetupStep4: React.FC<ISetupStep> = ({ nextStep }) => {
               />
             </div>
           </div>
-          <button className="btn btn-secondary mt-4" type="submit">
-            Verify Kompy watch
+          <button
+            className="btn btn-secondary mt-4"
+            disabled={!isValid || isSubmitting}
+            type="submit"
+          >
+            Register Kompy watch
           </button>
         </div>
       </form>

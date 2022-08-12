@@ -7,6 +7,7 @@ import {
   SetupStep3,
   SetupStep4,
 } from '@components';
+import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useCurrentUser } from 'src/hooks/useCurrentUser';
 import { mutate } from 'swr';
@@ -16,6 +17,7 @@ export const getServerSideProps = withPageAuthRequired();
 
 const Setup = ({ user: authenticatedUser }: Props) => {
   const [step, setStep] = useState(1);
+  const router = useRouter();
 
   const getUserData = useCallback(async () => {
     await mutate(`/api/user/${authenticatedUser.sub}`);
@@ -40,17 +42,31 @@ const Setup = ({ user: authenticatedUser }: Props) => {
   };
 
   useEffect(() => {
-    if (currentUser?.id && currentUser?.hasCompletedOnboarding) {
-      if (step <= 3) {
-        goToStep(3);
-      } else {
-        goToStep(4);
+    if (currentUser?.id) {
+      if (
+        !currentUser.carecircles.find((c) => !c.plwd.watchId) &&
+        currentUser.carecircles.length > 0
+      ) {
+        router.push('/switch');
+
+        return;
+      }
+
+      if (currentUser.hasCompletedOnboarding) {
+        if (step <= 3) {
+          goToStep(3);
+        } else {
+          goToStep(4);
+        }
+
+        return;
+      }
+
+      if (step === 1) {
+        goToStep(2);
       }
     }
-    if (step === 1 && currentUser?.id) {
-      goToStep(2);
-    }
-  }, [step, currentUser, nextStep]);
+  }, [step, currentUser, nextStep, router]);
 
   // Check which step and return step component
   const getStep = () => {
