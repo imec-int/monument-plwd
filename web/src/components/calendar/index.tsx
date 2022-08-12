@@ -88,8 +88,7 @@ export const Calendar: React.FC<ICalendar> = ({
       ) : null}
       <FullCalendar
         customButtons={calendarCustomButtons}
-        editable
-        eventClick={eventClick}
+        eventClick={canManageCalendar ? eventClick : undefined}
         events={calendarEvents}
         height={height || '500px'}
         initialView={initialView || 'dayGridMonth'}
