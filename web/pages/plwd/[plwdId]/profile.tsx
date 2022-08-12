@@ -37,6 +37,7 @@ const Profile = () => {
       firstName: plwd.firstName,
       lastName: plwd.lastName,
       phone: plwd.phone,
+      watchId: plwd.watchId,
     },
     resolver: yupResolver(plwdInfoSchema),
   });
@@ -128,6 +129,19 @@ const Profile = () => {
                 errors.email ? 'input-error' : ''
               }`}
               placeholder="Email"
+              type="text"
+            />
+          </div>
+          <div className="form-control w-full">
+            <label className="label">
+              <span className="label-text">IMEI / Watch ID</span>
+            </label>
+            <input
+              {...register('watchId')}
+              className={`input input-bordered w-96 ${
+                errors.watchId ? 'input-error' : ''
+              }`}
+              placeholder="IMEI / Watch ID"
               type="text"
             />
           </div>
