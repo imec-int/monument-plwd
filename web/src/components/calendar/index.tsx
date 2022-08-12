@@ -52,7 +52,9 @@ export const Calendar: React.FC<ICalendar> = ({
   const fieldProps = {
     ...(headerToolbarEnabled && {
       headerToolbar: {
-        center: 'new dayGridMonth,timeGridWeek,timeGridDay',
+        center: canManageCalendar
+          ? 'new dayGridMonth,timeGridWeek,timeGridDay'
+          : 'dayGridMonth,timeGridWeek,timeGridDay',
       },
     }),
   };
@@ -93,7 +95,6 @@ export const Calendar: React.FC<ICalendar> = ({
         height={height || '500px'}
         initialView={initialView || 'dayGridMonth'}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        selectable
         {...fieldProps}
       />
     </div>
