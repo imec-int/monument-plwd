@@ -22,12 +22,14 @@ export const CardProfile = ({
         <h2 className="card-title">
           {profile.firstName} {profile.lastName}
         </h2>
-        <p>
-          Phone:{' '}
-          <a className="link link-secondary" href={`tel:${profile.phone}`}>
-            {profile.phone}
-          </a>
-        </p>
+        {profile.phone ? (
+          <p>
+            Phone:{' '}
+            <a className="link link-secondary" href={`tel:${profile.phone}`}>
+              {profile.phone}
+            </a>
+          </p>
+        ) : null}
         {showCTA ? (
           <div className="card-actions mt-2">
             <Link href={`/plwd/${profile.id}/location`}>

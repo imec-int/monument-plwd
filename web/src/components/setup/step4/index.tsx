@@ -15,8 +15,6 @@ const watchSetupSchema = yup
     imei: yup
       .string()
       .test('len', 'Length must be exactly 15 digits', (value = '') => {
-        console.warn(value.length, value);
-
         return value.length === 15;
       })
       .required(),
@@ -25,7 +23,9 @@ const watchSetupSchema = yup
 
 type IWatchSetupSchema = yup.InferType<typeof watchSetupSchema>;
 
-export const SetupStep4: React.FC<ISetupStep> = ({ userData }) => {
+type Props = ISetupStep & { previousStep: () => void };
+
+export const SetupStep4: React.FC<Props> = ({ previousStep, userData }) => {
   const { enqueueSnackbar } = useSnackbar();
   const {
     formState: { isValid, isSubmitting },
@@ -114,6 +114,14 @@ export const SetupStep4: React.FC<ISetupStep> = ({ userData }) => {
             type="submit"
           >
             Register Kompy watch
+          </button>
+          <button
+            className="btn btn-outline mt-2"
+            disabled={isSubmitting}
+            onClick={previousStep}
+            type="button"
+          >
+            Go back
           </button>
         </div>
       </form>

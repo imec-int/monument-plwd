@@ -4,6 +4,8 @@ import { Container, FormInputPhone, ImageSetter } from '@components';
 import { UserRole } from '@enum';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ISetupStep } from '@interfaces';
+import { CustomError } from 'lib/CustomError';
+import { fetchWrapper } from 'lib/fetch';
 import { useSnackbar } from 'notistack';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -27,29 +29,36 @@ export const SetupStep1: React.FC<ISetupStep> = ({ nextStep, userData }) => {
     resolver: yupResolver(userInfoSchema),
   });
 
-  const onSubmit = (data: IFormUserInfo) => {
-    setIsLoading(true);
-    const newUser = {
-      ...data,
-      role: UserRole.PRIMARY_CARETAKER,
-      auth0Id: userData.authenticatedUser?.sub,
-      email: userData.authenticatedUser?.email,
-    };
+  const onSubmit = async (data: IFormUserInfo) => {
+    try {
+      setIsLoading(true);
 
-    fetch('/api/user', {
-      method: 'POST',
-      body: JSON.stringify({
-        user: newUser,
-      }),
-    })
-      .then((res) => res.json())
-      .then(() => {
-        enqueueSnackbar('Profile created', {
-          variant: 'success',
-        });
-        setIsLoading(false);
-        nextStep();
+      const newUser = {
+        ...data,
+        role: UserRole.PRIMARY_CARETAKER,
+        auth0Id: userData.authenticatedUser?.sub,
+        email: userData.authenticatedUser?.email,
+      };
+
+      await fetchWrapper('/api/user', {
+        method: 'POST',
+        body: JSON.stringify({
+          user: newUser,
+        }),
       });
+
+      enqueueSnackbar('Successfully created your profile!', {
+        variant: 'success',
+      });
+      nextStep();
+    } catch (error) {
+      const _error = error as CustomError;
+      enqueueSnackbar(`Failed to create profile: ${_error.toString()}`, {
+        variant: 'error',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
