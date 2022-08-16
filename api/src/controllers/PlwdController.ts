@@ -20,8 +20,10 @@ const addressSchemaObject = yup.object({
     description: yup.string().optional(),
     geometry: yup
         .object({
-            lat: yup.number().required(),
-            lng: yup.number().required(),
+            location: yup.object({
+                lat: yup.number().required(),
+                lng: yup.number().required(),
+            }),
         })
         .required(),
 });
@@ -41,11 +43,11 @@ export const createPlwdValidationSchema = yup.object({
         .object({
             address: addressSchemaObject.required(),
             caretakerId: yup.string().required(),
-            email: yup.string().required(),
+            email: yup.string().email().nullable(),
             firstName: yup.string().required(),
             lastName: yup.string().required(),
-            phone: yup.string().required(),
-            picture: yup.string(),
+            phone: yup.string().nullable(),
+            picture: yup.string().nullable(),
             watchId: yup.string().nullable(),
         })
         .required(),
@@ -57,12 +59,12 @@ export const updatePlwdValidationSchema = yup.object({
         .object({
             address: addressSchemaObject.required(),
             caretakerId: yup.string().required(),
-            email: yup.string().required(),
+            email: yup.string().email().nullable(),
             firstName: yup.string().required(),
             id: yup.string().required(),
             lastName: yup.string().required(),
-            phone: yup.string().required(),
-            picture: yup.string(),
+            phone: yup.string().nullable(),
+            picture: yup.string().nullable(),
             watchId: yup.string().nullable(),
         })
         .required(),

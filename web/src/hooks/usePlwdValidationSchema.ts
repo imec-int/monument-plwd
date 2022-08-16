@@ -1,12 +1,12 @@
-import { formInputPhoneSchema } from '@schema';
+import { formInputPhoneSchemaOptional } from '@schema';
 import * as yup from 'yup';
 
 export const usePlwdValidationSchema = () => {
   return yup.object({
     firstName: yup.string().required(),
     lastName: yup.string().required(),
-    phone: formInputPhoneSchema,
-    email: yup.string().email().required(),
+    phone: formInputPhoneSchemaOptional,
+    email: yup.string().email(),
     picture: yup.string(),
     address: yup.object({
       description: yup.string(),

@@ -7,17 +7,19 @@ interface IFormInputPhone {
   control: any;
   errors: any;
   name?: string;
+  required?: boolean;
 }
 
 export const FormInputPhone: React.FC<IFormInputPhone> = ({
   control,
   errors,
   name = 'phone',
+  required = false,
 }) => {
   return (
     <div className="form-control w-full">
       <label className="label">
-        <span className="label-text">Phone*</span>
+        <span className="label-text">Phone{required ? '*' : ''}</span>
       </label>
       <Controller
         control={control}

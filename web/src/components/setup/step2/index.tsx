@@ -3,6 +3,8 @@ import 'react-phone-number-input/style.css';
 import { Container, FormInputPhone, ImageSetterController } from '@components';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ISetupStep } from '@interfaces';
+import { CustomError } from 'lib/CustomError';
+import { fetchWrapper } from 'lib/fetch';
 import { useSnackbar } from 'notistack';
 import { useState } from 'react';
 import Autocomplete from 'react-google-autocomplete';
@@ -27,24 +29,31 @@ export const SetupStep2: React.FC<ISetupStep> = ({ nextStep, userData }) => {
     resolver: yupResolver(plwdInfoSchema),
   });
 
-  const onSubmit = (data: IFormPlwdInfo) => {
+  const onSubmit = async (data: IFormPlwdInfo) => {
     setIsLoading(true);
+
     const newUser = {
       ...data,
       caretakerId: userData.currentUser.id,
     };
-    fetch('/api/plwd', {
+    fetchWrapper('/api/plwd', {
       method: 'POST',
       body: JSON.stringify(newUser),
     })
-      .then((res) => res.json())
       .then(() => {
-        enqueueSnackbar('Updated', {
+        enqueueSnackbar(`Created PLWD ${data.firstName} ${data.lastName}`, {
           variant: 'success',
         });
+        nextStep();
+      })
+      .catch((error: CustomError) => {
+        enqueueSnackbar(`Failed to create PLWD: ${error.toString()}`, {
+          variant: 'error',
+        });
+      })
+      .finally(() => {
         setIsLoading(false);
       });
-    nextStep();
   };
 
   return (
@@ -106,7 +115,7 @@ export const SetupStep2: React.FC<ISetupStep> = ({ nextStep, userData }) => {
         <FormInputPhone control={control} errors={errors} />
         <div className="form-control w-full">
           <label className="label">
-            <span className="label-text">Email*</span>
+            <span className="label-text">Email</span>
           </label>
           <input
             {...register('email', { required: true })}

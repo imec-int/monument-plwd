@@ -22,7 +22,7 @@ let admin: IUser;
 let carecircleMember: IUser;
 let database: Knex;
 
-const address = { geometry: { lng: 1, lat: 1 } };
+const address = { geometry: { location: { lng: 1, lat: 1 } } };
 
 beforeAll(async () => {
     ({
