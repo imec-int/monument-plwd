@@ -23,9 +23,7 @@ See [README.MD](./web/README.MD) to set up and start the web application
 TODO
 
 ## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
+Please refer to the CONTRIBUTING.md file in this repo for how to contribute.
 
 ## License
 
