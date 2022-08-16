@@ -26,30 +26,29 @@ variables:
     value: 'monumentactivity.azurecr.io'
   - name: trivyVersion
     value: 0.29.2
+  - group: monument-diary
+  - name: postgis
+    value: postgis/postgis:11-3.2-alpine
 
 jobs:
-  - job: variables
-    displayName: 'Add Variables'
-    steps:
-      # Read .nvmrc value and assign it as the nodeVersion variable in the pipeline
-      # so it can be used in the upcoming jobs as an input.
-      #
-      # Read more here: https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
-      #
-      - bash: echo "##vso[task.setvariable variable=output;isOutput=true]$(cat web/.nvmrc)"
-        name: setNodeVersionVariable
-
-  - job: build
-    displayName: 'Build'
-    dependsOn: variables
-    variables:
-      - name: nodeVersion
-        value: $[ dependencies.variables.outputs['setNodeVersionVariable.output'] ]
+  - job: build_web
+    displayName: Build web
 
     steps:
       # https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/git-commands?view=azure-devops&tabs=yaml
       - checkout: self
         persistCredentials: true
+
+      # Read .nvmrc value and assign it as the nodeVersion variable in the pipeline
+      # so it can be used in the upcoming jobs as an input.
+      #
+      # Read more here: https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
+      #
+      - bash: |
+          NVM_NODE_VERSION=$(cat .nvmrc)
+          echo "##vso[task.setvariable variable=nodeVersion]$NVM_NODE_VERSION"
+        displayName: Set Node version
+        workingDirectory: 'web'
 
       - task: NodeTool@0
         displayName: Install NodeJS
@@ -58,19 +57,19 @@ jobs:
           versionSpec: $(nodeVersion)
 
       - task: Npm@1
-        displayName: Install dependencies
+        displayName: Install web dependencies
         inputs:
-          workingDir: 'web'
           command: 'install'
+          workingDir: web
 
       - task: Npm@1
-        displayName: Lint
+        displayName: Lint web
         inputs:
           command: 'custom'
-          workingDir: 'web'
           customCommand: 'run lint'
+          workingDir: web
 
-      - template: ../.azure-devops/gitversion.yml
+      - template: .azure-devops/gitversion.yml
 
       # This .env file contains all necessary environment variables
       # for the NextJS build process. This circumvents the issue that
@@ -86,7 +85,6 @@ jobs:
       - task: Docker@2
         displayName: Docker Build and Push Image
         inputs:
-          workingDir: 'web'
           containerRegistry: $(containerRegistry)
           repository: $(imageRepository)
           command: 'buildAndPush'
@@ -101,8 +99,7 @@ jobs:
         # Only make a tag/release for the master branch
         condition: eq(variables['Build.SourceBranchName'], 'main')
         inputs:
-          workingDir: 'web'
-          filePath: './.azure-devops/tag.sh'
+          filePath: '.azure-devops/tag.sh'
 
       - script: |
           sudo apt-get install rpm
@@ -125,3 +122,44 @@ jobs:
           script: |
             trivy image --exit-code 0 --severity LOW,MEDIUM $(loginServer)/$(imageRepository):$(Build.BuildId)
             trivy image --exit-code 1 --severity HIGH,CRITICAL $(loginServer)/$(imageRepository):$(Build.BuildId)
+
+  - job: Build_api
+    displayName: Build api
+    steps:
+      - checkout: self
+        persistCredentials: true
+
+      - bash: echo "##vso[task.setvariable variable=output;isOutput=true]$(cat .nvmrc)"
+        workingDirectory: api
+        name: setNodeVersionVariable
+
+      - task: NodeTool@0
+        displayName: Install NodeJS
+        inputs:
+          # nodeVersion variable is set in the previous job
+          versionSpec: $(nodeVersion)
+
+      - script: docker pull $(postgis)
+        displayName: Docker Pull Postgis
+
+      - task: Bash@3
+        displayName: 'Build and test api'
+        inputs:
+          targetType: 'inline'
+          workingDirectory: api
+          script: |
+            npm install
+            npm run test || exit
+            npm run build || exit
+            exit $?
+
+      - task: AzureWebApp@1
+        name: "deploy_api_to_app_service"
+        displayName: "Deploy api"
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+        inputs:
+          azureSubscription: 'Azure service connection for Monument'
+          appType: 'webApp'
+          appName: 'monument-diary-backend-prod'
+          package: 'api'
+          deploymentMethod: 'auto'
