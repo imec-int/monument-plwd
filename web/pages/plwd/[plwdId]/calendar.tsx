@@ -1,5 +1,5 @@
 import { withPageAuthRequired } from '@auth0/nextjs-auth0';
-import { Calendar as StyledCalendar, Container, Header } from '@components';
+import { Calendar, Container, Header } from '@components';
 import { LayoutWithAppContext } from '@components/layouts/LayoutWithAppContext';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect } from 'react';
@@ -8,31 +8,31 @@ import { usePermissions } from 'src/hooks/usePermissions';
 
 export const getServerSideProps = withPageAuthRequired();
 
-const Calendar = () => {
+const CalendarPage = () => {
   const { plwd } = useAppUserContext();
-  const { canManageCarecircle } = usePermissions();
+  const { canAccessCalendar } = usePermissions();
   const router = useRouter();
 
   useEffect(() => {
-    if (!canManageCarecircle) {
+    if (!canAccessCalendar) {
       router.push(`/plwd/${plwd.id}`);
     }
-  }, [canManageCarecircle, router, plwd]);
+  }, [canAccessCalendar, router, plwd]);
 
-  if (!canManageCarecircle) return null;
+  if (!canAccessCalendar) return null;
 
   return (
     <Container>
       <Header tabTitle="Monument - Calendar" />
       <div className="h-54">
-        <StyledCalendar />
+        <Calendar />
       </div>
     </Container>
   );
 };
 
-Calendar.getLayout = function getLayout(page: ReactElement) {
+CalendarPage.getLayout = function getLayout(page: ReactElement) {
   return <LayoutWithAppContext>{page}</LayoutWithAppContext>;
 };
 
-export default Calendar;
+export default CalendarPage;
