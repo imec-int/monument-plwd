@@ -1,10 +1,11 @@
+import { isValidPhoneNumber } from 'react-phone-number-input';
 import * as yup from 'yup';
 
 export const formInputPhoneSchema = yup
   .string()
   .required()
   .test('isBelgianNumber', 'Phone number is invalid', (value = '') => {
-    return Boolean(value.startsWith('+32'));
+    return isValidPhoneNumber(value, { defaultCountry: 'BE' }); // TODO: how can we support multiple/dynamic countries?
   });
 
 export const formInputPhoneSchemaOptional = yup
@@ -12,5 +13,5 @@ export const formInputPhoneSchemaOptional = yup
   .optional()
   .nullable()
   .test('isBelgianNumber', 'Phone number is invalid', (value = '') => {
-    return !value || Boolean(value.startsWith('+32'));
+    return !value || isValidPhoneNumber(value, { defaultCountry: 'BE' }); // TODO: how can we support multiple/dynamic countries?
   });
