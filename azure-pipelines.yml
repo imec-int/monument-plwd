@@ -129,9 +129,11 @@ jobs:
       - checkout: self
         persistCredentials: true
 
-      - bash: echo "##vso[task.setvariable variable=output;isOutput=true]$(cat .nvmrc)"
-        workingDirectory: api
-        name: setNodeVersionVariable
+      - bash: |
+          NVM_NODE_VERSION=$(cat .nvmrc)
+          echo "##vso[task.setvariable variable=nodeVersion]$NVM_NODE_VERSION"
+        displayName: Set Node version
+        workingDirectory: 'api'
 
       - task: NodeTool@0
         displayName: Install NodeJS
