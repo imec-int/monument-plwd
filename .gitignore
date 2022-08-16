@@ -106,6 +106,10 @@ dist
 .env.*
 !.env.example
 !.env.local.template
+!.env.template
 
 # Idea
 .idea/
+
+# Other
+.DS_Store

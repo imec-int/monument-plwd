@@ -1,7 +1,6 @@
-# Monument
+# Monument Diary - API
 
-This repository contains 2 services: 1 web application and 1 API service receiving the location data for the Monument project.
-This web application is used to notify PLWD caretakers when the plwd is wandering or missing. 
+API of the Monument Diary project.
 
 ## Table of Contents
 
@@ -13,20 +12,18 @@ This web application is used to notify PLWD caretakers when the plwd is wanderin
   - [Mapbox and Google Maps API](#mapbox-and-google-maps-api)
   - [Postgis](#postgis)
   - [Postgis (Apple silicon)](#postgis-apple-silicon)
-  - [Start API](#api-application)
-  - [Start Web application](#web-application)
+  - [Start Backend](#backend-application)
+  - [Start Frontend](#frontend-application)
 - [Documentation](#documentation)
   - [API Reference](#api-reference)
   - [Architecture](./ARCHITECTURE.md)
   - [Testing](#testing)
   - [Deploying](#table-of-contents)
 - [Contributing](#contributing)
-- [Code of condut](#code-of-conduct)
 - [License](#license)
 
 ## Requirements
 ---
-* [Auth0](https://auth0.com/) You need to have an Auth0 domain registered.
 * [docker](https://www.docker.com/products/docker-desktop/) (>= 18.02.0+) and `docker-compose`
 * [nvm](https://github.com/nvm-sh/nvm) or latest version of [NodeJS 16-lts](https://nodejs.org/en/download/)
 
@@ -35,15 +32,15 @@ This web application is used to notify PLWD caretakers when the plwd is wanderin
 
 ### Basic Setup
 
-We have two main folders, `web` and `api`.
+We have two main folders, `frontend` and `backend`.
 
-`cd` into the web folder and create a `.env.local` file based on the `.env.local.template`. Then `cd` into the api folder and once again create a `.env` file, based on `.env.template`.
+`cd` into the frontend folder and create a `.env.local` file based on the `.env.local.template`. Then `cd` into the backend fodler and once again create a `.env` file, based on `.env.template`.
 
 ```sh
 > cd web
 > cp .env.local.template .env.local
 
-> cd api
+> cd ../api
 > cp .env.template .env
 ```
 
@@ -88,7 +85,7 @@ Finally, create a new Custom API and take note of the "identifier" (or **API Aud
 
 OK, now it's time to actually use all the values you noted down and apply them as environment variables.
 
-For the `web` we need to provide the following variables:
+For the `frontend` we need to provide the following variables:
 
 ```sh
 # The base url of your application
@@ -113,7 +110,7 @@ You can execute the following command to generate a suitable string for the `AUT
 node -e "console.log(crypto.randomBytes(32).toString('hex'))"
 ```
 
-Next, let's configure the api `.env` file.
+Next, let's configure the backend `.env` file.
 We need to provide the following variables:
 
 ```sh
@@ -230,7 +227,7 @@ To circumvent this issue you can build the image yourself as described below.
 > docker-compose up
 ```
 
-### API application
+### Backend application
 ---
 Finally, we're going to start up the actual application.
 
@@ -242,7 +239,7 @@ nvm use
 
 Otherwise make sure that the latest NodeJS 16-lts version is available on your machine (as specified in the requirements).
 
-Next, run the following 2 commands to get the api application started.
+Next, run the following 2 commands to get the backend application started.
 
 ```sh
 npm install
@@ -251,8 +248,8 @@ npm run dev
 
 If all went well you should see the following appear in the terminal: `Development Server Started`.
 
-Great, the api is now up-and-running!
-### Web application
+Great, the backend is now up-and-running!
+### Frontend application
 > TODO
 
 ## Documentation
@@ -271,11 +268,9 @@ npm run test
 ```
 
 ## Contributing
-Please refer to the [CONTRIBUTING.MD](./CONTRIBUTING.md) file in this repo for how to contribute.
-
-## Code of conduct
-Please refer to the [CODE_OF_CONDUCT.MD](./CODE_OF_CONDUCT.md) file in this repo for the code of conduct.
+---
+> TODO
 
 ## License
 ---
-See [License](./LICENSE)
+> TODO
