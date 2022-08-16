@@ -23,9 +23,10 @@ See [README.MD](./web/README.MD) to set up and start the web application
 TODO
 
 ## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Please refer to the [CONTRIBUTING.MD](CONTRIBUTING.MD) file in this repo for how to contribute.
 
-Please make sure to update tests as appropriate.
+## Code of conduct
+Please refer to the [CODE_OF_CONDUCT.MD](./main/CODE_OF_CONDUCT.MD) file in this repo for the code of conduct.
 
 ## License
 
