@@ -26,7 +26,7 @@ TODO
 Please refer to the [CONTRIBUTING.MD](CONTRIBUTING.MD) file in this repo for how to contribute.
 
 ## Code of conduct
-Please refer to the [CODE_OF_CONDUCT.MD](CODE_OF_CONDUCT.MD) file in this repo for the code of conduct.
+Please refer to the [CODE_OF_CONDUCT.MD](./main/CODE_OF_CONDUCT.MD) file in this repo for the code of conduct.
 
 ## License
 
