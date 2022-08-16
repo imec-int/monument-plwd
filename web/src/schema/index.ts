@@ -10,6 +10,7 @@ export const formInputPhoneSchema = yup
 export const formInputPhoneSchemaOptional = yup
   .string()
   .optional()
+  .nullable()
   .test('isBelgianNumber', 'Phone number is invalid', (value = '') => {
     return !value || Boolean(value.startsWith('+32'));
   });

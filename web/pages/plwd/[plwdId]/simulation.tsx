@@ -9,6 +9,7 @@ import { TextField } from '@mui/material';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import * as turf from '@turf/turf';
 import dayjs from 'dayjs';
+import { fetchWrapper } from 'lib/fetch';
 import { useSnackbar } from 'notistack';
 import { ReactElement, useCallback, useMemo, useRef, useState } from 'react';
 import Autocomplete from 'react-google-autocomplete';
@@ -47,7 +48,7 @@ const postSimulationStep = (data: {
   selectedEventId: string;
   point: ISimulationPoint;
 }) => {
-  fetch('/api/simulation', {
+  fetchWrapper('/api/simulation', {
     method: 'post',
     body: JSON.stringify(data),
   });

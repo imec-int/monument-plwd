@@ -7,7 +7,6 @@ import { ISetupStep } from '@interfaces';
 import { CustomError } from 'lib/CustomError';
 import { fetchWrapper } from 'lib/fetch';
 import { useSnackbar } from 'notistack';
-import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useUserValidationSchema } from 'src/hooks/useUserValidationSchema';
 import * as yup from 'yup';
@@ -16,14 +15,13 @@ type IFormUserInfo = yup.InferType<ReturnType<typeof useUserValidationSchema>>;
 
 export const SetupStep1: React.FC<ISetupStep> = ({ nextStep, userData }) => {
   const userInfoSchema = useUserValidationSchema();
-  const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<IFormUserInfo>({
     defaultValues: {},
     resolver: yupResolver(userInfoSchema),
@@ -31,8 +29,6 @@ export const SetupStep1: React.FC<ISetupStep> = ({ nextStep, userData }) => {
 
   const onSubmit = async (data: IFormUserInfo) => {
     try {
-      setIsLoading(true);
-
       const newUser = {
         ...data,
         role: UserRole.PRIMARY_CARETAKER,
@@ -56,8 +52,6 @@ export const SetupStep1: React.FC<ISetupStep> = ({ nextStep, userData }) => {
       enqueueSnackbar(`Failed to create profile: ${_error.toString()}`, {
         variant: 'error',
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -115,7 +109,7 @@ export const SetupStep1: React.FC<ISetupStep> = ({ nextStep, userData }) => {
             type="text"
           />
         </div>
-        <FormInputPhone control={control} errors={errors} />
+        <FormInputPhone control={control} errors={errors} required />
         <div className="mt-2">
           <Controller
             control={control}
@@ -132,8 +126,8 @@ export const SetupStep1: React.FC<ISetupStep> = ({ nextStep, userData }) => {
           />
         </div>
         <button
-          className={`w-40 mt-8 m-auto btn btn-secondary ${
-            isLoading ? 'btn-loading' : ''
+          className={`w-40 mt-8 m-auto btn btn-secondary${
+            isSubmitting ? ' loading' : ''
           }`}
           type="submit"
         >

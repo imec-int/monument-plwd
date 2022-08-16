@@ -32,7 +32,7 @@ const Setup = ({ user: authenticatedUser }: Props) => {
 
   const previousStep = useCallback(() => {
     setStep((s) => s - 1);
-  }, [step]);
+  }, []);
 
   const { data: currentUser } = useCurrentUser(authenticatedUser.sub);
 

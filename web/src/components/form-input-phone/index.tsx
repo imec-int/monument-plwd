@@ -28,6 +28,7 @@ export const FormInputPhone: React.FC<IFormInputPhone> = ({
           <div className="input input-bordered w-full flex">
             <PhoneInput
               addInternationalOption={false}
+              className="w-full"
               countries={['BE']}
               defaultCountry="BE"
               onChange={onChange}

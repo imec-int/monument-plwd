@@ -109,8 +109,10 @@ export const SetupStep4: React.FC<Props> = ({ previousStep, userData }) => {
             </div>
           </div>
           <button
-            className="btn btn-secondary mt-4"
-            disabled={!isValid || isSubmitting}
+            className={`btn btn-secondary mt-4${
+              isSubmitting ? ' loading' : ''
+            }`}
+            disabled={!isValid}
             type="submit"
           >
             Register Kompy watch
