@@ -162,14 +162,24 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
       refetchExternalContacts();
       onClose();
 
-      enqueueSnackbar(`Successfully update the event "${event.title}"`, {
-        variant: 'success',
-      });
+      enqueueSnackbar(
+        `Successfully ${event.id ? 'updated' : 'created'} the event "${
+          event.title
+        }"`,
+        {
+          variant: 'success',
+        }
+      );
     } catch (error) {
       const _error = error as CustomError;
-      enqueueSnackbar(`Failed to update the event: ${_error}`, {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        `Failed to ${
+          selectedEvent.id ? 'update' : 'create'
+        } the event: ${_error}`,
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -367,7 +377,6 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
               className="btn btn-error"
               onClick={() => {
                 deleteCalendarEvent(selectedEvent.id);
-                onClose();
               }}
               type="button"
             >
