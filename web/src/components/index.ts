@@ -5,6 +5,7 @@ export { Login } from './login';
 export { SetupStep1 } from './setup/step1';
 export { SetupStep2 } from './setup/step2';
 export { SetupStep3 } from './setup/step3';
+export { SetupStep4 } from './setup/step4';
 
 // Contexts
 export { AppUserContext, userDefault } from './contexts/AppUserContext';

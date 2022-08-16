@@ -35,11 +35,11 @@ const eventIsOngoingEvent = (event: IEvent) => {
 const refreshInterval = 30000; // refresh every 30s
 
 const Location = () => {
-  const { plwd, user, nudgeCaretakerToSetupWatch } = useAppUserContext();
+  const { plwd, nudgeCaretakerToSetupWatch } = useAppUserContext();
   const { canAccessLocation, canManageLocation } = usePermissions();
 
   const { data: calendarEvents = [] } = useCalendarEvents(plwd.id);
-  const { data: locations = [] } = useLocations(user.auth0Id, refreshInterval);
+  const { data: locations = [] } = useLocations(plwd.id, refreshInterval);
 
   const [currentLocation] = locations;
 

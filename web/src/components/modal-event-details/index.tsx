@@ -1,4 +1,5 @@
 import { Modal, ModalContact, TableContacts } from '@components';
+import { InfoIcon } from '@components/icons/InfoIcon';
 import { RepeatEvent } from '@constants';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { IModalEventDetails } from '@interfaces';
@@ -338,18 +339,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
               <Tooltip title="The contact who will receive a notification in case of emergency (eg: The person with dementia seems lost).">
                 <span className="label-text flex">
                   Contact Persons
-                  <svg
-                    className="h-5 w-5 ml-1"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      clipRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                      fillRule="evenodd"
-                    />
-                  </svg>
+                  <InfoIcon />
                 </span>
               </Tooltip>
             </label>

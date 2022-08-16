@@ -58,6 +58,9 @@ export const Header: React.FC<IHeader> = ({ tabTitle, isPublic }) => {
               <li>
                 <Link href={`${basePath}/simulation`}>{t('simulation')}</Link>
               </li>
+              <li>
+                <Link href={`${basePath}/help`}>{t('help')}</Link>
+              </li>
             </ul>
             <NotificationBadge />
             <div className="dropdown dropdown-end ml-2">

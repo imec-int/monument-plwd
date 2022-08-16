@@ -3,7 +3,7 @@ import { fetchWrapper, logger } from 'lib';
 import { CustomError } from 'lib/CustomError';
 
 export default withApiAuthRequired(async (req, res) => {
-  const { userId } = req.query;
+  const { plwdId } = req.query;
 
   const { accessToken } = await getAccessToken(req, res, {
     scopes: [],
@@ -12,7 +12,7 @@ export default withApiAuthRequired(async (req, res) => {
   try {
     if (req.method === 'GET') {
       const response = await fetchWrapper(
-        process.env.MONUMENT_DIARY_API_BASE_URL + `/locations/${userId}`,
+        process.env.MONUMENT_DIARY_API_BASE_URL + `/locations/${plwdId}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

@@ -21,14 +21,13 @@ type ReturnType = {
 };
 
 export const useLocations = (
-  auth0Id?: string | null,
+  plwdId: string,
   refreshInterval?: number
 ): ReturnType => {
-  const { data, error } = useSWR(
-    auth0Id ? `/api/locations/${auth0Id}` : null,
-    fetchWrapper,
-    { refreshInterval: refreshInterval ?? 0, shouldRetryOnError: false }
-  );
+  const { data, error } = useSWR(`/api/locations/${plwdId}`, fetchWrapper, {
+    refreshInterval: refreshInterval ?? 0,
+    shouldRetryOnError: false,
+  });
 
   return {
     data,

@@ -1,8 +1,15 @@
 import { Container } from '@components';
 import { ISetupStep } from '@interfaces';
-import Image from 'next/image';
+import { useRouter } from 'next/router';
+import { useCallback } from 'react';
 
-export const SetupStep3: React.FC<ISetupStep> = ({ nextStep, userData }) => {
+export const SetupStep3: React.FC<ISetupStep> = ({ nextStep }) => {
+  const router = useRouter();
+
+  const onSkip = useCallback(() => {
+    router.push('/');
+  }, [router]);
+
   return (
     <Container>
       <div className="card m-auto w-[40rem] text-center p-8 bg-base-100 shadow-xl my-8">
@@ -12,23 +19,13 @@ export const SetupStep3: React.FC<ISetupStep> = ({ nextStep, userData }) => {
           also skip it for later but you won&apos;t be able to use it fully
           until then.
         </p>
-        <p className="my-4">Please follow the steps below</p>
-        <p className="mb-2">Step 1.</p>
-        <div className="w-full h-80 relative">
-          <Image
-            alt="Step 1 Smartwatch setup"
-            layout="fill"
-            objectFit="contain"
-            src="/images/smartsetup.avif"
-          />
-        </div>
         <button
           className="w-40 mt-8 m-auto btn btn-secondary"
           onClick={nextStep}
         >
           Continue
         </button>
-        <button className="btn btn-link text-secondary" onClick={nextStep}>
+        <button className="btn btn-link text-secondary" onClick={onSkip}>
           Skip this for later
         </button>
       </div>

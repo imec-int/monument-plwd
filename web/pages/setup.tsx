@@ -5,7 +5,9 @@ import {
   SetupStep1,
   SetupStep2,
   SetupStep3,
+  SetupStep4,
 } from '@components';
+import { Affiliation } from '@constants';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useCurrentUser } from 'src/hooks/useCurrentUser';
@@ -16,28 +18,19 @@ export const getServerSideProps = withPageAuthRequired();
 
 const Setup = ({ user: authenticatedUser }: Props) => {
   const [step, setStep] = useState(1);
-
   const router = useRouter();
 
-  const getUserData = async () => {
+  const getUserData = useCallback(async () => {
     await mutate(`/api/user/${authenticatedUser.sub}`);
-  };
+  }, [authenticatedUser]);
 
-  // Goto next step with usecallback
+  // Goto next step
   const nextStep = useCallback(() => {
-    if (step === 3) {
-      router.push('/');
-    } else {
-      getUserData();
-      setStep(step + 1);
-    }
-  }, [router, step]);
+    getUserData();
+    setStep(step + 1);
+  }, [step, getUserData]);
 
-  const {
-    data: currentUser,
-    error: currentUserError,
-    loading: isLoadingCurrentUser,
-  } = useCurrentUser(authenticatedUser.sub);
+  const { data: currentUser } = useCurrentUser(authenticatedUser.sub);
 
   const userData = {
     currentUser,
@@ -50,13 +43,31 @@ const Setup = ({ user: authenticatedUser }: Props) => {
   };
 
   useEffect(() => {
-    if (currentUser?.id && currentUser?.hasCompletedOnboarding) {
-      goToStep(3);
+    if (currentUser?.id) {
+      if (
+        !currentUser.carecircles
+          .filter((c) => c.affiliation === Affiliation.PRIMARY_CARETAKER)
+          .find((c) => !c.plwd.watchId) &&
+        currentUser.carecircles.length > 0
+      ) {
+        router.push('/switch');
+
+        return;
+      }
+
+      if (currentUser.hasCompletedOnboarding) {
+        if (step < 3) {
+          goToStep(3);
+        }
+
+        return;
+      }
+
+      if (step === 1) {
+        goToStep(2);
+      }
     }
-    if (step === 1 && currentUser?.id) {
-      goToStep(2);
-    }
-  }, [step, currentUser, nextStep]);
+  }, [step, currentUser, nextStep, router]);
 
   // Check which step and return step component
   const getStep = () => {
@@ -67,8 +78,10 @@ const Setup = ({ user: authenticatedUser }: Props) => {
         return <SetupStep2 nextStep={nextStep} userData={userData} />;
       case 3:
         return <SetupStep3 nextStep={nextStep} userData={userData} />;
+      case 4:
+        return <SetupStep4 nextStep={nextStep} userData={userData} />;
       default:
-        return <SetupStep1 nextStep={nextStep} userData={userData} />;
+        return null;
     }
   };
 
