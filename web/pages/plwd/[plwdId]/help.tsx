@@ -2,11 +2,17 @@ import { withPageAuthRequired } from '@auth0/nextjs-auth0';
 import { Container } from '@components/container';
 import { Header } from '@components/header';
 import { LayoutWithAppContext } from '@components/layouts/LayoutWithAppContext';
+import Link from 'next/link';
 import { ReactElement } from 'react';
+import { useAppUserContext } from 'src/hooks/useAppUserContext';
+import { usePermissions } from 'src/hooks/usePermissions';
 
 export const getServerSideProps = withPageAuthRequired();
 
 const Help = () => {
+  const { canManageCarecircle } = usePermissions();
+  const { plwd } = useAppUserContext();
+
   return (
     <Container>
       <Header tabTitle="Monument - Help" />
@@ -28,7 +34,15 @@ const Help = () => {
                 one of your watch.
                 <br />
                 <br />
-                You may update it via &apos;Profile&apos; page
+                You may update it via the{' '}
+                {canManageCarecircle ? (
+                  <Link href={`/plwd/${plwd.id}/profile`} passHref>
+                    <a className="link link-secondary">Profile</a>
+                  </Link>
+                ) : (
+                  <span>Profile</span>
+                )}{' '}
+                page
               </p>
             </div>
           </div>

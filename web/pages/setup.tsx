@@ -7,6 +7,7 @@ import {
   SetupStep3,
   SetupStep4,
 } from '@components';
+import { Affiliation } from '@constants';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useCurrentUser } from 'src/hooks/useCurrentUser';
@@ -44,7 +45,9 @@ const Setup = ({ user: authenticatedUser }: Props) => {
   useEffect(() => {
     if (currentUser?.id) {
       if (
-        !currentUser.carecircles.find((c) => !c.plwd.watchId) &&
+        !currentUser.carecircles
+          .filter((c) => c.affiliation === Affiliation.PRIMARY_CARETAKER)
+          .find((c) => !c.plwd.watchId) &&
         currentUser.carecircles.length > 0
       ) {
         router.push('/switch');
@@ -53,10 +56,8 @@ const Setup = ({ user: authenticatedUser }: Props) => {
       }
 
       if (currentUser.hasCompletedOnboarding) {
-        if (step <= 3) {
+        if (step < 3) {
           goToStep(3);
-        } else {
-          goToStep(4);
         }
 
         return;
