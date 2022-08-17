@@ -14,11 +14,7 @@ export class LocationControllerAuthorizationService {
         const { user: requestingUser } = ctx;
         const { plwdId } = ctx.params;
 
-        const isAuthorized = await this.authService.isAuthorizedForActionOnPlwd(
-            requestingUser,
-            plwdId,
-            this.authService.canAccessLocation
-        );
+        const isAuthorized = await this.authService.isAuthorizedForActionOnPlwdWithOngoingEvent(requestingUser, plwdId);
         if (isAuthorized.isUnauthorized()) {
             ctx.status = isAuthorized.status;
             ctx.body = isAuthorized.message;

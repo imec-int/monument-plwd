@@ -165,7 +165,12 @@ export const authenticatedRoutes = ({
         ctx.set('X-Response-Time', `${ms}ms`);
     });
 
-    const authService = new DefaultAuthorizationService(userRepository, plwdRepository, carecircleMemberRepository);
+    const authService = new DefaultAuthorizationService(
+        userRepository,
+        plwdRepository,
+        carecircleMemberRepository,
+        calendarEventRepository
+    );
 
     /**
      * Users

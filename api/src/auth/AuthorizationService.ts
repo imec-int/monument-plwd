@@ -2,6 +2,7 @@ import { IPlwd } from '../models/Plwd';
 import { IUser, User } from '../models/User';
 import { UserRole } from '../models/UserRole';
 import { CarecircleMemberRepository } from 'src/repositories/CarecircleMemberRepository';
+import { CalendarEventRepository } from 'src/repositories/CalendarEventRepository';
 import { PlwdRepository } from 'src/repositories/PlwdRepository';
 import { UserRepository } from 'src/repositories/UserRepository';
 import { CalendarPermissions, CarecirclePermissions, LocationPermissions } from './Permissions';
@@ -59,7 +60,8 @@ export class DefaultAuthorizationService {
     constructor(
         private readonly userRepository: UserRepository,
         private readonly plwdRepository: PlwdRepository,
-        private readonly carecircleMemberRepository: CarecircleMemberRepository
+        private readonly carecircleMemberRepository: CarecircleMemberRepository,
+        private readonly calendarEventRepository: CalendarEventRepository
     ) {}
 
     /**
@@ -87,6 +89,10 @@ export class DefaultAuthorizationService {
         );
     }
 
+    canAccessLocationWhenAssigned(permissions: string[]) {
+        return permissions.includes(LocationPermissions['when-assigned:locations']);
+    }
+
     canManageLocation(permissions: string[]) {
         return permissions.includes(LocationPermissions['always:locations']);
     }
@@ -111,6 +117,35 @@ export class DefaultAuthorizationService {
 
     canManageCarecircle(permissions: string[]) {
         return permissions.includes(CarecirclePermissions['manage:carecircle']);
+    }
+
+    // Check if user is authorized to fetch locations when assigned to an event by checking if there is an ongoing event for the plwd
+    async isAuthorizedForActionOnPlwdWithOngoingEvent(requestingUser: User, plwdId: string): Promise<ValidationStatus> {
+        const user = await this.userRepository.getUserByAuth0Id(requestingUser.id);
+        const plwd = await this.plwdRepository.get(plwdId);
+
+        if (!user) return SimpleValidationStatus.notFound();
+        if (!plwd) return SimpleValidationStatus.notFound();
+
+        if (this.hasAdminRole(user)) return SimpleValidationStatus.ok();
+        if (this.isPrimaryCaretakerOfPlwd(user, plwd)) return SimpleValidationStatus.ok();
+
+        const carecircleMembership = await this.carecircleMemberRepository.getByUserId(user.id);
+        const carecircleForCurrentPlwd = carecircleMembership.find((c) => c.plwdId === plwd.id);
+
+        if (!carecircleForCurrentPlwd) return SimpleValidationStatus.forbidden();
+
+        // Check if there is an ongoing event for the plwd
+        const permissions = carecircleForCurrentPlwd.permissions;
+        // If the permission of the user is "when-assigned" we need to check if there is an ongoing event from the calendar for the plwd
+        if (this.canManageLocation(permissions)) {
+            return SimpleValidationStatus.ok();
+        }
+        if (this.canAccessLocationWhenAssigned(permissions)) {
+            const ongoingEvent = await this.calendarEventRepository.getOngoingEventsByPlwdId(plwdId);
+            if (ongoingEvent.length) return SimpleValidationStatus.ok();
+        }
+        return SimpleValidationStatus.forbidden();
     }
 
     async isAuthorizedForActionOnPlwd(
