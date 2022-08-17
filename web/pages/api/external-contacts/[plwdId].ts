@@ -12,8 +12,7 @@ export default withApiAuthRequired(async (req, res) => {
   try {
     if (req.method === 'GET') {
       const response = await fetchWrapper(
-        process.env.API_BASE_URL +
-          `/external-contacts/${plwdId}`,
+        process.env.API_BASE_URL + `/external-contacts/${plwdId}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

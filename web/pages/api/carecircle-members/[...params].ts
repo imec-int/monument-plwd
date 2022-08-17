@@ -13,8 +13,7 @@ export default withApiAuthRequired(async (req, res) => {
   try {
     if (req.method === 'DELETE') {
       const response = await fetchWrapper(
-        process.env.API_BASE_URL +
-          `/carecircle-member/${plwdId}/${id}`,
+        process.env.API_BASE_URL + `/carecircle-member/${plwdId}/${id}`,
         {
           method: 'delete',
           headers: {
@@ -25,8 +24,7 @@ export default withApiAuthRequired(async (req, res) => {
       res.status(200).json(response.data);
     } else if (req.method === 'POST') {
       const response = await fetchWrapper(
-        process.env.API_BASE_URL +
-          `/carecircle-member/${plwdId}`,
+        process.env.API_BASE_URL + `/carecircle-member/${plwdId}`,
         {
           method: 'post',
           body: req.body,
@@ -40,8 +38,7 @@ export default withApiAuthRequired(async (req, res) => {
       res.status(200).json(response.data);
     } else if (req.method === 'PATCH') {
       const response = await fetchWrapper(
-        process.env.API_BASE_URL +
-          `/carecircle-member/${plwdId}/${id}`,
+        process.env.API_BASE_URL + `/carecircle-member/${plwdId}/${id}`,
         {
           method: 'patch',
           body: req.body,
@@ -55,8 +52,7 @@ export default withApiAuthRequired(async (req, res) => {
       res.status(200).json(response.data);
     } else if (req.method === 'GET') {
       const response = await fetchWrapper(
-        process.env.API_BASE_URL +
-          `/carecircle-members/${plwdId}`,
+        process.env.API_BASE_URL + `/carecircle-members/${plwdId}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
