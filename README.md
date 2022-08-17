@@ -206,7 +206,7 @@ The Google Maps API allows you to use the different location inputs across the p
 For this you can visit the [Google Maps Platform](https://mapsplatform.google.com/).
 Create an account if not already done (you will need gmail account). Once done click on start and it will redirect you to the Google Cloud Console.
 From there you'll have to create a billing account (you can create a free trial but your payment method will still be required).
-After the account is create visit the apis tab and generate an api key for Google Maps that you can then insert in your .env file.
+After the account is create visit the credentials tab to see your api key for Google Maps that you can then insert in your .env file.
 
 ```sh
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=[GOOGLE_MAPS_API_KEY]

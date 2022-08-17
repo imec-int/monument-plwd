@@ -122,5 +122,5 @@ export interface Ilocation {
   id: string;
   location: { lng: number; lat: number };
   timestamp: string | Date;
-  userId: string;
+  watchId: string;
 }
