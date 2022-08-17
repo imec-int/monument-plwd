@@ -87,7 +87,7 @@ export class CalendarEventController {
         } catch (err) {
             logger.error('Failed to fetch calendarEvents:', err);
             ctx.status = 500;
-            ctx.body = { success: false };
+            ctx.body = { success: false, data: undefined };
         }
     };
 
@@ -101,7 +101,7 @@ export class CalendarEventController {
         } catch (err) {
             logger.error('Failed to fetch calendarEvents:', err);
             ctx.status = 500;
-            ctx.body = { success: false };
+            ctx.body = { success: false, data: undefined };
         }
     };
 
@@ -112,11 +112,11 @@ export class CalendarEventController {
             await this.notificationRepository.deleteAllForEvent(eventId);
             await this.calendarEventRepository.deleteById(eventId);
             ctx.status = 200;
-            ctx.body = { success: true };
+            ctx.body = { success: true, data: { id: eventId } };
         } catch (err) {
             logger.error('Failed to delete calendarEvent:', err);
             ctx.status = 500;
-            ctx.body = { success: false };
+            ctx.body = { success: false, data: undefined };
         }
     };
 }

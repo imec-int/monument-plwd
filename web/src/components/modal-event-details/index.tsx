@@ -1,4 +1,9 @@
-import { Modal, ModalContact, TableContacts } from '@components';
+import {
+  Modal,
+  ModalContact,
+  ModalEventDelete,
+  TableContacts,
+} from '@components';
 import { InfoIcon } from '@components/icons/InfoIcon';
 import { RepeatEvent } from '@constants';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -94,7 +99,16 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
     control,
   });
 
-  const { isVisible, open, close } = useModal();
+  const {
+    isVisible: isContactModalVisible,
+    open: openContactModal,
+    close: closeContactModal,
+  } = useModal();
+  const {
+    isVisible: isDeleteModalVisible,
+    open: openDeleteModal,
+    close: closeDeleteModal,
+  } = useModal();
   const watchStartTime = watch('startTimeValue');
 
   const onClose = () => {
@@ -181,20 +195,6 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
         }
       );
     }
-  };
-
-  const deleteCalendarEvent = (eventId: string) => {
-    // setLoading(true);
-    fetch(`/api/calendar-event/${plwd.id}/${eventId}`, {
-      method: 'DELETE',
-    }).then(() => {
-      // setLoading(false);
-      fetchCalendarEvents();
-      enqueueSnackbar('Deleted', {
-        variant: 'success',
-      });
-      onClose();
-    });
   };
 
   const hasErrors = Object.keys(errors).length > 0;
@@ -361,7 +361,11 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
               </Tooltip>
             </label>
             <div className="flex">
-              <button className="btn w-32 mb-4" onClick={open} type="button">
+              <button
+                className="btn w-32 mb-4"
+                onClick={openContactModal}
+                type="button"
+              >
                 Add new
               </button>
             </div>
@@ -375,9 +379,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
           {selectedEvent.id && (
             <button
               className="btn btn-error"
-              onClick={() => {
-                deleteCalendarEvent(selectedEvent.id);
-              }}
+              onClick={openDeleteModal}
               type="button"
             >
               Delete
@@ -394,13 +396,23 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
           </button>
         </div>
       </Modal>
-      {isVisible ? (
+      {isContactModalVisible ? (
         <ModalContact
           getUsers={refetchCarecircle}
-          onClose={close}
+          onClose={closeContactModal}
           onSuccess={onSuccess}
           selectedContact={{}}
           showAddUserToCarecircleToggle
+        />
+      ) : null}
+      {isDeleteModalVisible ? (
+        <ModalEventDelete
+          closeDetailsModal={onClose}
+          eventId={selectedEvent.id}
+          eventTitle={selectedEvent.title}
+          onClose={closeDeleteModal}
+          plwdId={plwd.id}
+          refetch={fetchCalendarEvents}
         />
       ) : null}
     </div>
