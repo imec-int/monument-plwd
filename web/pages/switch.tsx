@@ -33,7 +33,7 @@ const Switch = ({ user }: Props) => {
   }, [currentUser, router, isLoadingCurrentUser]);
 
   useEffect(() => {
-    if (userIsLinkedToOnlyOneCarecircle) {
+    if (userIsLinkedToOnlyOneCarecircle && currentUser) {
       const [carecircle] = currentUser.carecircles;
       router.push(`/plwd/${carecircle.plwd.id}`);
     }
@@ -41,7 +41,13 @@ const Switch = ({ user }: Props) => {
 
   if (isLoadingCurrentUser) return <Spinner />;
 
-  if (currentUserError) return <div>{currentUserError.message}</div>;
+  if (currentUserError) {
+    if (currentUserError.statusCode === 404) {
+      return null;
+    }
+
+    return <div>{currentUserError.toString()}</div>;
+  }
 
   // Do not show the list when loading the page in case user only is linked to one carecircle
   if (userIsLinkedToOnlyOneCarecircle) return null;
@@ -65,10 +71,10 @@ const Switch = ({ user }: Props) => {
         <h2 className="text-xl">For which person do you want to login?</h2>
         <div className="card p-8 shadow-xl mb-24">
           <ul className="menu bg-base-100 p-2 rounded-box">
-            {currentUser.carecircles.length === 0 ? (
+            {currentUser?.carecircles?.length === 0 ? (
               <p>Oops... you are not assigned to any person.</p>
             ) : null}
-            {currentUser.carecircles.map((carecircle) => (
+            {currentUser?.carecircles?.map((carecircle) => (
               <li key={carecircle.id}>
                 <Link href={`/plwd/${carecircle.plwd.id}`}>
                   <div className="flex">

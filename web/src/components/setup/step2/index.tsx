@@ -31,7 +31,7 @@ export const SetupStep2: React.FC<ISetupStep> = ({ nextStep, userData }) => {
     try {
       const newUser = {
         ...data,
-        caretakerId: userData.currentUser.id,
+        caretakerId: userData.currentUser?.id,
       };
       await fetchWrapper('/api/plwd', {
         method: 'POST',

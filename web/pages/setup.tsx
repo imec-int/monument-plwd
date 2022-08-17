@@ -47,6 +47,10 @@ const Setup = ({ user: authenticatedUser }: Props) => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [step]);
+
+  useEffect(() => {
     if (currentUser?.id) {
       if (
         !currentUser.carecircles

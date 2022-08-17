@@ -40,7 +40,7 @@ export const SetupStep4: React.FC<Props> = ({ previousStep, userData }) => {
     mode: 'onChange',
   });
 
-  const [carecircle] = userData.currentUser.carecircles.filter(
+  const [carecircle] = (userData.currentUser?.carecircles ?? []).filter(
     (c) => !c.plwd.watchId
   );
 
@@ -58,7 +58,7 @@ export const SetupStep4: React.FC<Props> = ({ previousStep, userData }) => {
         variant: 'success',
       });
 
-      await mutate(`/api/user/${userData.currentUser.auth0Id}`);
+      await mutate(`/api/user/${userData.currentUser?.auth0Id}`);
     } catch (error) {
       enqueueSnackbar('Failed to register the watch, please try again.', {
         variant: 'error',
