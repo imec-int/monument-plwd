@@ -187,7 +187,30 @@ You'll have to create an account [here](https://www.twilio.com/try-twilio) and [
 
 ### Mapbox and Google Maps API
 
-> TODO
+## Mapbox
+---
+
+To enable Mapbox which is used to display the different locations of the PLWD on the map you will need to get an access Token.
+It is free until a certain amount of requests.
+What you have to do is go to [Mapbox](https://mapbox.com/) and sign up with a new account if you don't already have one. Afterwards go into your account [Mapbox account](https://account.mapbox.com) and create an access token from the available button. You should just give it a name and you can create your token.
+Once you have your token, you can copy it and parse it into the related env variable in your .env file.
+
+```sh
+NEXT_PUBLIC_MAPBOX_TOKEN=[MAPBOX_TOKEN]
+```
+
+## Google Maps API
+---
+
+The Google Maps API allows you to use the different location inputs across the platform. To be able to use it you will be also required to create a token.
+For this you can visit the [Google Maps Platform](https://mapsplatform.google.com/).
+Create an account if not already done (you will need gmail account). Once done click on start and it will redirect you to the Google Cloud Console.
+From there you'll have to create a billing account (you can create a free trial but your payment method will still be required).
+After the account is create visit the apis tab and generate an api key for Google Maps that you can then insert in your .env file.
+
+```sh
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=[GOOGLE_MAPS_API_KEY]
+```
 
 ## Postgis
 ---
