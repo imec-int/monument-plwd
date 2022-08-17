@@ -11,7 +11,12 @@ import { CompositeNotificationService } from '../services/NotificationService';
 import { CarecircleMemberRepository } from 'src/repositories/CarecircleMemberRepository';
 import { PlwdRepository } from 'src/repositories/PlwdRepository';
 import { ExternalContactsRepository } from 'src/repositories/ExternalContactsRepository';
-import { UserAuthorizationService, UserController } from './../controllers/UserController';
+import {
+    UserAuthorizationService,
+    UserController,
+    createUserValidationSchema,
+    updateUserValidationSchema,
+} from './../controllers/UserController';
 import { SimulationController } from '../controllers/SimulationController';
 import {
     PlwdAuthorizationService,
@@ -23,11 +28,17 @@ import {
 import {
     CarecircleMemberAuthorizationService,
     CarecircleMemberController,
+    createCarecircleMemberValidationSchema,
 } from '../controllers/CarecircleMemberController';
-import { CalendarEventAuthorizationService, CalendarEventController } from '../controllers/CalendarEventController';
+import {
+    CalendarEventAuthorizationService,
+    CalendarEventController,
+    createCalendarEventValidationSchema,
+} from '../controllers/CalendarEventController';
 import {
     ExternalContactController,
     ExternalContactControllerAuthorizationService,
+    createExternalContactValidationSchema,
 } from '../controllers/ExternalContactController';
 import { LocationController, LocationControllerAuthorizationService } from '../controllers/LocationController';
 import { DefaultAuthorizationService } from '../auth/AuthorizationService';
@@ -179,8 +190,13 @@ export const authenticatedRoutes = ({
     const userController = new UserController(plwdRepository, userRepository, carecircleMemberRepository, auth0Service);
     router.get('/users/me', userController.getMe);
     router.get('/user/:auth0Id', userAuthorizationService.isAuthorizedToAccessUser, userController.getByAuth0Id);
-    router.post('/user', userController.create);
-    router.patch('/user/:id', userAuthorizationService.canUpdateUser, userController.update);
+    router.post('/user', validateRequest(createUserValidationSchema), userController.create);
+    router.patch(
+        '/user/:id',
+        validateRequest(updateUserValidationSchema),
+        userAuthorizationService.canUpdateUser,
+        userController.update
+    );
     router.delete('/user/:id', userAuthorizationService.isAuthorizedAsAdmin, userController.deleteUser);
 
     /**
@@ -195,6 +211,7 @@ export const authenticatedRoutes = ({
     );
     router.post(
         '/external-contact/:plwdId',
+        validateRequest(createExternalContactValidationSchema),
         externalContactAuthorizationService.canManageExternalContactsForPlwd,
         externalContactController.createExternalContact
     );
@@ -215,11 +232,13 @@ export const authenticatedRoutes = ({
     );
     router.post(
         '/carecircle-member/:plwdId',
+        validateRequest(createCarecircleMemberValidationSchema),
         carecircleMemberAuthorizationService.canManageCarecircle,
         carecircleMemberController.create
     );
     router.patch(
         '/carecircle-member/:plwdId/:id',
+        validateRequest(createCarecircleMemberValidationSchema),
         carecircleMemberAuthorizationService.canManageCarecircle,
         carecircleMemberController.update
     );
@@ -276,11 +295,13 @@ export const authenticatedRoutes = ({
     );
     router.post(
         '/calendar-event/:plwdId',
+        validateRequest(createCalendarEventValidationSchema),
         calendarEventAuthorizationService.canManageCalendar,
         calendarEventController.postCalendarEvent
     );
     router.patch(
         '/calendar-event/:plwdId',
+        validateRequest(createCalendarEventValidationSchema),
         calendarEventAuthorizationService.canManageCalendar,
         calendarEventController.patchCalendarEvent
     );
