@@ -320,8 +320,6 @@ describe('LocationController', () => {
         await calendarEventRepository.deleteById(createdEvent.id);
     });
 
-    // TODO
-
     it('Should allow to fetch locations if there is an ongoing event for a permission when-assigned', async () => {
         await jwt.loginAs(carecircleMember.auth0Id);
 
