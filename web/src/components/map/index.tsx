@@ -1,5 +1,5 @@
 import { ILocationWithAddress } from '@interfaces';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ReactMapGL, { Layer, Marker, Source } from 'react-map-gl';
 
 export default function Map({
