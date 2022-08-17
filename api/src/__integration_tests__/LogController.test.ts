@@ -116,7 +116,7 @@ describe('LogController', () => {
             location: { lat: userOutsideGeofenceCoordinate.lat, lng: userOutsideGeofenceCoordinate.lng },
             id: storedLocation.id,
             timestamp: locationLogs[0].timestamp,
-            userId: plwd.watchId,
+            watchId: plwd.watchId,
         } as ILocation);
     });
 

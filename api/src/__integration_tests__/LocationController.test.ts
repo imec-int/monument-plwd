@@ -106,7 +106,7 @@ describe('LocationController', () => {
         const [location] = response.body.data;
         expect(location.location).toEqual(userOutsideGeofenceCoordinate);
         expect(location.timestamp).toEqual(log.timestamp);
-        expect(location.userId).toEqual(log.user);
+        expect(location.watchId).toEqual(log.user);
 
         await locationRepository.deleteById(location.id);
     });
@@ -133,7 +133,7 @@ describe('LocationController', () => {
         const [location] = response.body.data;
         expect(location.location).toEqual(userOutsideGeofenceCoordinate);
         expect(location.timestamp).toEqual(log.timestamp);
-        expect(location.userId).toEqual(log.user);
+        expect(location.watchId).toEqual(log.user);
 
         await locationRepository.deleteById(location.id);
     });
@@ -160,7 +160,7 @@ describe('LocationController', () => {
         const [location] = response.body.data;
         expect(location.location).toEqual(userOutsideGeofenceCoordinate);
         expect(location.timestamp).toEqual(log.timestamp);
-        expect(location.userId).toEqual(log.user);
+        expect(location.watchId).toEqual(log.user);
 
         await locationRepository.deleteById(location.id);
         await calendarEventRepository.deleteById(createdEvent.id);
@@ -195,7 +195,7 @@ describe('LocationController', () => {
         const [location] = response.body.data;
         expect(location.location).toEqual(userWithinGeofenceCoordinates);
         expect(location.timestamp).toEqual(secondLog.timestamp);
-        expect(location.userId).toEqual(secondLog.user);
+        expect(location.watchId).toEqual(secondLog.user);
 
         const [one, two] = await locationRepository.get();
 

@@ -36,7 +36,7 @@ export const handleLocations = async ({
     // Take last location (note: locations.at(-1) fails because of ts-jest...)
     const lastLocation = locations[locations.length - 1] as ILocation;
 
-    const watchId = lastLocation.userId;
+    const watchId = lastLocation.watchId;
     if (!watchId) {
         logger.error('[handleLocations] - No watchId specified for the current location...', { lastLocation });
         return;
