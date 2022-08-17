@@ -22,7 +22,7 @@ This web application is used to notify caretakers and carecircles of persons liv
   - [Testing](#testing)
   - [Deploying](#table-of-contents)
 - [Contributing](#contributing)
-- [Code of condut](#code-of-conduct)
+- [Code of conduct](#code-of-conduct)
 - [License](#license)
 
 ## Requirements
