@@ -13,7 +13,7 @@ export default withApiAuthRequired(async (req, res) => {
   try {
     if (req.method === 'DELETE') {
       const response = await fetchWrapper(
-        process.env.MONUMENT_DIARY_API_BASE_URL +
+        process.env.API_BASE_URL +
           `/carecircle-member/${plwdId}/${id}`,
         {
           method: 'delete',
@@ -25,7 +25,7 @@ export default withApiAuthRequired(async (req, res) => {
       res.status(200).json(response.data);
     } else if (req.method === 'POST') {
       const response = await fetchWrapper(
-        process.env.MONUMENT_DIARY_API_BASE_URL +
+        process.env.API_BASE_URL +
           `/carecircle-member/${plwdId}`,
         {
           method: 'post',
@@ -40,7 +40,7 @@ export default withApiAuthRequired(async (req, res) => {
       res.status(200).json(response.data);
     } else if (req.method === 'PATCH') {
       const response = await fetchWrapper(
-        process.env.MONUMENT_DIARY_API_BASE_URL +
+        process.env.API_BASE_URL +
           `/carecircle-member/${plwdId}/${id}`,
         {
           method: 'patch',
@@ -55,7 +55,7 @@ export default withApiAuthRequired(async (req, res) => {
       res.status(200).json(response.data);
     } else if (req.method === 'GET') {
       const response = await fetchWrapper(
-        process.env.MONUMENT_DIARY_API_BASE_URL +
+        process.env.API_BASE_URL +
           `/carecircle-members/${plwdId}`,
         {
           headers: {

@@ -11,7 +11,7 @@ export default async function publicLocation(
   try {
     if (req.method === 'GET') {
       const response = await fetchWrapper(
-        process.env.MONUMENT_DIARY_API_BASE_URL + `/public-location/${eventid}`
+        process.env.API_BASE_URL + `/public-location/${eventid}`
       );
       res.status(200).json(response.data);
     } else {

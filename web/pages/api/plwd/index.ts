@@ -10,7 +10,7 @@ export default withApiAuthRequired(async (req, res) => {
   try {
     if (req.method === 'POST') {
       const response = await fetchWrapper(
-        process.env.MONUMENT_DIARY_API_BASE_URL + '/plwd',
+        process.env.API_BASE_URL + '/plwd',
         {
           method: 'post',
           body: req.body,

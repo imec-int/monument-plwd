@@ -10,7 +10,7 @@ export default withApiAuthRequired(async function getUserByAuth0Id(req, res) {
   try {
     if (req.method === 'POST') {
       await fetchWrapper(
-        process.env.MONUMENT_DIARY_API_BASE_URL + '/simulation',
+        process.env.API_BASE_URL + '/simulation',
         {
           method: 'post',
           headers: {

@@ -12,7 +12,7 @@ export default withApiAuthRequired(async (req, res) => {
   try {
     if (req.method === 'PATCH') {
       const response = await fetchWrapper(
-        process.env.MONUMENT_DIARY_API_BASE_URL + `/calendar-event/${plwdId}`,
+        process.env.API_BASE_URL + `/calendar-event/${plwdId}`,
         {
           method: 'patch',
           body: req.body,
@@ -26,7 +26,7 @@ export default withApiAuthRequired(async (req, res) => {
       res.status(200).json(response.data);
     } else if (req.method === 'POST') {
       const response = await fetchWrapper(
-        process.env.MONUMENT_DIARY_API_BASE_URL + `/calendar-event/${plwdId}`,
+        process.env.API_BASE_URL + `/calendar-event/${plwdId}`,
         {
           method: 'post',
           body: req.body,
