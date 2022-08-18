@@ -73,11 +73,13 @@ export class SimulationController {
                     `[simulate] - Event start time has not passed the allowed ${NOTIFICATION_TRIGGER_DELAY} minutes delay`,
                     calendarEvent
                 );
+                ctx.status = 200;
                 return;
             }
 
             if (!isBefore(now, end)) {
                 logger.info(`[simulate] - Event has already ended.`, calendarEvent);
+                ctx.status = 200;
                 return;
             }
 
@@ -85,6 +87,7 @@ export class SimulationController {
                 logger.error(`[simulate] - geometry data is invalid`, {
                     coordinateA: calendarEvent.address.geometry,
                 });
+                ctx.status = 200;
                 return;
             }
 
@@ -103,6 +106,7 @@ export class SimulationController {
                     `[handleLocations] - PLWD [${plwd.id}] is within ${MAX_DISTANCE_FROM_EVENT} meters from the event, nothing more to report.`,
                     { coordinateA, coordinateB }
                 );
+                ctx.status = 200;
                 return;
             }
 
