@@ -1,9 +1,26 @@
 import { CalendarEvent } from '../models/CalendarEvent';
 import { CalendarEventRepository } from '../repositories/CalendarEventRepository';
 import Koa, { Middleware } from 'koa';
+import * as yup from 'yup';
 import logger from '../utils/logger';
 import { DefaultAuthorizationService } from 'src/auth/AuthorizationService';
 import { NotificationRepository } from '../repositories/NotificationRepository';
+
+const requestUserContext = yup
+    .object({
+        id: yup.string().required(),
+    })
+    .required();
+
+export const createCalendarEventValidationSchema = yup.object({
+    user: requestUserContext,
+    body: yup
+        .object({
+            carecircleMemberIds: yup.array().of(yup.string()).required(),
+            externalContactIds: yup.array().of(yup.string()).required(),
+        })
+        .required(),
+});
 
 export class CalendarEventAuthorizationService {
     constructor(private readonly authService: DefaultAuthorizationService) {}

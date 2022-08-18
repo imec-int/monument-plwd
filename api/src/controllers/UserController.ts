@@ -3,11 +3,56 @@ import { CarecircleMemberRepository } from 'src/repositories/CarecircleMemberRep
 import { PlwdRepository } from 'src/repositories/PlwdRepository';
 import { UserRepository } from 'src/repositories/UserRepository';
 import Koa, { Middleware } from 'koa';
+import * as yup from 'yup';
 import logger from '../utils/logger';
 import { IUser } from 'src/models/User';
 import { DefaultAuthorizationService } from '../auth/AuthorizationService';
 import { Auth0Service } from 'src/services/RestApiBasedAuth0Service';
 import { ICarecircleMember } from 'src/models/CarecircleMember';
+
+const requestUserContext = yup
+    .object({
+        id: yup.string().required(),
+    })
+    .required();
+
+export const createUserValidationSchema = yup.object({
+    user: requestUserContext,
+    body: yup
+        .object({
+            user: yup
+                .object({
+                    auth0Id: yup.string(),
+                    email: yup.string().required(),
+                    firstName: yup.string().required(),
+                    lastName: yup.string().required(),
+                    phone: yup.string().required(),
+                    picture: yup.string(),
+                    role: yup.string().required(),
+                })
+                .required(),
+        })
+        .required(),
+});
+
+export const updateUserValidationSchema = yup.object({
+    user: requestUserContext,
+    body: yup
+        .object({
+            user: yup
+                .object({
+                    id: yup.string(),
+                    email: yup.string().required(),
+                    firstName: yup.string().required(),
+                    lastName: yup.string().required(),
+                    phone: yup.string().required(),
+                    picture: yup.string(),
+                    role: yup.string().required(),
+                })
+                .required(),
+        })
+        .required(),
+});
 
 export class UserAuthorizationService {
     constructor(private readonly authService: DefaultAuthorizationService) {}

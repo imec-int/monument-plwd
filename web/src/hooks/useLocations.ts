@@ -11,7 +11,7 @@ type ILocation = {
   id: string;
   location: ICoordinate;
   timestamp: string;
-  userId: string;
+  watchId: string;
 };
 
 type ReturnType = {

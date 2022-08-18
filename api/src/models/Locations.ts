@@ -8,5 +8,5 @@ export type ILocation = {
     id: string;
     timestamp: string;
     location: ICoordinate;
-    userId: string;
+    watchId: string;
 };
