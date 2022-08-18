@@ -19,6 +19,7 @@ This web application is used to notify caretakers and carecircles of persons liv
 - [Documentation](#documentation)
   - [API Reference](#api-reference)
   - [Architecture](./ARCHITECTURE.md)
+  - [Terminology](#terminology)
   - [Testing](#testing)
   - [Deploying](#table-of-contents)
 - [Contributing](#contributing)
@@ -273,6 +274,13 @@ The web application should now be available [here](http://localhost:3000).
 
 ## Documentation
 ---
+
+### Terminology
+- PLWD: person with disablity
+- Primary caretaker: The primary person who is taking care of the person with disabilities, this person has access to everything on the platform
+- Caretaker: A person who is taking care of the person with disabilities added by the primary caretaker, those persons have an account created on Auth0 and can connect to the platform, their permissions on the platform will be restricted to what the primary caretaker decides
+- Carecircle: The group of caretakers related to the person with disabilities
+- External Contact: A person that can be contacted in case of an emergency during an event but who is not part of the carecircle and so cannot connect to the platform
 
 ### Testing
 
