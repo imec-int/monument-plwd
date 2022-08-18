@@ -57,8 +57,6 @@ const Location = () => {
     return calendarEvents.filter(eventIsOngoingEvent).length > 0;
   }, [calendarEvents]);
 
-  const today = dayjs().startOf('day').format('Do MMMM');
-
   if (nudgeCaretakerToSetupWatch) {
     return (
       <Container>
@@ -88,39 +86,6 @@ const Location = () => {
           <div className="w-full h-4/6 flex gap-4 mb-8">
             <div className="flex-1 rounded-xl overflow-hidden shadow-xl">
               <Map currentLocation={currentLocation} />
-            </div>
-            <div className="max-w-md">
-              <div className="card w-full h-full bg-base-100 shadow-xl overflow-scroll">
-                <div className="card-body">
-                  <h2 className="card-title">Time log of wandering {today}</h2>
-                  <div className="overflow-x-auto">
-                    <table className="table w-full">
-                      <thead>
-                        <tr>
-                          <th>Time</th>
-                          <th>Event</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {locations.map((location) => {
-                          return (
-                            <tr key={location.id}>
-                              <td>
-                                {dayjs(location.timestamp).format(
-                                  'MMM DD HH:mm'
-                                )}
-                              </td>
-                              <td className="whitespace-normal">
-                                Frank is at his house
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </>
