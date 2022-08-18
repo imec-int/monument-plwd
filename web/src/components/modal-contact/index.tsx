@@ -450,10 +450,15 @@ const ModalContactAdd = ({
               type: 'custom',
               message: 'Phone already exists',
             });
-          } else {
+          } else if (err.text.includes('[carecircle-member-conflict]')) {
             setError('email', {
               type: 'custom',
               message: 'This account is already part of the carecircle',
+            });
+          } else if (err.text.includes('[phone-email-conflict]')) {
+            setError('email', {
+              type: 'custom',
+              message: 'Phone number does not match',
             });
           }
 

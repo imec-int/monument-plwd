@@ -163,7 +163,8 @@ export class CarecircleMemberController {
                 );
                 if (!existingUserByEmailAndPhone) {
                     ctx.status = 409;
-                    ctx.body = 'Phone and email does not match';
+                    ctx.body = '[phone-email-conflict]: Phone and email does not match';
+                    ctx.message = '[phone-email-conflict]: Phone and email does not match';
 
                     return;
                 }
@@ -177,7 +178,8 @@ export class CarecircleMemberController {
                 // If the user exists in the carecircle we return an error
                 if (existingUserInCarecircle) {
                     ctx.status = 409;
-                    ctx.body = 'User already exists in the carecircle';
+                    ctx.body = '[carecircle-member-conflict]: User already exists in the carecircle';
+                    ctx.message = '[carecircle-member-conflict]: User already exists in the carecircle';
 
                     return;
                 }
