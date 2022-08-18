@@ -115,7 +115,7 @@ export const SetupStep2: React.FC<ISetupStep> = ({ nextStep, userData }) => {
             <span className="label-text">Email</span>
           </label>
           <input
-            {...register('email', { required: true })}
+            {...register('email')}
             className={`input input-bordered w-full ${
               errors.email ? 'input-error' : ''
             }`}
