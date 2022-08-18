@@ -201,11 +201,11 @@ NEXT_PUBLIC_MAPBOX_TOKEN=[MAPBOX_TOKEN]
 ## Google Maps API
 ---
 
-The Google Maps API allows you to use the different location inputs across the platform. To be able to use it you will be also required to create a token.
+The Google Maps API allows you to use the different location inputs across the platform. To be able to use it you will are also required to create a token.
 For this you can visit the [Google Maps Platform](https://mapsplatform.google.com/).
-Create an account if not already done (you will need gmail account). Once done click on start and it will redirect you to the Google Cloud Console.
-From there you'll have to create a billing account (you can create a free trial but your payment method will still be required).
-After the account is create visit the credentials tab to see your api key for Google Maps that you can then insert in your .env file.
+Create an account if necessary - you will need to use a google account. Once done click on "start" and it will redirect you to the Google Cloud Console.
+From there you'll have to create a billing account (you can create a free trial but a payment method is required).
+After the account is created visit the credentials tab to see your api key for Google Maps that you can then paste in your .env file.
 
 ```sh
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=[GOOGLE_MAPS_API_KEY]
