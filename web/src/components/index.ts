@@ -50,7 +50,7 @@ export { TableContacts } from './table-contacts';
 export { WarningAlert } from './alert/WarningAlert';
 
 // Spinner
-export { Spinner } from './spinner';
+export { ContentSpinner, Spinner } from './spinner';
 
 // NotificationBadge
 export { NotificationBadge } from './notification-badge';

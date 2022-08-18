@@ -1,3 +1,4 @@
+import { ContentSpinner } from '@components';
 import { ILocationWithAddress } from '@interfaces';
 import { useEffect, useRef, useState } from 'react';
 import ReactMapGL, { Layer, MapRef, Marker, Source } from 'react-map-gl';
@@ -84,5 +85,5 @@ export default function Map({
     );
   }
 
-  return <div></div>;
+  return <ContentSpinner />;
 }

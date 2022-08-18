@@ -50,7 +50,7 @@ const Location = () => {
       ])
     : undefined;
 
-  const { data: currentLocationAddress = 'Loading...' } =
+  const { data: currentLocationAddress = 'Waiting on location...' } =
     useGeocoding(coordinates);
 
   const hasOngoingCalendarEvent = useMemo(() => {
