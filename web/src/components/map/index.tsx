@@ -1,6 +1,6 @@
 import { ILocationWithAddress } from '@interfaces';
-import { useEffect, useState } from 'react';
-import ReactMapGL, { Layer, Marker, Source } from 'react-map-gl';
+import { useEffect, useRef, useState } from 'react';
+import ReactMapGL, { Layer, MapRef, Marker, Source } from 'react-map-gl';
 
 export default function Map({
   currentLocation,
@@ -9,8 +9,9 @@ export default function Map({
   currentLocation: ILocationWithAddress;
   locations?: ILocationWithAddress[];
 }) {
-  const [latitude, setLatitude] = useState<number>(0);
-  const [longitude, setLongitude] = useState<number>(0);
+  const mapRef = useRef<MapRef>(null);
+  const [latitude, setLatitude] = useState<number | undefined>(undefined);
+  const [longitude, setLongitude] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     if (currentLocation?.location) {
@@ -19,7 +20,16 @@ export default function Map({
     }
   }, [currentLocation]);
 
-  if (latitude && longitude) {
+  useEffect(() => {
+    if (mapRef && mapRef.current) {
+      mapRef.current.flyTo({
+        center: [longitude ?? 0, latitude ?? 0],
+        zoom: 12,
+      });
+    }
+  }, [longitude, latitude]);
+
+  if (typeof latitude === 'number' && typeof longitude === 'number') {
     return (
       <ReactMapGL
         dragPan
@@ -30,6 +40,7 @@ export default function Map({
         }}
         mapStyle="mapbox://styles/mapbox/dark-v9"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+        ref={mapRef}
       >
         {/* 51.21645030497296, 4.423584313166383 */}
         <Marker anchor="bottom" latitude={latitude} longitude={longitude}>
