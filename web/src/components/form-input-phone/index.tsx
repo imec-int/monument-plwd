@@ -7,17 +7,19 @@ interface IFormInputPhone {
   control: any;
   errors: any;
   name?: string;
+  required?: boolean;
 }
 
 export const FormInputPhone: React.FC<IFormInputPhone> = ({
   control,
   errors,
   name = 'phone',
+  required = false,
 }) => {
   return (
     <div className="form-control w-full">
       <label className="label">
-        <span className="label-text">Phone*</span>
+        <span className="label-text">Phone{required ? '*' : ''}</span>
       </label>
       <Controller
         control={control}
@@ -26,6 +28,7 @@ export const FormInputPhone: React.FC<IFormInputPhone> = ({
           <div className="input input-bordered w-full flex">
             <PhoneInput
               addInternationalOption={false}
+              className="w-full"
               countries={['BE']}
               defaultCountry="BE"
               onChange={onChange}

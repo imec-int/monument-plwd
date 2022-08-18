@@ -1,4 +1,9 @@
-import { Modal, ModalContact, TableContacts } from '@components';
+import {
+  Modal,
+  ModalContact,
+  ModalEventDelete,
+  TableContacts,
+} from '@components';
 import { InfoIcon } from '@components/icons/InfoIcon';
 import { RepeatEvent } from '@constants';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -6,8 +11,9 @@ import { IModalEventDetails } from '@interfaces';
 import { TextField, Tooltip } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
+import { CustomError } from 'lib/CustomError';
+import { fetchWrapper } from 'lib/fetch';
 import { useSnackbar } from 'notistack';
-import { useState } from 'react';
 import Autocomplete from 'react-google-autocomplete';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { useModal } from 'src/hooks/useModal';
@@ -70,7 +76,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
   const defaultContacts = [...caretakersForForm, ...externalContactsForForm];
   const {
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     getValues,
     handleSubmit,
     register,
@@ -93,8 +99,16 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
     control,
   });
 
-  const [isLoading, setLoading] = useState(false);
-  const { isVisible, open, close } = useModal();
+  const {
+    isVisible: isContactModalVisible,
+    open: openContactModal,
+    close: closeContactModal,
+  } = useModal();
+  const {
+    isVisible: isDeleteModalVisible,
+    open: openDeleteModal,
+    close: closeDeleteModal,
+  } = useModal();
   const watchStartTime = watch('startTimeValue');
 
   const onClose = () => {
@@ -129,55 +143,58 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
     append(contact);
   };
 
-  const onSubmit = (data: IFormCalendarEvent) => {
-    const carecircleMemberIds: any = data.contacts
-      .filter((c) => c.checked && c.caretakerId)
-      .map((c) => c.caretakerId);
+  const onSubmit = async (data: IFormCalendarEvent) => {
+    try {
+      const carecircleMemberIds = data.contacts
+        .filter((c) => c.checked && c.caretakerId)
+        .map((c) => c.caretakerId);
 
-    const externalContactIds = data.contacts
-      .filter((c) => c.checked && c.externalContactId)
-      .map((c) => c.externalContactId);
+      const externalContactIds = data.contacts
+        .filter((c) => c.checked && c.externalContactId)
+        .map((c) => c.externalContactId);
 
-    const newEvent = {
-      ...(selectedEvent.id && { id: selectedEvent.id }),
-      address: data.address,
-      carecircleMemberIds,
-      externalContactIds,
-      endTime: data.endTimeValue,
-      // pickedUp: data.pickedUp,
-      plwdId: plwd.id,
-      repeat: data.repeat,
-      startTime: data.startTimeValue,
-      title: data.title,
-    };
-    const reqMethod = newEvent.id ? 'PATCH' : 'POST';
-    setLoading(true);
-    fetch(`/api/calendar-event/${plwd.id}`, {
-      method: reqMethod,
-      body: JSON.stringify(newEvent),
-    }).then(() => {
-      setLoading(false);
+      const event = {
+        address: data.address,
+        carecircleMemberIds,
+        externalContactIds,
+        endTime: data.endTimeValue,
+        id: selectedEvent.id,
+        // pickedUp: data.pickedUp,
+        plwdId: plwd.id,
+        repeat: data.repeat,
+        startTime: data.startTimeValue,
+        title: data.title,
+      };
+
+      const reqMethod = event.id ? 'PATCH' : 'POST';
+      await fetchWrapper(`/api/calendar-event/${plwd.id}`, {
+        method: reqMethod,
+        body: JSON.stringify(event),
+      });
+
       fetchCalendarEvents();
       refetchExternalContacts();
-      enqueueSnackbar('Updated', {
-        variant: 'success',
-      });
       onClose();
-    });
-  };
 
-  const deleteCalendarEvent = (eventId: string) => {
-    setLoading(true);
-    fetch(`/api/calendar-event/${plwd.id}/${eventId}`, {
-      method: 'DELETE',
-    }).then(() => {
-      setLoading(false);
-      fetchCalendarEvents();
-      enqueueSnackbar('Deleted', {
-        variant: 'success',
-      });
-      onClose();
-    });
+      enqueueSnackbar(
+        `Successfully ${event.id ? 'updated' : 'created'} the event "${
+          event.title
+        }"`,
+        {
+          variant: 'success',
+        }
+      );
+    } catch (error) {
+      const _error = error as CustomError;
+      enqueueSnackbar(
+        `Failed to ${
+          selectedEvent.id ? 'update' : 'create'
+        } the event: ${_error}`,
+        {
+          variant: 'error',
+        }
+      );
+    }
   };
 
   const hasErrors = Object.keys(errors).length > 0;
@@ -344,7 +361,11 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
               </Tooltip>
             </label>
             <div className="flex">
-              <button className="btn w-32 mb-4" onClick={open} type="button">
+              <button
+                className="btn w-32 mb-4"
+                onClick={openContactModal}
+                type="button"
+              >
                 Add new
               </button>
             </div>
@@ -358,10 +379,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
           {selectedEvent.id && (
             <button
               className="btn btn-error"
-              onClick={() => {
-                deleteCalendarEvent(selectedEvent.id);
-                onClose();
-              }}
+              onClick={openDeleteModal}
               type="button"
             >
               Delete
@@ -371,20 +389,30 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
             Cancel
           </button>
           <button
-            className={`btn btn-secondary ${isLoading ? 'btn-loading' : ''}`}
+            className={`btn btn-secondary${isSubmitting ? ' loading' : ''}`}
             type="submit"
           >
             {selectedEvent.id ? 'Update' : 'Add'}
           </button>
         </div>
       </Modal>
-      {isVisible ? (
+      {isContactModalVisible ? (
         <ModalContact
           getUsers={refetchCarecircle}
-          onClose={close}
+          onClose={closeContactModal}
           onSuccess={onSuccess}
           selectedContact={{}}
           showAddUserToCarecircleToggle
+        />
+      ) : null}
+      {isDeleteModalVisible ? (
+        <ModalEventDelete
+          closeDetailsModal={onClose}
+          eventId={selectedEvent.id}
+          eventTitle={selectedEvent.title}
+          onClose={closeDeleteModal}
+          plwdId={plwd.id}
+          refetch={fetchCalendarEvents}
         />
       ) : null}
     </div>

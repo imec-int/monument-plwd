@@ -3,8 +3,9 @@ import 'react-phone-number-input/style.css';
 import { Container, FormInputPhone, ImageSetterController } from '@components';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ISetupStep } from '@interfaces';
+import { CustomError } from 'lib/CustomError';
+import { fetchWrapper } from 'lib/fetch';
 import { useSnackbar } from 'notistack';
-import { useState } from 'react';
 import Autocomplete from 'react-google-autocomplete';
 import { Controller, useForm } from 'react-hook-form';
 import { usePlwdValidationSchema } from 'src/hooks/usePlwdValidationSchema';
@@ -14,37 +15,42 @@ type IFormPlwdInfo = yup.InferType<ReturnType<typeof usePlwdValidationSchema>>;
 
 export const SetupStep2: React.FC<ISetupStep> = ({ nextStep, userData }) => {
   const plwdInfoSchema = usePlwdValidationSchema();
-  const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<IFormPlwdInfo>({
     defaultValues: {},
     resolver: yupResolver(plwdInfoSchema),
   });
 
-  const onSubmit = (data: IFormPlwdInfo) => {
-    setIsLoading(true);
-    const newUser = {
-      ...data,
-      caretakerId: userData.currentUser.id,
-    };
-    fetch('/api/plwd', {
-      method: 'POST',
-      body: JSON.stringify(newUser),
-    })
-      .then((res) => res.json())
-      .then(() => {
-        enqueueSnackbar('Updated', {
-          variant: 'success',
-        });
-        setIsLoading(false);
+  const onSubmit = async (data: IFormPlwdInfo) => {
+    try {
+      const newUser = {
+        ...data,
+        caretakerId: userData.currentUser?.id,
+      };
+      await fetchWrapper('/api/plwd', {
+        method: 'POST',
+        body: JSON.stringify(newUser),
       });
-    nextStep();
+
+      enqueueSnackbar(
+        `Succesfully created PLWD ${data.firstName} ${data.lastName}!`,
+        {
+          variant: 'success',
+        }
+      );
+      nextStep();
+    } catch (error) {
+      const _error = error as CustomError;
+      enqueueSnackbar(`Failed to create PLWD: ${_error}`, {
+        variant: 'error',
+      });
+    }
   };
 
   return (
@@ -106,10 +112,10 @@ export const SetupStep2: React.FC<ISetupStep> = ({ nextStep, userData }) => {
         <FormInputPhone control={control} errors={errors} />
         <div className="form-control w-full">
           <label className="label">
-            <span className="label-text">Email*</span>
+            <span className="label-text">Email</span>
           </label>
           <input
-            {...register('email', { required: true })}
+            {...register('email')}
             className={`input input-bordered w-full ${
               errors.email ? 'input-error' : ''
             }`}
@@ -155,8 +161,8 @@ export const SetupStep2: React.FC<ISetupStep> = ({ nextStep, userData }) => {
           <ImageSetterController control={control} name="picture" />
         </div>
         <button
-          className={`w-40 mt-8 m-auto btn btn-secondary ${
-            isLoading ? 'btn-loading' : ''
+          className={`w-40 mt-8 m-auto btn btn-secondary${
+            isSubmitting ? ' loading' : ''
           }`}
           type="submit"
         >

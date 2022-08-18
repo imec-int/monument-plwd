@@ -3,9 +3,11 @@ import { Container, FormInputPhone, Header } from '@components';
 import { LayoutWithAppContext } from '@components/layouts/LayoutWithAppContext';
 import { UserRole } from '@enum';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { CustomError } from 'lib/CustomError';
+import { fetchWrapper } from 'lib/fetch';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'notistack';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect } from 'react';
 import Autocomplete from 'react-google-autocomplete';
 import { Controller, useForm } from 'react-hook-form';
 import { useAppUserContext } from 'src/hooks/useAppUserContext';
@@ -22,14 +24,13 @@ const Profile = () => {
   const { user, plwd } = useAppUserContext();
   const { canManageCarecircle } = usePermissions();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
   const plwdInfoSchema = usePlwdValidationSchema();
 
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<IFormPlwdInfo>({
     defaultValues: {
       address: plwd.address,
@@ -42,23 +43,31 @@ const Profile = () => {
     resolver: yupResolver(plwdInfoSchema),
   });
 
-  const onSubmit = (data: IFormPlwdInfo) => {
-    const updatedUser = {
-      ...data,
-      id: plwd.id,
-    };
-    setIsLoading(true);
-    fetch(`/api/plwd/${updatedUser.id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(updatedUser),
-    })
-      .then((res) => res.json())
-      .then(() => {
-        enqueueSnackbar('Updated', {
-          variant: 'success',
-        });
-        setIsLoading(false);
+  const onSubmit = async (data: IFormPlwdInfo) => {
+    try {
+      const updatedUser = {
+        ...data,
+        caretakerId: plwd.caretakerId,
+        id: plwd.id,
+      };
+
+      await fetchWrapper(`/api/plwd/${updatedUser.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(updatedUser),
       });
+
+      enqueueSnackbar(
+        `Successfully updated PLWD ${data.firstName} ${data.lastName}!`,
+        {
+          variant: 'success',
+        }
+      );
+    } catch (error) {
+      const _error = error as CustomError;
+      enqueueSnackbar(`Failed to update PLWD: ${_error}`, {
+        variant: 'error',
+      });
+    }
   };
 
   useEffect(() => {
@@ -180,8 +189,8 @@ const Profile = () => {
             />
           </div>
           <button
-            className={`w-40 m-auto btn btn-secondary ${
-              isLoading ? 'btn-loading' : ''
+            className={`w-40 m-auto btn btn-secondary${
+              isSubmitting ? ' loading' : ''
             }`}
             type="submit"
           >

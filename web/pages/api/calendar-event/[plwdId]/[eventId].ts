@@ -11,8 +11,7 @@ export default withApiAuthRequired(async (req, res) => {
   try {
     if (req.method === 'DELETE') {
       const response = await fetchWrapper(
-        process.env.MONUMENT_DIARY_API_BASE_URL +
-          `/calendar-event/${plwdId}/${eventId}`,
+        process.env.API_BASE_URL + `/calendar-event/${plwdId}/${eventId}`,
         {
           method: 'delete',
           headers: {

@@ -30,6 +30,10 @@ const Setup = ({ user: authenticatedUser }: Props) => {
     setStep(step + 1);
   }, [step, getUserData]);
 
+  const previousStep = useCallback(() => {
+    setStep((s) => s - 1);
+  }, []);
+
   const { data: currentUser } = useCurrentUser(authenticatedUser.sub);
 
   const userData = {
@@ -41,6 +45,10 @@ const Setup = ({ user: authenticatedUser }: Props) => {
   const goToStep = (step: number) => {
     setStep(step);
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [step]);
 
   useEffect(() => {
     if (currentUser?.id) {
@@ -79,7 +87,13 @@ const Setup = ({ user: authenticatedUser }: Props) => {
       case 3:
         return <SetupStep3 nextStep={nextStep} userData={userData} />;
       case 4:
-        return <SetupStep4 nextStep={nextStep} userData={userData} />;
+        return (
+          <SetupStep4
+            nextStep={nextStep}
+            previousStep={previousStep}
+            userData={userData}
+          />
+        );
       default:
         return null;
     }

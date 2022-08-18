@@ -15,8 +15,6 @@ const watchSetupSchema = yup
     imei: yup
       .string()
       .test('len', 'Length must be exactly 15 digits', (value = '') => {
-        console.warn(value.length, value);
-
         return value.length === 15;
       })
       .required(),
@@ -25,7 +23,9 @@ const watchSetupSchema = yup
 
 type IWatchSetupSchema = yup.InferType<typeof watchSetupSchema>;
 
-export const SetupStep4: React.FC<ISetupStep> = ({ userData }) => {
+type Props = ISetupStep & { previousStep: () => void };
+
+export const SetupStep4: React.FC<Props> = ({ previousStep, userData }) => {
   const { enqueueSnackbar } = useSnackbar();
   const {
     formState: { isValid, isSubmitting },
@@ -40,7 +40,7 @@ export const SetupStep4: React.FC<ISetupStep> = ({ userData }) => {
     mode: 'onChange',
   });
 
-  const [carecircle] = userData.currentUser.carecircles.filter(
+  const [carecircle] = (userData.currentUser?.carecircles ?? []).filter(
     (c) => !c.plwd.watchId
   );
 
@@ -58,7 +58,7 @@ export const SetupStep4: React.FC<ISetupStep> = ({ userData }) => {
         variant: 'success',
       });
 
-      await mutate(`/api/user/${userData.currentUser.auth0Id}`);
+      await mutate(`/api/user/${userData.currentUser?.auth0Id}`);
     } catch (error) {
       enqueueSnackbar('Failed to register the watch, please try again.', {
         variant: 'error',
@@ -109,11 +109,21 @@ export const SetupStep4: React.FC<ISetupStep> = ({ userData }) => {
             </div>
           </div>
           <button
-            className="btn btn-secondary mt-4"
-            disabled={!isValid || isSubmitting}
+            className={`btn btn-secondary mt-4${
+              isSubmitting ? ' loading' : ''
+            }`}
+            disabled={!isValid}
             type="submit"
           >
             Register Kompy watch
+          </button>
+          <button
+            className="btn btn-outline mt-2"
+            disabled={isSubmitting}
+            onClick={previousStep}
+            type="button"
+          >
+            Go back
           </button>
         </div>
       </form>

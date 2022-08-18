@@ -9,7 +9,7 @@ export type IButton = React.DetailedHTMLProps<
 export interface IModalEventDetails {
   caretakers: ICarecircleMember[];
   externalContacts: IExternalContact[];
-  fetchCalendarEvents: any;
+  fetchCalendarEvents: () => Promise<any>;
   plwd: IPlwd;
   selectedEvent: any;
   setSelectedEvent: any;
@@ -102,7 +102,7 @@ export type IExternalContact = {
 };
 
 export type IUserData = {
-  currentUser: IUser;
+  currentUser: IUser | undefined;
   authenticatedUser: UserProfile;
 };
 

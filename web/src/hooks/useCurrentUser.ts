@@ -1,14 +1,21 @@
 import { IUser } from '@interfaces';
+import { CustomError } from 'lib/CustomError';
 import { fetchWrapper } from 'lib/fetch';
 import useSWR from 'swr';
 
-export const useCurrentUser = (id?: string | null) => {
+type ReturnType = {
+  data?: IUser;
+  error?: CustomError;
+  loading: boolean;
+};
+
+export const useCurrentUser = (id?: string | null): ReturnType => {
   const { data, error } = useSWR(id ? `/api/user/${id}` : null, fetchWrapper, {
     shouldRetryOnError: false,
   });
 
   return {
-    data: data as IUser,
+    data,
     error,
     loading: !error && !data,
   };

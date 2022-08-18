@@ -4,8 +4,9 @@ import { Container, FormInputPhone, ImageSetter } from '@components';
 import { UserRole } from '@enum';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ISetupStep } from '@interfaces';
+import { CustomError } from 'lib/CustomError';
+import { fetchWrapper } from 'lib/fetch';
 import { useSnackbar } from 'notistack';
-import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useUserValidationSchema } from 'src/hooks/useUserValidationSchema';
 import * as yup from 'yup';
@@ -14,42 +15,44 @@ type IFormUserInfo = yup.InferType<ReturnType<typeof useUserValidationSchema>>;
 
 export const SetupStep1: React.FC<ISetupStep> = ({ nextStep, userData }) => {
   const userInfoSchema = useUserValidationSchema();
-  const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<IFormUserInfo>({
     defaultValues: {},
     resolver: yupResolver(userInfoSchema),
   });
 
-  const onSubmit = (data: IFormUserInfo) => {
-    setIsLoading(true);
-    const newUser = {
-      ...data,
-      role: UserRole.PRIMARY_CARETAKER,
-      auth0Id: userData.authenticatedUser?.sub,
-      email: userData.authenticatedUser?.email,
-    };
+  const onSubmit = async (data: IFormUserInfo) => {
+    try {
+      const newUser = {
+        ...data,
+        role: UserRole.PRIMARY_CARETAKER,
+        auth0Id: userData.authenticatedUser?.sub,
+        email: userData.authenticatedUser?.email,
+      };
 
-    fetch('/api/user', {
-      method: 'POST',
-      body: JSON.stringify({
-        user: newUser,
-      }),
-    })
-      .then((res) => res.json())
-      .then(() => {
-        enqueueSnackbar('Profile created', {
-          variant: 'success',
-        });
-        setIsLoading(false);
-        nextStep();
+      await fetchWrapper('/api/user', {
+        method: 'POST',
+        body: JSON.stringify({
+          user: newUser,
+        }),
       });
+
+      enqueueSnackbar('Successfully created your profile!', {
+        variant: 'success',
+      });
+      nextStep();
+    } catch (error) {
+      const _error = error as CustomError;
+      enqueueSnackbar(`Failed to create profile: ${_error.toString()}`, {
+        variant: 'error',
+      });
+    }
   };
 
   return (
@@ -106,7 +109,7 @@ export const SetupStep1: React.FC<ISetupStep> = ({ nextStep, userData }) => {
             type="text"
           />
         </div>
-        <FormInputPhone control={control} errors={errors} />
+        <FormInputPhone control={control} errors={errors} required />
         <div className="mt-2">
           <Controller
             control={control}
@@ -123,8 +126,8 @@ export const SetupStep1: React.FC<ISetupStep> = ({ nextStep, userData }) => {
           />
         </div>
         <button
-          className={`w-40 mt-8 m-auto btn btn-secondary ${
-            isLoading ? 'btn-loading' : ''
+          className={`w-40 mt-8 m-auto btn btn-secondary${
+            isSubmitting ? ' loading' : ''
           }`}
           type="submit"
         >

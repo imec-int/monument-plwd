@@ -249,7 +249,7 @@ const ModalContactEdit = ({
           />
         </div>
         <div className="flex mt-2 gap-4">
-          <FormInputPhone control={control} errors={errors} />
+          <FormInputPhone control={control} errors={errors} required />
           <div className="form-control w-full">
             <label className="label">
               <span className="label-text">Affiliation</span>

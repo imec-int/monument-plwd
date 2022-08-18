@@ -1,6 +1,7 @@
 import { AppUserContext, Spinner } from '@components';
 import { CurrentUserError } from '@components/errors/CurrentUserError';
 import { PlwdError } from '@components/errors/PlwdError';
+import { IUser } from '@interfaces';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useMemo } from 'react';
 import { useCurrentUser } from 'src/hooks/useCurrentUser';
@@ -49,16 +50,18 @@ export const LayoutWithAppContext = ({
   if (currentUserError) return <CurrentUserError error={currentUserError} />;
   if (plwdError) return <PlwdError error={plwdError} />;
 
+  const _currentUser = currentUser as IUser;
+
   return (
     <AppUserContext.Provider
       value={{
-        hasAccessToMultipleCarecircles: currentUser.carecircles.length > 1,
+        hasAccessToMultipleCarecircles: _currentUser.carecircles.length > 1,
         nudgeCaretakerToSetupWatch,
         permissions:
-          currentUser.carecircles?.find((c) => c.plwd.id === plwd.id)
+          _currentUser.carecircles.find((c) => c.plwd.id === plwd.id)
             ?.permissions ?? [],
         plwd,
-        user: currentUser,
+        user: _currentUser,
       }}
     >
       {children}

@@ -1,7 +1,8 @@
 # Monument
 
-This repository contains 2 services: 1 web application and 1 API service receiving the location data for the Monument project.
-This web application is used to notify PLWD caretakers when the plwd is wandering or missing. 
+This repository contains 2 services: 1 web application and 1 API service to query the platform data and receiving the location data for the Monument project.
+
+This web application is used to notify caretakers and carecircles of persons living with dementia when they start wandering, get lost or are late for events. 
 
 ## Table of Contents
 
@@ -18,10 +19,11 @@ This web application is used to notify PLWD caretakers when the plwd is wanderin
 - [Documentation](#documentation)
   - [API Reference](#api-reference)
   - [Architecture](./ARCHITECTURE.md)
+  - [Terminology](#terminology)
   - [Testing](#testing)
   - [Deploying](#table-of-contents)
 - [Contributing](#contributing)
-- [Code of condut](#code-of-conduct)
+- [Code of conduct](#code-of-conduct)
 - [License](#license)
 
 ## Requirements
@@ -220,13 +222,13 @@ There are multiple ways to get such a container up-and-running but we're going t
 
 > If you're using Apple silicon you'll need to build the image yourself since postgis does not host any ARM-64 builds on their Docker repository yet. Read [here](#postgis-bis-apple-silicon) how to do this.
 
-Make sure that `POSTGRES_DB`, `POSTGRES_PASSWORD`, `POSTGRES_USER`, `POSTGRES_HOST` and `POSTGRES_PORT` in the `.env` file are correctly set before continuing - for local development the values specified in the `.env.template` should suffice to get started.
+Make sure that `POSTGRES_DB`, `POSTGRES_PASSWORD`, `POSTGRES_USER`, `POSTGRES_HOST` and `POSTGRES_PORT` in the API `.env` file are correctly set before continuing - for local development the values copied from the `.env.template` should suffice to get started.
 
 Next, run the command below in your terminal:
 
 ```sh
 # Pulls a postgis image and starts the container
-docker-compose up
+> docker-compose up
 ```
 
 >The first time executing this command you could get a warning from Docker that the volume folder is missing - you can dismiss this by typing `y[es]` in the terminal.
@@ -259,7 +261,7 @@ Finally, we're going to start up the actual application.
 If you're using `nvm` then you can execute the following command to make sure that you use the minimum required NodeJS version that this project requires.
 
 ```sh
-nvm use
+> nvm use
 ```
 
 Otherwise make sure that the latest NodeJS 16-lts version is available on your machine (as specified in the requirements).
@@ -267,18 +269,40 @@ Otherwise make sure that the latest NodeJS 16-lts version is available on your m
 Next, run the following 2 commands to get the api application started.
 
 ```sh
-npm install
-npm run dev
+> npm install
+> npm run dev
 ```
 
 If all went well you should see the following appear in the terminal: `Development Server Started`.
 
 Great, the api is now up-and-running!
+
 ### Web application
-> TODO
+
+To start the web application we need to do a few small things first.
+
+Verify that you provided all the environment variables in the `.env.local` file. If not, then go back to the [auth0 configuration](#auth0-configuration) step.
+
+`cd` into the `web` folder and execute the following commands:
+
+```sh
+> npm install
+> npm run dev
+```
+
+After a few seconds the following log should appear in the terminal `compiled client and server successfully`.
+
+The web application should now be available [here](http://localhost:3000).
 
 ## Documentation
 ---
+
+### Terminology
+- PLWD: person with disablity
+- Primary caretaker: The primary person who is taking care of the person with disabilities, this person has access to everything on the platform
+- Caretaker: A person who is taking care of the person with disabilities added by the primary caretaker, those persons have an account created on Auth0 and can connect to the platform, their permissions on the platform will be restricted to what the primary caretaker decides
+- Carecircle: The group of caretakers related to the person with disabilities
+- External Contact: A person that can be contacted in case of an emergency during an event but who is not part of the carecircle and so cannot connect to the platform
 
 ### Testing
 
@@ -287,9 +311,10 @@ These tests use jest as their test-runner and [testcontainers](https://github.co
 
 The environment variables used by the tests are configured [here](./.jest/setEnvVars.js).
 
-You can run the tests via the command below:
+You can run the tests via the commands below:
 ```shell
-npm run test
+> cd api # make sure to run the tests from the api folder
+> npm run test
 ```
 
 ## Contributing
@@ -299,5 +324,4 @@ Please refer to the [CONTRIBUTING.MD](./CONTRIBUTING.md) file in this repo for h
 Please refer to the [CODE_OF_CONDUCT.MD](./CODE_OF_CONDUCT.md) file in this repo for the code of conduct.
 
 ## License
----
 See [License](./LICENSE)

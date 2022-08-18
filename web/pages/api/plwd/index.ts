@@ -9,18 +9,15 @@ export default withApiAuthRequired(async (req, res) => {
 
   try {
     if (req.method === 'POST') {
-      const response = await fetchWrapper(
-        process.env.MONUMENT_DIARY_API_BASE_URL + '/plwd',
-        {
-          method: 'post',
-          body: req.body,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await fetchWrapper(process.env.API_BASE_URL + '/plwd', {
+        method: 'post',
+        body: req.body,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
       res.status(200).json(response.data);
     } else {
       res.status(405).end();

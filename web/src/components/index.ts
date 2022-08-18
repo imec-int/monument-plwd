@@ -22,6 +22,7 @@ export { Paragraph } from './paragraph';
 export { Modal, ModalActions } from './modal';
 export { ModalContact } from './modal-contact';
 export { ModalContactDelete } from './modal-contact-delete';
+export { ModalEventDelete } from './modal-event-delete';
 export { ModalEventDetails } from './modal-event-details';
 
 // Calendar
