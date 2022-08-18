@@ -456,9 +456,9 @@ const ModalContactAdd = ({
               message: 'This account is already part of the carecircle',
             });
           } else if (err.text.includes('[phone-email-conflict]')) {
-            setError('email', {
+            setError('phone', {
               type: 'custom',
-              message: 'Phone number does not match',
+              message: 'A different phone is already linked to this account',
             });
           }
 
