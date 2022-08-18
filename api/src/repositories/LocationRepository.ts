@@ -30,7 +30,7 @@ export const mapToViewModel = (data: any): ILocation => {
         id: data.id,
         location: { lng: location.coordinates[0], lat: location.coordinates[1] },
         timestamp: new Date(data.timestamp).toISOString(),
-        userId: data.userId,
+        watchId: data.watchId,
     };
 };
 
@@ -43,10 +43,10 @@ const getByWatchId = (knex: Knex) => {
                 'created_at AS createdAt',
                 'id',
                 'timestamp',
-                'user_id AS userId',
+                'watch_id AS watchId',
                 knex.raw('ST_AsGeoJSON(location) AS location')
             )
-            .where('user_id', watchId)
+            .where('watch_id', watchId)
             .orderBy('timestamp', 'desc');
         profiler.done({ message });
         return result.map(mapToViewModel);
@@ -72,16 +72,16 @@ const getPublicLocation = (knex: Knex) => {
                 'created_at AS createdAt',
                 'id',
                 'timestamp',
-                'user_id AS userId',
+                'watch_id AS watchId',
                 knex.raw('ST_AsGeoJSON(location) AS location')
             )
-            .where('user_id', watchId)
+            .where('watch_id', watchId)
             .whereBetween('timestamp', [startTimeMinus30Minutes, endTimePlus30Minutes])
             .orderBy('timestamp', 'desc');
 
         // From the result condense the result to get time events from every 10 minutes
         result = result.reduce((acc, curr) => {
-            const { timestamp, id, location, userId, createdAt } = curr;
+            const { timestamp, id, location, watchId, createdAt } = curr;
             const time = new Date(timestamp).getTime();
             const timeKey = Math.floor(time / 1000 / 60 / 10) * 10 * 1000 * 60;
             if (!acc[timeKey]) {
@@ -89,7 +89,7 @@ const getPublicLocation = (knex: Knex) => {
                     id,
                     timestamp: new Date(timeKey).toISOString(),
                     location,
-                    userId,
+                    watchId,
                     createdAt,
                 };
             }
@@ -104,10 +104,10 @@ const getPublicLocation = (knex: Knex) => {
                     'created_at AS createdAt',
                     'id',
                     'timestamp',
-                    'user_id AS userId',
+                    'watch_id AS watchId',
                     knex.raw('ST_AsGeoJSON(location) AS location')
                 )
-                .where('user_id', watchId)
+                .where('watch_id', watchId)
                 .orderBy('timestamp', 'desc');
 
             result = lastLocation ? [lastLocation] : [];
@@ -126,10 +126,10 @@ const insert = (knex: Knex) => {
             const formatGeometryToPoint = `Point(${location.location.lng} ${location.location.lat})`;
             await knex.raw(
                 `
-                INSERT INTO locations (user_id, timestamp, location, created_at)
+                INSERT INTO locations (watch_id, timestamp, location, created_at)
                 VALUES (?, ?, ST_GeomFromText(?), ?);
                 `,
-                [location.userId, location.timestamp, formatGeometryToPoint, location.createdAt]
+                [location.watchId, location.timestamp, formatGeometryToPoint, location.createdAt]
             );
         }
         profiler.done({ message });
@@ -189,7 +189,7 @@ const get = (knex: Knex) => {
             'created_at AS createdAt',
             'id',
             'timestamp',
-            'user_id AS userId',
+            'watch_id AS watchId',
             knex.raw('ST_AsGeoJSON(location) AS location')
         );
         return results.map(mapToViewModel);

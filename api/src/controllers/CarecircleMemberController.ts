@@ -3,11 +3,39 @@ import { IUser } from 'src/models/User';
 import { UserRepository } from 'src/repositories/UserRepository';
 import { CarecircleMemberRepository } from 'src/repositories/CarecircleMemberRepository';
 import Koa, { Middleware } from 'koa';
+import * as yup from 'yup';
 import logger from '../utils/logger';
 import { DefaultAuthorizationService } from 'src/auth/AuthorizationService';
 import { Auth0Service } from 'src/services/RestApiBasedAuth0Service';
 import { UserRole } from '../models/UserRole';
 import { Affiliation, ICarecircleMemberBody } from '../models/CarecircleMember';
+
+const requestUserContext = yup
+    .object({
+        id: yup.string().required(),
+    })
+    .required();
+
+export const createCarecircleMemberValidationSchema = yup.object({
+    user: requestUserContext,
+    body: yup
+        .object({
+            affiliation: yup.string().required(),
+            permissions: yup.string().required(),
+            user: yup
+                .object({
+                    id: yup.string(),
+                    email: yup.string().required(),
+                    firstName: yup.string().required(),
+                    lastName: yup.string().required(),
+                    phone: yup.string().required(),
+                    picture: yup.string(),
+                    role: yup.string(),
+                })
+                .required(),
+        })
+        .required(),
+});
 
 export class CarecircleMemberAuthorizationService {
     constructor(private readonly authService: DefaultAuthorizationService) {}

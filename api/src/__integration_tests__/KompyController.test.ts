@@ -206,7 +206,7 @@ describe('KompyController', () => {
         expect(log.user).toEqual(body.device.udid);
 
         const [location] = locations;
-        expect(location.userId).toEqual(body.device.udid);
+        expect(location.watchId).toEqual(body.device.udid);
         expect(location.timestamp).toEqual(body.timestamp);
         expect(location.location.lat).toEqual(Number(body.position.latitude));
         expect(location.location.lng).toEqual(Number(body.position.longitude));

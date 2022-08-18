@@ -1,8 +1,29 @@
 import { ICreateExternalContactBody } from './../models/ExternalContact';
 import { ExternalContactsRepository } from './../repositories/ExternalContactsRepository';
 import Koa, { Middleware } from 'koa';
+import * as yup from 'yup';
 import logger from '../utils/logger';
 import { DefaultAuthorizationService } from 'src/auth/AuthorizationService';
+
+const requestUserContext = yup
+    .object({
+        id: yup.string().required(),
+    })
+    .required();
+
+export const createExternalContactValidationSchema = yup.object({
+    user: requestUserContext,
+    body: yup
+        .object({
+            affiliation: yup.string().required(),
+            email: yup.string().required(),
+            firstName: yup.string().required(),
+            lastName: yup.string().required(),
+            phone: yup.string().required(),
+            plwdId: yup.string().required(),
+        })
+        .required(),
+});
 
 export class ExternalContactControllerAuthorizationService {
     constructor(private readonly authService: DefaultAuthorizationService) {}

@@ -3,7 +3,7 @@ import { IUser } from 'src/models/User';
 import { UserRepository } from 'src/repositories/UserRepository';
 import { initTestSetup, MockAuthorizationHeaderTransform } from './IntegrationTestUtils';
 import { StartedPostgisContainer } from './PostgisContainer';
-import { adminUser, caretakerUser, externalContactUser, plwdUser } from './seed-data/users';
+import { adminUser, caretakerUser, externalContactUser, plwdUser, carecircleMemberUser } from './seed-data/users';
 import { LocationRepository } from '../repositories/LocationRepository';
 import { LogEvent } from '../models/Log';
 import { userOutsideGeofenceCoordinate, userWithinGeofenceCoordinates } from './seed-data/locations';
@@ -17,7 +17,9 @@ import request from 'supertest';
 import Koa from 'koa';
 import { CalendarEventBuilder } from './seed-data/events';
 import { CalendarEventRepository } from '../repositories/CalendarEventRepository';
+import { CarecircleMemberRepository } from '../repositories/CarecircleMemberRepository';
 import { addMinutes, subMinutes } from 'date-fns';
+import { membershipWithReadOnlyPermissions } from './seed-data/carecircleMembership';
 
 let container: StartedPostgisContainer;
 let userRepository: UserRepository;
@@ -33,6 +35,8 @@ let caretaker: IUser;
 let plwd: IPlwd;
 let contactPerson: IExternalContact;
 let admin: IUser;
+let carecircleMember: IUser;
+let carecircleMemberRepository: CarecircleMemberRepository;
 
 const coordinatesToLocationLogPayload = (coordinates: ICoordinate) =>
     JSON.stringify({
@@ -47,6 +51,7 @@ beforeAll(async () => {
         database,
         repositories: {
             calendarEventRepository,
+            carecircleMemberRepository,
             externalContactRepository,
             locationRepository,
             plwdRepository,
@@ -59,12 +64,14 @@ beforeAll(async () => {
 beforeEach(async () => {
     admin = await userRepository.insert(adminUser);
     caretaker = await userRepository.insert(caretakerUser);
+    carecircleMember = await userRepository.insert(carecircleMemberUser);
     plwd = await plwdRepository.insert({ ...plwdUser, caretakerId: caretaker.id });
     contactPerson = await externalContactRepository.insert({ ...externalContactUser, plwdId: plwd.id });
 });
 
 afterEach(async () => {
     await externalContactRepository.remove(contactPerson.id);
+    await userRepository.deleteById(carecircleMember.id);
     await plwdRepository.deleteById(plwd.id);
     await userRepository.deleteById(caretaker.id);
 });
@@ -99,7 +106,7 @@ describe('LocationController', () => {
         const [location] = response.body.data;
         expect(location.location).toEqual(userOutsideGeofenceCoordinate);
         expect(location.timestamp).toEqual(log.timestamp);
-        expect(location.userId).toEqual(log.user);
+        expect(location.watchId).toEqual(log.user);
 
         await locationRepository.deleteById(location.id);
     });
@@ -126,7 +133,7 @@ describe('LocationController', () => {
         const [location] = response.body.data;
         expect(location.location).toEqual(userOutsideGeofenceCoordinate);
         expect(location.timestamp).toEqual(log.timestamp);
-        expect(location.userId).toEqual(log.user);
+        expect(location.watchId).toEqual(log.user);
 
         await locationRepository.deleteById(location.id);
     });
@@ -153,7 +160,7 @@ describe('LocationController', () => {
         const [location] = response.body.data;
         expect(location.location).toEqual(userOutsideGeofenceCoordinate);
         expect(location.timestamp).toEqual(log.timestamp);
-        expect(location.userId).toEqual(log.user);
+        expect(location.watchId).toEqual(log.user);
 
         await locationRepository.deleteById(location.id);
         await calendarEventRepository.deleteById(createdEvent.id);
@@ -188,7 +195,7 @@ describe('LocationController', () => {
         const [location] = response.body.data;
         expect(location.location).toEqual(userWithinGeofenceCoordinates);
         expect(location.timestamp).toEqual(secondLog.timestamp);
-        expect(location.userId).toEqual(secondLog.user);
+        expect(location.watchId).toEqual(secondLog.user);
 
         const [one, two] = await locationRepository.get();
 
@@ -311,5 +318,85 @@ describe('LocationController', () => {
         expect(response.text).toEqual(`Event ${createdEvent.id} is not active`);
 
         await calendarEventRepository.deleteById(createdEvent.id);
+    });
+
+    it('Should allow to fetch locations if there is an ongoing event for a permission when-assigned', async () => {
+        await jwt.loginAs(carecircleMember.auth0Id);
+
+        const startTime = subMinutes(new Date(), 40).toISOString();
+        const endTime = addMinutes(new Date(), 40).toISOString();
+
+        const membership = {
+            ...membershipWithReadOnlyPermissions,
+            plwdId: plwd.id,
+            userId: carecircleMember.id,
+        };
+        await carecircleMemberRepository.addMember(membership);
+
+        const calendarEvent = new CalendarEventBuilder()
+            .withStartTime(startTime)
+            .withEndTime(endTime)
+            .withPLWD(plwd.id)
+            .withCreatedBy(carecircleMember.id)
+            .build();
+        const createdEvent = await calendarEventRepository.insert(calendarEvent);
+
+        const log = {
+            id: '004169c5-6e0f-46e8-86ff-290d6f46e6b2',
+            timestamp: new Date().toISOString(),
+            payload: coordinatesToLocationLogPayload(userOutsideGeofenceCoordinate),
+            user: plwd.watchId,
+            type: LogEvent.LOCATION,
+        };
+        const locationLogs = [log];
+        const locations = locationLogs.map(mapToLocation);
+        await locationRepository.insert(locations);
+
+        const response = await request(app.callback()).get(`/locations/${createdEvent.plwdId}`);
+        expect(response.status).toEqual(200);
+        expect(response.body.data).toHaveLength(1);
+
+        await calendarEventRepository.deleteById(createdEvent.id);
+        await carecircleMemberRepository.removeMemberByUserId(membership.plwdId, carecircleMember.id);
+    });
+
+    it('Should not allow to fetch locations if there is no ongoing event for a permission when-assigned', async () => {
+        await jwt.loginAs(carecircleMember.auth0Id);
+
+        const startTime = subMinutes(new Date(), 41).toISOString();
+        const endTime = subMinutes(new Date(), 21).toISOString();
+
+        const membership = {
+            ...membershipWithReadOnlyPermissions,
+            plwdId: plwd.id,
+            userId: carecircleMember.id,
+        };
+        await carecircleMemberRepository.addMember(membership);
+
+        const calendarEvent = new CalendarEventBuilder()
+            .withStartTime(startTime)
+            .withEndTime(endTime)
+            .withPLWD(plwd.id)
+            .withCreatedBy(caretaker.id)
+            .build();
+        const createdEvent = await calendarEventRepository.insert(calendarEvent);
+
+        const log = {
+            id: '004169c5-6e0f-46e8-86ff-290d6f46e6b2',
+            timestamp: new Date().toISOString(),
+            payload: coordinatesToLocationLogPayload(userOutsideGeofenceCoordinate),
+            user: plwd.watchId,
+            type: LogEvent.LOCATION,
+        };
+        const locationLogs = [log];
+        const locations = locationLogs.map(mapToLocation);
+        await locationRepository.insert(locations);
+
+        const response = await request(app.callback()).get(`/locations/${createdEvent.plwdId}`);
+        expect(response.status).toEqual(403);
+        expect(response.text).toEqual('Forbidden');
+
+        await calendarEventRepository.deleteById(createdEvent.id);
+        await carecircleMemberRepository.removeMemberByUserId(membership.plwdId, carecircleMember.id);
     });
 });

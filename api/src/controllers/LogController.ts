@@ -93,7 +93,7 @@ export const mapToLocation = (log: Log) => {
             id: randomUUID(),
             location: { lat: Number(payload.position.latitude), lng: Number(payload.position.longitude) },
             timestamp: log.timestamp,
-            userId: log.user,
+            watchId: log.user,
         } as ILocation;
     }
 
@@ -103,7 +103,7 @@ export const mapToLocation = (log: Log) => {
         id: randomUUID(),
         location: { lat: payload.latitude, lng: payload.longitude },
         timestamp: log.timestamp,
-        userId: log.user,
+        watchId: log.user,
     } as ILocation;
 };
 
