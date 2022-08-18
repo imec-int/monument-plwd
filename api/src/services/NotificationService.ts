@@ -56,9 +56,7 @@ export const constructNotificationMessage = ({
 }) => `
 Hi ${recipient.user.firstName} ${recipient.user.lastName},
         
-${plwd.firstName} ${plwd.lastName} is late for the appointment "${calendarEvent.title}" that was planned today at ${
-    calendarEvent.address.description
-} (${format(new Date(calendarEvent.startTime), 'HH:mm')} - ${format(new Date(calendarEvent.endTime), 'HH:mm')}).
+${plwd.firstName} ${plwd.lastName} is late for the appointment "${calendarEvent.title}".
 
 It is possible that ${plwd.firstName} ${plwd.lastName} got lost.
 
