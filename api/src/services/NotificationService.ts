@@ -66,7 +66,7 @@ Via this link ${baseUrl}location/track/${calendarEvent.id} you have access to ${
     plwd.lastName.endsWith('s') ? "'" : "'s"
 } location.
 
-Via this number ${plwd.phone} you can contact ${plwd.firstName} ${plwd.lastName}.
+${plwd.phone ? `Via this number ${plwd.phone} you can contact ${plwd.firstName} ${plwd.lastName}.` : ''}
 
 ${contactPersons
     .map(
