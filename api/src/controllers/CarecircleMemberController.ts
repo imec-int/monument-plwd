@@ -141,14 +141,27 @@ export class CarecircleMemberController {
             let carecircleMemberBody: ICarecircleMemberBody;
             let _user: IUser;
 
-            const userExistsOnAuth0 = await this.auth0Service.hasUser(user.email);
+            const auth0User = await this.auth0Service.getUser(user.email);
 
-            if (userExistsOnAuth0) {
+            if (auth0User) {
                 // Check if the user matches with the data stored in the database
                 // if the phone and email do NOT match we return an error
                 // saying that the user is invalid (phone + email must match).
-                const existingUser = await this.userRepository.getUserByEmailAndPhone(user.email, user.phone);
+                const existingUser = await this.userRepository.getUserByEmail(user.email);
+
                 if (!existingUser) {
+                    await this.userRepository.insert({
+                        ...user,
+                        role: UserRole.USER,
+                        auth0Id: auth0User.user_id,
+                    });
+                }
+
+                const existingUserByEmailAndPhone = await this.userRepository.getUserByEmailAndPhone(
+                    user.email,
+                    user.phone
+                );
+                if (!existingUserByEmailAndPhone) {
                     ctx.status = 409;
                     ctx.body = 'Phone and email does not match';
 
@@ -157,7 +170,7 @@ export class CarecircleMemberController {
 
                 // Check if existingUser exists in the carecircle by getByUserIdAndPlwdId
                 const existingUserInCarecircle = await this.carecircleMemberRepository.getByUserIdAndPlwdId(
-                    existingUser.id,
+                    existingUserByEmailAndPhone.id,
                     plwdId
                 );
 
@@ -169,12 +182,12 @@ export class CarecircleMemberController {
                     return;
                 }
 
-                _user = existingUser;
+                _user = existingUserByEmailAndPhone;
                 carecircleMemberBody = {
                     affiliation,
                     permissions,
                     plwdId,
-                    userId: existingUser.id,
+                    userId: existingUserByEmailAndPhone.id,
                     id: randomUUID(),
                 } as ICarecircleMemberBody;
                 await this.carecircleMemberRepository.addMember(carecircleMemberBody);
