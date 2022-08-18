@@ -190,10 +190,9 @@ You'll have to create an account [here](https://www.twilio.com/try-twilio) and [
 ## Mapbox
 ---
 
-To enable Mapbox which is used to display the different locations of the PLWD on the map you will need to get an access Token.
-It is free until a certain amount of requests.
-What you have to do is go to [Mapbox](https://mapbox.com/) and sign up with a new account if you don't already have one. Afterwards go into your account [Mapbox account](https://account.mapbox.com) and create an access token from the available button. You should just give it a name and you can create your token.
-Once you have your token, you can copy it and parse it into the related env variable in your .env file.
+To enable Mapbox which is used to display the locations on the map you will need to get an access token.
+Go to [Mapbox](https://mapbox.com/) and sign up with a new account if you don't already have one. Afterwards go into your account [Mapbox account](https://account.mapbox.com) and create an access token from the available button. Give it a suitable name and create your token.
+Once you have your token, you can copy and paste it into the related env variable in your .env file.
 
 ```sh
 NEXT_PUBLIC_MAPBOX_TOKEN=[MAPBOX_TOKEN]
