@@ -41,7 +41,7 @@ const Home = () => {
             <Calendar
               headerToolbarEnabled={false}
               height="528px"
-              initialView="timeGridDay"
+              initialView="timeGridWeek"
             />
           ) : (
             <div className="hero h-[528px] bg-base-200">
