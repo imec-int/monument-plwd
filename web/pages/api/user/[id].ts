@@ -21,6 +21,20 @@ export default withApiAuthRequired(async (req, res) => {
         }
       );
       res.status(200).json(response.data);
+    } else if (req.method === 'PATCH') {
+      const response = await fetchWrapper(
+        process.env.API_BASE_URL + `/user/${id}`,
+        {
+          method: 'patch',
+          body: req.body,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      res.status(200).json(response.data);
     } else if (req.method === 'GET') {
       const response = await fetchWrapper(
         process.env.API_BASE_URL + `/user/${id}`,
