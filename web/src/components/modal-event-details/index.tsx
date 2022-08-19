@@ -353,7 +353,9 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
           </div> */}
           <div className="form-control w-full">
             <label className="label">
-              <Tooltip title="The contact who will receive a notification in case of emergency (eg: The person with dementia seems lost).">
+              <Tooltip
+                title={`The contacts who will receive a notification when ${plwd.firstName} ${plwd.lastName} is more than 10 minutes late for this calendar event`}
+              >
                 <span className="label-text flex">
                   Contact Persons
                   <InfoIcon />
