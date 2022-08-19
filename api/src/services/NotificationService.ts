@@ -64,6 +64,10 @@ Via this link ${baseUrl}location/track/${calendarEvent.id} you have access to ${
     plwd.lastName.endsWith('s') ? "'" : "'s"
 } location.
 
+You can see the direction on Google Maps via this link https://www.google.com/maps/dir/?api=1&destination=${
+    calendarEvent.address.geometry?.location.lat
+},${calendarEvent.address.geometry?.location.lng} .
+
 ${plwd.phone ? `Via this number ${plwd.phone} you can contact ${plwd.firstName} ${plwd.lastName}.` : ''}
 
 ${contactPersons
