@@ -15,6 +15,9 @@ export { Button } from './button';
 export { DeleteButton } from './button-delete';
 export { EditButton } from './button-edit';
 
+// Links
+export { LinkGoogleMap } from './link-google-map';
+
 // Texts
 export { Paragraph } from './paragraph';
 
