@@ -1,6 +1,5 @@
 import { getSendgridClient } from './../utils/sendgridClient';
 import { getTwilioClient } from './../utils/twillioClient';
-import { format } from 'date-fns';
 import { NotificationRepository } from './../repositories/NotificationRepository';
 import { INotificationType } from '../models/Notification';
 import logger from '../utils/logger';
@@ -11,12 +10,14 @@ import mailClient from '@sendgrid/mail';
 import { IPlwd } from '../models/Plwd';
 import { IExternalContact } from 'src/models/ExternalContact';
 import { ICarecircleMember } from 'src/models/CarecircleMember';
+import { ICoordinate } from 'src/models/Locations';
 
 type Recipient = ICarecircleMember | IExternalContact;
 
 export interface INotifyForEventNotificationService {
     allowResend?: boolean;
     event: CalendarEventWithContacts;
+    location: ICoordinate;
     plwd: IPlwd;
     recipients: Recipient[];
 }
@@ -24,6 +25,7 @@ export interface INotifyForEventNotificationService {
 export interface INotifyForEventNotificationDelegate {
     allowResend?: boolean;
     event: CalendarEventWithContacts;
+    location: ICoordinate;
     plwd: IPlwd;
     recipients: Recipient[];
 }
@@ -45,12 +47,14 @@ export const constructNotificationMessage = ({
     baseUrl,
     calendarEvent,
     contactPersons,
+    location,
     plwd,
     recipient,
 }: {
     baseUrl: string;
     calendarEvent: CalendarEventWithContacts;
     contactPersons: (ICarecircleMember | IExternalContact)[];
+    location: ICoordinate;
     plwd: IPlwd;
     recipient: Recipient;
 }) => `
@@ -63,6 +67,10 @@ It is possible that ${plwd.firstName} ${plwd.lastName} got lost.
 Via this link ${baseUrl}location/track/${calendarEvent.id} you have access to ${plwd.firstName} ${plwd.lastName}${
     plwd.lastName.endsWith('s') ? "'" : "'s"
 } location.
+
+You can see the direction on Google Maps via this link https://www.google.com/maps/dir/?api=1&destination=${
+    location.lat
+},${location.lng}
 
 ${plwd.phone ? `Via this number ${plwd.phone} you can contact ${plwd.firstName} ${plwd.lastName}.` : ''}
 
@@ -92,7 +100,7 @@ class TextMessageService implements NotificationDelegate {
         this.twilioClient = getTwilioClient(config);
     }
 
-    async notifyForEvent({ recipients, event, plwd, allowResend }: INotifyForEventNotificationDelegate) {
+    async notifyForEvent({ recipients, event, plwd, allowResend, location }: INotifyForEventNotificationDelegate) {
         for await (const recipient of recipients) {
             try {
                 const baseUrl = this.config.notification.baseUrl;
@@ -101,6 +109,7 @@ class TextMessageService implements NotificationDelegate {
                     baseUrl,
                     calendarEvent: event,
                     contactPersons: otherRecipients,
+                    location,
                     plwd,
                     recipient: recipient,
                 });
@@ -133,9 +142,9 @@ class TextMessageService implements NotificationDelegate {
                 logger.info(
                     sentNotificationForEventLogMessage({
                         contactId: recipient.user.id,
-                        serviceName: TextMessageService.name,
                         eventId: event.id,
                         plwdId: plwd.id,
+                        serviceName: TextMessageService.name,
                     })
                 );
                 await this.repository.insert({
@@ -158,7 +167,7 @@ class WhatsappMessageService implements NotificationDelegate {
         this.twilioClient = getTwilioClient(config);
     }
 
-    async notifyForEvent({ event, plwd, recipients, allowResend }: INotifyForEventNotificationDelegate) {
+    async notifyForEvent({ event, plwd, recipients, allowResend, location }: INotifyForEventNotificationDelegate) {
         for await (const recipient of recipients) {
             try {
                 const baseUrl = this.config.notification.baseUrl;
@@ -167,6 +176,7 @@ class WhatsappMessageService implements NotificationDelegate {
                     baseUrl,
                     calendarEvent: event,
                     contactPersons: otherRecipients,
+                    location,
                     plwd,
                     recipient: recipient,
                 });
@@ -225,7 +235,7 @@ class EmailService implements NotificationDelegate {
         this.mailClient = getSendgridClient(config);
     }
 
-    async notifyForEvent({ event, plwd, recipients, allowResend }: INotifyForEventNotificationDelegate) {
+    async notifyForEvent({ event, plwd, recipients, allowResend, location }: INotifyForEventNotificationDelegate) {
         for await (const recipient of recipients) {
             try {
                 const baseUrl = this.config.notification.baseUrl;
@@ -234,6 +244,7 @@ class EmailService implements NotificationDelegate {
                     baseUrl,
                     calendarEvent: event,
                     contactPersons: otherRecipients,
+                    location,
                     plwd,
                     recipient: recipient,
                 });
@@ -289,7 +300,7 @@ class EmailService implements NotificationDelegate {
 class ConsoleLogService implements NotificationDelegate {
     constructor(private readonly repository: NotificationRepository, private readonly config: IConfig) {}
 
-    async notifyForEvent({ event, plwd, recipients }: INotifyForEventNotificationDelegate) {
+    async notifyForEvent({ event, plwd, recipients, location }: INotifyForEventNotificationDelegate) {
         for await (const recipient of recipients) {
             try {
                 const baseUrl = this.config.notification.baseUrl;
@@ -298,6 +309,7 @@ class ConsoleLogService implements NotificationDelegate {
                     baseUrl,
                     calendarEvent: event,
                     contactPersons: otherRecipients,
+                    location,
                     plwd,
                     recipient: recipient,
                 });

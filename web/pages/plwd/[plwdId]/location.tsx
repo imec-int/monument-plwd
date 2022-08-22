@@ -1,5 +1,5 @@
 import { withPageAuthRequired } from '@auth0/nextjs-auth0';
-import { Container, Header, WarningAlert } from '@components';
+import { Container, Header, LinkGoogleMap, WarningAlert } from '@components';
 import { LayoutWithAppContext } from '@components/layouts/LayoutWithAppContext';
 import { IEvent } from '@interfaces';
 import dayjs from 'dayjs';
@@ -82,7 +82,13 @@ const Location = () => {
       {canManageLocation || (canAccessLocation && hasOngoingCalendarEvent) ? (
         <>
           <h2 className="card-title mb-2">Last known location</h2>
-          <p className="mb-4">{currentLocationAddress}</p>
+          <div className="flex gap-2">
+            <p className="mb-4">{currentLocationAddress}</p>
+            <LinkGoogleMap
+              lat={locations[0]?.location.lat}
+              lng={locations[0]?.location.lng}
+            />
+          </div>
           <div className="w-full h-4/6 flex gap-4 mb-8">
             <div className="flex-1 rounded-xl overflow-hidden shadow-xl">
               <Map currentLocation={currentLocation} />
