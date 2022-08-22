@@ -8,9 +8,15 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    # Ignore major dependency upgrades
+    ignore:
+      - update-types: ["version-updates:semver-major"]
 
   - package-ecosystem: "npm"
     directory: "/web"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    # Ignore major dependency upgrades
+    ignore:
+      - update-types: ["version-updates:semver-major"]
