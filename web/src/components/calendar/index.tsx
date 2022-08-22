@@ -30,21 +30,23 @@ export const Calendar: React.FC<ICalendar> = ({
   const { data = [] } = useCalendarEvents(plwd.id);
 
   const calendarEvents = useMemo(() => {
-    return data
-      ? data.map((e: IEvent) => ({
-          id: e.id,
-          title: e.title,
-          start: new Date(e.startTime),
-          end: new Date(e.endTime),
-          extendedProps: {
-            address: e.address,
-            externalContacts: e.externalContacts.map((c) => c.id),
-            pickedUp: e.pickedUp,
-            repeat: e.repeat,
-            caretakers: e.carecircleMembers.map((c) => c.id),
-          },
-        }))
-      : [];
+    // Add styling to calendar events
+    return data.map((e: IEvent) => ({
+      backgroundColor: e.address ? 'rgb(55, 136, 216)' : 'rgb(240, 0, 184)',
+      borderColor: e.address ? 'rgb(55, 136, 216)' : 'rgb(240, 0, 184)',
+      display: 'block',
+      end: new Date(e.endTime),
+      id: e.id,
+      start: new Date(e.startTime),
+      title: e.title,
+      extendedProps: {
+        address: e.address,
+        externalContacts: e.externalContacts.map((c) => c.id),
+        pickedUp: e.pickedUp,
+        repeat: e.repeat,
+        caretakers: e.carecircleMembers.map((c) => c.id),
+      },
+    }));
   }, [data]);
 
   const fetchCalendarEvents = () => mutate(`/api/calendar-events/${plwd.id}`);
@@ -91,6 +93,12 @@ export const Calendar: React.FC<ICalendar> = ({
       <FullCalendar
         customButtons={calendarCustomButtons}
         eventClick={canManageCalendar ? eventClick : undefined}
+        eventTimeFormat={{
+          hour: '2-digit',
+          hour12: false,
+          meridiem: false,
+          minute: '2-digit',
+        }}
         events={calendarEvents}
         height={height || '500px'}
         initialView={initialView || 'dayGridMonth'}
