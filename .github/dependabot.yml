@@ -11,7 +11,7 @@ updates:
     # Ignore major dependency upgrades
     ignore:
       - dependency-name: "*"
-        update-types: ["version-updates:semver-major"]
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "npm"
     directory: "/web"
@@ -21,4 +21,4 @@ updates:
     # Ignore major dependency upgrades
     ignore:
       - dependency-name: "*"
-        update-types: ["version-updates:semver-major"]
+        update-types: ["version-update:semver-major"]
