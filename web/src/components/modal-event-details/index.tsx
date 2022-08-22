@@ -251,7 +251,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
                   }`}
                   defaultValue={value?.description}
                   language="en"
-                  onPlaceSelected={(place: any) => {
+                  onPlaceSelected={(place) => {
                     onChange({
                       description: place.formatted_address,
                       geometry: {
@@ -265,6 +265,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
                   options={{
                     types: ['address'],
                   }}
+                  placeholder="Search address"
                 />
               )}
               rules={{ required: true }}
