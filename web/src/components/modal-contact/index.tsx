@@ -1,17 +1,26 @@
 import 'react-phone-number-input/style.css';
 
-import { FormInputPhone, ImageSetter, Modal, ModalActions } from '@components';
+import {
+  FormInputPhone,
+  ImageSetter,
+  Modal,
+  ModalActions,
+  ModalAffiliation,
+} from '@components';
 import { Affiliation } from '@constants';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { ICarecircleMember } from '@interfaces';
+import { IAffiliation, ICarecircleMember } from '@interfaces';
 import { EmptyIUser } from '@interfaces';
+import { Tooltip } from '@mui/material';
 import { formInputPhoneSchema } from '@schema';
 import { CustomError } from 'lib/CustomError';
 import { fetchWrapper } from 'lib/fetch';
 import { useSnackbar } from 'notistack';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useAffiliations } from 'src/hooks/useAffiliations';
 import { useAppUserContext } from 'src/hooks/useAppUserContext';
+import { mutate } from 'swr';
 import * as yup from 'yup';
 
 const userSchema = yup.object({
@@ -66,6 +75,7 @@ type IUserSchema = yup.InferType<typeof userSchema>;
 
 type IContactModalBase = {
   getUsers: () => Promise<void>;
+  addAffiliation: (affiliation: string) => Promise<void>;
   onClose: () => void;
   onError?: (err: Error) => Promise<void> | void;
   onSuccess?: (data: IUserSchema) => Promise<void> | void;
@@ -120,6 +130,8 @@ const ModalContactEdit = ({
 }: IEditContactModal) => {
   const { enqueueSnackbar } = useSnackbar();
   const { plwd } = useAppUserContext();
+  const { data: affiliations = [] } = useAffiliations(plwd.id);
+  const [addAffliationOpen, setAddAffiliationOpen] = useState<boolean>(false);
 
   const permissions = useMemo(() => {
     if (selectedContact.permissions) {
@@ -137,6 +149,14 @@ const ModalContactEdit = ({
     affiliation: selectedContact.affiliation,
     permissions: undefined,
   };
+
+  const availableAffiliations = useMemo(() => {
+    const mappedAffiliations = affiliations.map(
+      (a: IAffiliation) => a.affiliation
+    );
+
+    return [...mappedAffiliations, ...ContactAffiliations];
+  }, [affiliations]);
 
   const {
     control,
@@ -203,146 +223,172 @@ const ModalContactEdit = ({
   };
 
   return (
-    <Modal onSubmit={handleSubmit(onSubmit)}>
-      <h3 className="font-bold text-lg">Edit contact</h3>
-      <div className="w-full">
-        <div className="flex w-full gap-4">
-          <div className="form-control w-full flex-auto grow">
+    <div>
+      <Modal onSubmit={handleSubmit(onSubmit)}>
+        <h3 className="font-bold text-lg">Edit contact</h3>
+        <div className="w-full">
+          <div className="flex w-full gap-4">
+            <div className="form-control w-full flex-auto grow">
+              <label className="label">
+                <span className="label-text">First name*</span>
+              </label>
+              <input
+                {...register('firstName', { required: true })}
+                className={`input input-bordered w-full ${
+                  errors.firstName ? 'input-error' : ''
+                }`}
+                placeholder="eg. Ana"
+                type="text"
+              />
+            </div>
+            <div className="form-control w-full flex-auto">
+              <label className="label">
+                <span className="label-text">Last name*</span>
+              </label>
+              <input
+                {...register('lastName', { required: true })}
+                className={`input input-bordered w-full ${
+                  errors.lastName ? 'input-error' : ''
+                }`}
+                placeholder="eg. Wouters"
+                type="text"
+              />
+            </div>
+          </div>
+          <div className="form-control w-full mt-2">
             <label className="label">
-              <span className="label-text">First name*</span>
+              <span className="label-text">Email*</span>
             </label>
             <input
-              {...register('firstName', { required: true })}
+              {...register('email', { required: true })}
               className={`input input-bordered w-full ${
-                errors.firstName ? 'input-error' : ''
+                errors.email ? 'input-error' : ''
               }`}
-              placeholder="eg. Ana"
+              disabled
+              placeholder="eg. ana.wouters@gmail.com"
               type="text"
             />
           </div>
-          <div className="form-control w-full flex-auto">
-            <label className="label">
-              <span className="label-text">Last name*</span>
-            </label>
-            <input
-              {...register('lastName', { required: true })}
-              className={`input input-bordered w-full ${
-                errors.lastName ? 'input-error' : ''
-              }`}
-              placeholder="eg. Wouters"
-              type="text"
-            />
+          <div className="flex mt-2 gap-4 items-end">
+            <FormInputPhone control={control} errors={errors} required />
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Affiliation</span>
+              </label>
+              <Controller
+                control={control}
+                name="affiliation"
+                render={({ field: { value, onChange } }) => (
+                  <select
+                    className="select select-bordered"
+                    onChange={onChange}
+                    value={value}
+                  >
+                    {Object.values(availableAffiliations).map((text) => (
+                      <option key={text}>{text}</option>
+                    ))}
+                  </select>
+                )}
+              />
+            </div>
+            <Tooltip title="Add a new affiliation">
+              <div
+                className="btn btn-square"
+                onClick={() => setAddAffiliationOpen(true)}
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+            </Tooltip>
           </div>
-        </div>
-        <div className="form-control w-full mt-2">
-          <label className="label">
-            <span className="label-text">Email*</span>
-          </label>
-          <input
-            {...register('email', { required: true })}
-            className={`input input-bordered w-full ${
-              errors.email ? 'input-error' : ''
-            }`}
-            disabled
-            placeholder="eg. ana.wouters@gmail.com"
-            type="text"
-          />
-        </div>
-        <div className="flex mt-2 gap-4">
-          <FormInputPhone control={control} errors={errors} required />
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">Affiliation</span>
-            </label>
+          <div className="mt-2">
             <Controller
               control={control}
-              name="affiliation"
+              name="picture"
               render={({ field: { value, onChange } }) => (
-                <select
-                  className="select select-bordered"
-                  onChange={onChange}
-                  value={value}
-                >
-                  {Object.values(ContactAffiliations).map((text) => (
-                    <option key={text}>{text}</option>
-                  ))}
-                </select>
+                <ImageSetter
+                  base64image={value}
+                  label="Upload avatar"
+                  setBase64Image={(base64) => {
+                    onChange(base64);
+                  }}
+                />
               )}
             />
           </div>
-        </div>
-        <div className="mt-2">
-          <Controller
-            control={control}
-            name="picture"
-            render={({ field: { value, onChange } }) => (
-              <ImageSetter
-                base64image={value}
-                label="Upload avatar"
-                setBase64Image={(base64) => {
-                  onChange(base64);
-                }}
-              />
-            )}
-          />
-        </div>
-        <div className="grid grid-cols-3 gap-4 mt-2 w-full">
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">{permissionLabels[0]}</span>
-            </label>
-            <select
-              className="select select-bordered"
-              {...register('locationPermission')}
-            >
-              {Object.entries(permissionOptions[0]).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">{permissionLabels[1]}</span>
-            </label>
-            <select
-              className="select select-bordered"
-              {...register('calendarPermission')}
-            >
-              {Object.entries(permissionOptions[1]).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">{permissionLabels[2]}</span>
-            </label>
-            <select
-              className="select select-bordered"
-              {...register('carecirclePermission')}
-            >
-              {Object.entries(permissionOptions[2]).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value}
-                </option>
-              ))}
-            </select>
+          <div className="grid grid-cols-3 gap-4 mt-2 w-full">
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">{permissionLabels[0]}</span>
+              </label>
+              <select
+                className="select select-bordered"
+                {...register('locationPermission')}
+              >
+                {Object.entries(permissionOptions[0]).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">{permissionLabels[1]}</span>
+              </label>
+              <select
+                className="select select-bordered"
+                {...register('calendarPermission')}
+              >
+                {Object.entries(permissionOptions[1]).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">{permissionLabels[2]}</span>
+              </label>
+              <select
+                className="select select-bordered"
+                {...register('carecirclePermission')}
+              >
+                {Object.entries(permissionOptions[2]).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
-      </div>
-      <ModalActions>
-        <button className="btn" onClick={onClose} type="button">
-          Cancel
-        </button>
-        <button className="btn btn-secondary" type="submit">
-          Save
-        </button>
-      </ModalActions>
-    </Modal>
+        <ModalActions>
+          <button className="btn" onClick={onClose} type="button">
+            Cancel
+          </button>
+          <button className="btn btn-secondary" type="submit">
+            Save
+          </button>
+        </ModalActions>
+      </Modal>
+      {addAffliationOpen ? (
+        <ModalAffiliation onClose={() => setAddAffiliationOpen(false)} />
+      ) : null}
+    </div>
   );
 };
 
@@ -356,6 +402,9 @@ const ModalContactAdd = ({
 }: IAddContactModal) => {
   const { plwd } = useAppUserContext();
   const { enqueueSnackbar } = useSnackbar();
+  const { data: affiliations = [] } = useAffiliations(plwd.id);
+
+  const [addAffliationOpen, setAddAffiliationOpen] = useState<boolean>(false);
 
   const permissions = useMemo(() => {
     if (selectedContact.permissions) {
@@ -372,6 +421,14 @@ const ModalContactAdd = ({
     ...selectedContact,
     permissions: undefined,
   };
+
+  const availableAffiliations = useMemo(() => {
+    const mappedAffiliations = affiliations.map(
+      (a: IAffiliation) => a.affiliation
+    );
+
+    return [...mappedAffiliations, ...ContactAffiliations];
+  }, [affiliations]);
 
   const {
     control,
@@ -479,182 +536,208 @@ const ModalContactAdd = ({
   };
 
   return (
-    <Modal onSubmit={handleSubmit(onSubmit)}>
-      <h3 className="font-bold text-lg">Add a new contact</h3>
-      <div className="w-full">
-        <div className="flex w-full gap-4">
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">First name*</span>
-            </label>
-            <input
-              {...register('firstName', { required: true })}
-              className={`input input-bordered w-full ${
-                errors.firstName ? 'input-error' : ''
-              }`}
-              placeholder="eg. Ana"
-              type="text"
-            />
-          </div>
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">Last name*</span>
-            </label>
-            <input
-              {...register('lastName', { required: true })}
-              className={`input input-bordered w-full ${
-                errors.lastName ? 'input-error' : ''
-              }`}
-              placeholder="eg. Wouters"
-              type="text"
-            />
-          </div>
-        </div>
-        <div className="form-control w-full mt-2">
-          <label className="label">
-            <span className="label-text">Email*</span>
-          </label>
-          <input
-            {...register('email', { required: true })}
-            className={`input input-bordered w-full ${
-              errors.email ? 'input-error' : ''
-            }`}
-            placeholder="eg. ana.wouters@gmail.com"
-            type="text"
-          />
-          {errors.email ? (
-            <label className="label">
-              <span className="label-text-alt text-error">
-                {errors.email.message}
-              </span>
-            </label>
-          ) : null}
-        </div>
-        <div className="flex mt-2 gap-4">
-          <FormInputPhone control={control} errors={errors} />
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">Affiliation</span>
-            </label>
-            <Controller
-              control={control}
-              name="affiliation"
-              render={({ field: { value, onChange } }) => (
-                <select
-                  className="select select-bordered"
-                  onChange={onChange}
-                  value={value}
-                >
-                  {Object.values(ContactAffiliations).map((text) => (
-                    <option key={text}>{text}</option>
-                  ))}
-                </select>
-              )}
-            />
-          </div>
-        </div>
-        <div className="flex items-end">
-          <div className="mt-2 flex-1">
-            <div className="max-w-[280px] overflow-hidden">
-              <Controller
-                control={control}
-                name="picture"
-                render={({ field: { value, onChange } }) => (
-                  <ImageSetter
-                    base64image={value}
-                    label="Upload avatar"
-                    setBase64Image={(base64) => {
-                      onChange(base64);
-                    }}
-                  />
-                )}
+    <div>
+      <Modal onSubmit={handleSubmit(onSubmit)}>
+        <h3 className="font-bold text-lg">Add a new contact</h3>
+        <div className="w-full">
+          <div className="flex w-full gap-4">
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">First name*</span>
+              </label>
+              <input
+                {...register('firstName', { required: true })}
+                className={`input input-bordered w-full ${
+                  errors.firstName ? 'input-error' : ''
+                }`}
+                placeholder="eg. Ana"
+                type="text"
+              />
+            </div>
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Last name*</span>
+              </label>
+              <input
+                {...register('lastName', { required: true })}
+                className={`input input-bordered w-full ${
+                  errors.lastName ? 'input-error' : ''
+                }`}
+                placeholder="eg. Wouters"
+                type="text"
               />
             </div>
           </div>
-          {showAddUserToCarecircleToggle ? (
-            <div className="flex mt-3">
-              <div className="form-control">
-                <label className="cursor-pointer label pb-1">
-                  <input
-                    {...register('addUserToCarecircle')}
-                    className="checkbox checkbox-secondary mr-2"
-                    type="checkbox"
+          <div className="form-control w-full mt-2">
+            <label className="label">
+              <span className="label-text">Email*</span>
+            </label>
+            <input
+              {...register('email', { required: true })}
+              className={`input input-bordered w-full ${
+                errors.email ? 'input-error' : ''
+              }`}
+              placeholder="eg. ana.wouters@gmail.com"
+              type="text"
+            />
+            {errors.email ? (
+              <label className="label">
+                <span className="label-text-alt text-error">
+                  {errors.email.message}
+                </span>
+              </label>
+            ) : null}
+          </div>
+          <div className="flex mt-2 gap-4 items-end">
+            <FormInputPhone control={control} errors={errors} />
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Affiliation</span>
+              </label>
+              <Controller
+                control={control}
+                name="affiliation"
+                render={({ field: { value, onChange } }) => (
+                  <select
+                    className="select select-bordered"
+                    onChange={onChange}
+                    value={value}
+                  >
+                    {Object.values(availableAffiliations).map((text) => (
+                      <option key={text}>{text}</option>
+                    ))}
+                  </select>
+                )}
+              />
+            </div>
+            <Tooltip title="Add a new affiliation">
+              <div
+                className="btn btn-square"
+                onClick={() => setAddAffiliationOpen(true)}
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
-                  <span className="label-text w-[110px]">
-                    Add to carecircle
-                  </span>
+                </svg>
+              </div>
+            </Tooltip>
+          </div>
+          <div className="flex items-end">
+            <div className="mt-2 flex-1">
+              <div className="max-w-[280px] overflow-hidden">
+                <Controller
+                  control={control}
+                  name="picture"
+                  render={({ field: { value, onChange } }) => (
+                    <ImageSetter
+                      base64image={value}
+                      label="Upload avatar"
+                      setBase64Image={(base64) => {
+                        onChange(base64);
+                      }}
+                    />
+                  )}
+                />
+              </div>
+            </div>
+            {showAddUserToCarecircleToggle ? (
+              <div className="flex mt-3">
+                <div className="form-control">
+                  <label className="cursor-pointer label pb-1">
+                    <input
+                      {...register('addUserToCarecircle')}
+                      className="checkbox checkbox-secondary mr-2"
+                      type="checkbox"
+                    />
+                    <span className="label-text w-[110px]">
+                      Add to carecircle
+                    </span>
+                  </label>
+                </div>
+              </div>
+            ) : null}
+          </div>
+          {carecircleToggleIsActive ? (
+            <div className="grid grid-cols-3 gap-4 mt-2 w-full">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">{permissionLabels[0]}</span>
                 </label>
+                <select
+                  className="select select-bordered"
+                  {...register('locationPermission')}
+                >
+                  {Object.entries(permissionOptions[0]).map(([key, value]) => (
+                    <option key={key} value={key}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">{permissionLabels[1]}</span>
+                </label>
+                <select
+                  className="select select-bordered"
+                  {...register('calendarPermission')}
+                >
+                  {Object.entries(permissionOptions[1]).map(([key, value]) => (
+                    <option key={key} value={key}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">{permissionLabels[2]}</span>
+                </label>
+                <select
+                  className="select select-bordered"
+                  {...register('carecirclePermission')}
+                >
+                  {Object.entries(permissionOptions[2]).map(([key, value]) => (
+                    <option key={key} value={key}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           ) : null}
         </div>
-        {carecircleToggleIsActive ? (
-          <div className="grid grid-cols-3 gap-4 mt-2 w-full">
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">{permissionLabels[0]}</span>
-              </label>
-              <select
-                className="select select-bordered"
-                {...register('locationPermission')}
-              >
-                {Object.entries(permissionOptions[0]).map(([key, value]) => (
-                  <option key={key} value={key}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">{permissionLabels[1]}</span>
-              </label>
-              <select
-                className="select select-bordered"
-                {...register('calendarPermission')}
-              >
-                {Object.entries(permissionOptions[1]).map(([key, value]) => (
-                  <option key={key} value={key}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">{permissionLabels[2]}</span>
-              </label>
-              <select
-                className="select select-bordered"
-                {...register('carecirclePermission')}
-              >
-                {Object.entries(permissionOptions[2]).map(([key, value]) => (
-                  <option key={key} value={key}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        ) : null}
-      </div>
-      <ModalActions>
-        <button
-          className={isSubmitting ? 'btn btn-disabled' : 'btn'}
-          disabled={isSubmitting}
-          onClick={onClose}
-          type="button"
-        >
-          Cancel
-        </button>
-        <button
-          className={isSubmitting ? 'btn btn-disabled' : 'btn btn-secondary'}
-          disabled={isSubmitting}
-          type="submit"
-        >
-          Add
-        </button>
-      </ModalActions>
-    </Modal>
+        <ModalActions>
+          <button
+            className={isSubmitting ? 'btn btn-disabled' : 'btn'}
+            disabled={isSubmitting}
+            onClick={onClose}
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            className={isSubmitting ? 'btn btn-disabled' : 'btn btn-secondary'}
+            disabled={isSubmitting}
+            type="submit"
+          >
+            Add
+          </button>
+        </ModalActions>
+      </Modal>
+      {addAffliationOpen ? (
+        <ModalAffiliation onClose={() => setAddAffiliationOpen(false)} />
+      ) : null}
+    </div>
   );
 };
