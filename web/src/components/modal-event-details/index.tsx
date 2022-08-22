@@ -310,7 +310,6 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
               <input
                 {...register('addADestination')}
                 className="toggle toggle-secondary"
-                // defaultChecked={false}
                 type="checkbox"
               />
             </label>
