@@ -223,6 +223,7 @@ const getOngoingEventsByPlwdId = (knex: Knex) => {
         const result = await knex(table)
             .select('*')
             .where('plwd_user_id', plwdId)
+            .andWhereNot('address', null)
             .where('start_time', '<=', now)
             .andWhere('end_time', '>=', now);
         const mappedEvents = result.map(mapToCalendarEventWithContacts);

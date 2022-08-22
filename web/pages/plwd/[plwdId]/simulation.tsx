@@ -338,6 +338,7 @@ const Simulation = () => {
                         options={{
                           types: ['address'],
                         }}
+                        placeholder="Enter address"
                       />
                     )
                   }

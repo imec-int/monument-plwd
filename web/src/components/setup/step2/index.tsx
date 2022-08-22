@@ -138,7 +138,7 @@ export const SetupStep2: React.FC<ISetupStep> = ({ nextStep, userData }) => {
                 }`}
                 defaultValue={value?.description}
                 language="en"
-                onPlaceSelected={(place: any) => {
+                onPlaceSelected={(place) => {
                   onChange({
                     description: place.formatted_address,
                     geometry: {
@@ -152,6 +152,7 @@ export const SetupStep2: React.FC<ISetupStep> = ({ nextStep, userData }) => {
                 options={{
                   types: ['address'],
                 }}
+                placeholder="Enter address"
               />
             )}
             rules={{ required: true }}
