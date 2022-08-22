@@ -62,7 +62,7 @@ export class CalendarEventBuilder {
         return this;
     }
 
-    withAddress(address: IAddress) {
+    withAddress(address?: IAddress) {
         this.calendarEvent = { ...this.calendarEvent, address };
         return this;
     }

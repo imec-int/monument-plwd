@@ -48,15 +48,15 @@ export const handleLocations = async ({
         return;
     }
 
-    // Fetch current calendar events for user by user ID, normally there should only be one
+    // Fetch current calendar events for a plwd by plwdId, normally there should only be one
     // but let's handle the case where there are multiple at once as well...
-    const ongoingEventsUser = await calendarEventRepository.getOngoingEventsByPlwdId(plwd.id);
-    if (ongoingEventsUser.length === 0) {
+    const ongoingEvents = await calendarEventRepository.getOngoingEventsByPlwdId(plwd.id);
+    if (ongoingEvents.length === 0) {
         logger.info(`[handleLocations] - PLWD [${plwd.id}] does not have any ongoing events`);
         return;
     }
 
-    for await (const ongoingEvent of ongoingEventsUser) {
+    for await (const ongoingEvent of ongoingEvents) {
         // Check if event has surpassed the 10 minutes mark since the start of the event
         const start = new Date(ongoingEvent.startTime);
         const notificationThresholdTime = add(start, { minutes: NOTIFICATION_TRIGGER_DELAY });
@@ -71,7 +71,7 @@ export const handleLocations = async ({
             return;
         }
 
-        // PLWD is late, verify his location...
+        // plwd is late, verify his location...
         if (hasValidLocations(ongoingEvent.address.geometry?.location, lastLocation.location)) {
             const coordinateA = ongoingEvent.address.geometry?.location as ICoordinate;
             const coordinateB = lastLocation.location as ICoordinate;

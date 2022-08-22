@@ -82,8 +82,6 @@ afterAll(async () => {
 });
 
 describe('LocationController', () => {
-    // TODO: add authorization to this route + tests
-    // We need the watchId to be fully implemented first for this though
     it('Should allow to fetch locations as a caretaker', async () => {
         await jwt.loginAs(caretaker.auth0Id);
 

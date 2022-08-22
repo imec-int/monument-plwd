@@ -10,7 +10,7 @@ export const plwdUser = {
     firstName: 'Person',
     lastName: 'Living with dementia',
     phone: '+32497887766',
-    picture: 'https://pwld-picture.com',
+    picture: 'https://plwd-picture.com',
     watchId: 'plwdwatchid',
 };
 
