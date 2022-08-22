@@ -83,17 +83,20 @@ export class SimulationController {
                 return;
             }
 
-            if (!calendarEvent.address.geometry?.location) {
+            const calendarEventLocation = calendarEvent?.address?.geometry?.location as ICoordinate;
+            const currentLocation = location as ICoordinate;
+            if (!calendarEventLocation || !currentLocation) {
                 logger.error(`[simulate] - geometry data is invalid`, {
-                    coordinateA: calendarEvent.address.geometry,
+                    coordinateA: calendarEventLocation,
+                    coordinateB: currentLocation,
                 });
                 ctx.status = 200;
                 return;
             }
 
             // Provided location is used as the simulated user's 'current' location
-            const coordinateA = calendarEvent.address.geometry.location as ICoordinate;
-            const coordinateB = location as ICoordinate;
+            const coordinateA = calendarEventLocation;
+            const coordinateB = currentLocation;
 
             const isWithinDistance = await this.locationRepository.isWithinDistance({
                 coordinateA,

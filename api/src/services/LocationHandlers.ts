@@ -20,7 +20,7 @@ type handleLocationInterface = {
     userRepository: UserRepository;
 };
 
-const hasValidLocations = (eventLocation: ICoordinate | undefined, userLocation: ICoordinate | undefined) => {
+const hasValidLocations = (eventLocation?: ICoordinate, userLocation?: ICoordinate) => {
     if (!eventLocation || !eventLocation.lat || !eventLocation.lng) return false;
     if (!userLocation || !userLocation.lat || !userLocation.lng) return false;
     return true;
@@ -72,9 +72,10 @@ export const handleLocations = async ({
         }
 
         // plwd is late, verify his location...
-        if (hasValidLocations(ongoingEvent.address.geometry?.location, lastLocation.location)) {
-            const coordinateA = ongoingEvent.address.geometry?.location as ICoordinate;
-            const coordinateB = lastLocation.location as ICoordinate;
+        const ongoingEventLocation = ongoingEvent?.address?.geometry?.location as ICoordinate;
+        if (hasValidLocations(ongoingEventLocation, lastLocation.location)) {
+            const coordinateA = ongoingEventLocation;
+            const coordinateB = lastLocation.location;
             // Check if users's last sent position is within X amount of meters distance of event location
             // using fancy POSTGIS SQL statement
             const isWithinDistance = await locationRepository.isWithinDistance({
@@ -103,7 +104,7 @@ export const handleLocations = async ({
             }
         } else {
             logger.error(`[handleLocations] - geometry data is invalid`, {
-                coordinateA: ongoingEvent.address.geometry,
+                coordinateA: ongoingEvent?.address?.geometry,
                 coordinateB: lastLocation.location,
             });
             return;
