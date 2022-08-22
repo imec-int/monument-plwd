@@ -10,7 +10,8 @@ updates:
     open-pull-requests-limit: 5
     # Ignore major dependency upgrades
     ignore:
-      - update-types: ["version-updates:semver-major"]
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "npm"
     directory: "/web"
@@ -19,4 +20,5 @@ updates:
     open-pull-requests-limit: 5
     # Ignore major dependency upgrades
     ignore:
-      - update-types: ["version-updates:semver-major"]
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
