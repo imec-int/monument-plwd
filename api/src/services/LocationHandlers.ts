@@ -100,7 +100,12 @@ export const handleLocations = async ({
                 const recipients = [...externalContacts, ...carecircleMembers];
 
                 // Send notification to the contact and caretaker
-                await notificationService.notifyForEvent({ plwd, recipients, event: ongoingEvent });
+                await notificationService.notifyForEvent({
+                    event: ongoingEvent,
+                    location: coordinateB,
+                    plwd,
+                    recipients,
+                });
             }
         } else {
             logger.error(`[handleLocations] - geometry data is invalid`, {

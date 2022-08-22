@@ -20,7 +20,7 @@ class MockTextMessageService implements NotificationDelegate {
         this.twilioClient = getTwilioClient(config);
     }
 
-    async notifyForEvent({ event, plwd, recipients }: INotifyForEventNotificationDelegate) {
+    async notifyForEvent({ event, plwd, recipients, location }: INotifyForEventNotificationDelegate) {
         for await (const recipient of recipients) {
             try {
                 const baseUrl = this.config.notification.baseUrl;
@@ -29,6 +29,7 @@ class MockTextMessageService implements NotificationDelegate {
                     baseUrl,
                     calendarEvent: event,
                     contactPersons: otherRecipients,
+                    location,
                     plwd,
                     recipient: recipient,
                 });
@@ -85,7 +86,7 @@ class MockWhatsappMessageService implements NotificationDelegate {
         this.twilioClient = getTwilioClient(config);
     }
 
-    async notifyForEvent({ event, plwd, recipients }: INotifyForEventNotificationDelegate) {
+    async notifyForEvent({ event, plwd, recipients, location }: INotifyForEventNotificationDelegate) {
         for await (const recipient of recipients) {
             try {
                 const baseUrl = this.config.notification.baseUrl;
@@ -94,6 +95,7 @@ class MockWhatsappMessageService implements NotificationDelegate {
                     baseUrl,
                     calendarEvent: event,
                     contactPersons: otherRecipients,
+                    location,
                     plwd,
                     recipient: recipient,
                 });
@@ -153,7 +155,7 @@ class MockEmailService implements NotificationDelegate {
         };
     }
 
-    async notifyForEvent({ event, plwd, recipients }: INotifyForEventNotificationDelegate) {
+    async notifyForEvent({ event, plwd, recipients, location }: INotifyForEventNotificationDelegate) {
         for await (const recipient of recipients) {
             try {
                 const hasNotified = await this.repository.hasNotificationForEvent({
@@ -180,6 +182,7 @@ class MockEmailService implements NotificationDelegate {
                     baseUrl,
                     calendarEvent: event,
                     contactPersons: otherRecipients,
+                    location,
                     plwd,
                     recipient: recipient,
                 });

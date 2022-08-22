@@ -394,9 +394,10 @@ describe('LogController', () => {
         expect(spyOnIsWithinDistance).toBeCalledTimes(1);
         expect(spyOnNotifyForEvent).toBeCalledTimes(1);
         expect(spyOnNotifyForEvent).toBeCalledWith({
-            recipients,
             event: ongoingDailyCalendarEvent,
+            location: locations[0].location,
             plwd,
+            recipients,
         } as INotifyForEventNotificationService);
         expect(spyOnHasNotificationForEvent).toBeCalledTimes(2);
 
@@ -477,9 +478,10 @@ describe('LogController', () => {
         expect(spyOnIsWithinDistance).toBeCalledTimes(1);
         expect(spyOnNotifyForEvent).toBeCalledTimes(1);
         expect(spyOnNotifyForEvent).toBeCalledWith({
-            recipients,
             event: ongoingDailyCalendarEvent,
+            location: locations[0].location,
             plwd,
+            recipients,
         } as INotifyForEventNotificationService);
         expect(spyOnHasNotificationForEvent).toBeCalledTimes(4);
 
@@ -590,9 +592,10 @@ describe('LogController', () => {
         expect(spyOnIsWithinDistance).toBeCalledTimes(2);
         expect(spyOnNotifyForEvent).toBeCalledTimes(2);
         expect(spyOnNotifyForEvent).toBeCalledWith({
-            recipients: [...externalContactRecipients, ...carecircleRecipients],
             event: ongoingDailyCalendarEvent,
+            location: locations[0].location,
             plwd,
+            recipients: [...externalContactRecipients, ...carecircleRecipients],
         } as INotifyForEventNotificationService);
         expect(spyOnHasNotificationForEvent).toBeCalledTimes(6);
         expect(spyOnInsertNotificationForEvent).toBeCalledTimes(3);

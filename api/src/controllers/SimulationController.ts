@@ -122,10 +122,11 @@ export class SimulationController {
 
             // Send notification
             await this.notificationService.notifyForEvent({
+                allowResend: true,
+                event: calendarEvent,
+                location: coordinateB,
                 plwd,
                 recipients,
-                event: calendarEvent,
-                allowResend: true,
             });
 
             ctx.status = 200;
