@@ -139,4 +139,16 @@ describe('AffiliationController', () => {
 
         await affiliationRepository.remove(affiliation.id);
     });
+
+    it('Should not allow the creation of a global affiliation even with lowercase', async () => {
+        await jwt.loginAs(admin.auth0Id);
+
+        const data = {
+            affiliation: 'family',
+            plwdId: plwd.id,
+        };
+
+        const response = await request(app.callback()).post(`/affiliation/${plwd.id}`).send(data);
+        expect(response.status).toEqual(409);
+    });
 });

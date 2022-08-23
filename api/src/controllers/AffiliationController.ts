@@ -68,12 +68,16 @@ export class AffiliationController {
     createAffiliation = async (ctx: Koa.ParameterizedContext) => {
         const body = ctx.request.body as ICreateAffiliation;
 
+        const affiliationLowerCase = body.affiliation.toLocaleLowerCase();
+
         try {
             const plwdAffiliations = await this.affiliationRepository.getByPlwdId(body.plwdId);
-            const existingAffiliation = plwdAffiliations.filter((a) => a.affiliation === body.affiliation);
-            const globalAffiliations = (<any>Object).values(Affiliation);
+            const existingAffiliation = plwdAffiliations.filter(
+                (a) => a.affiliation.toLocaleLowerCase() === affiliationLowerCase
+            );
+            const globalAffiliations = (<any>Object).values(Affiliation).map((g) => g.toLowerCase());
             // Check also if the affiliation is not part of the global affiliations from enum Affiliations
-            if (existingAffiliation.length > 0 || globalAffiliations.includes(body.affiliation)) {
+            if (existingAffiliation.length > 0 || globalAffiliations.includes(affiliationLowerCase)) {
                 ctx.status = 409;
                 ctx.body = {
                     message: `[existing-affiliation]: Affiliation ${body.affiliation} already exists for plwd ${body.plwdId}`,

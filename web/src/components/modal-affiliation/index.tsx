@@ -36,34 +36,38 @@ export const ModalAffiliation = ({ onClose }: IModalAffiliation) => {
   };
 
   const onSubmit = async (data: IAddAffiliationSchema) => {
-    const affiliation = {
-      affiliation: data.affiliation,
-      plwdId: plwd.id,
-    };
+    try {
+      const affiliation = {
+        affiliation: data.affiliation,
+        plwdId: plwd.id,
+      };
 
-    await fetchWrapper(`/api/affiliation/${plwd.id}`, {
-      method: 'POST',
-      body: JSON.stringify(affiliation),
-    })
-      .then(async () => {
-        enqueueSnackbar(`Successfully added affiliation ${data.affiliation}`, {
-          variant: 'success',
-        });
-        await refetchAffiliations();
-        onClose();
-      })
-      .catch(async (err: CustomError) => {
-        if (err.statusCode === 409) {
-          enqueueSnackbar(`Affiliation '${data.affiliation}' already exists`, {
-            variant: 'error',
-          });
-        } else {
-          enqueueSnackbar(`Failed to add affiliation ${data.affiliation}`, {
-            variant: 'error',
-          });
-        }
-        onClose();
+      await fetchWrapper(`/api/affiliation/${plwd.id}`, {
+        method: 'POST',
+        body: JSON.stringify(affiliation),
       });
+
+      enqueueSnackbar(`Successfully added affiliation ${data.affiliation}`, {
+        variant: 'success',
+      });
+      await refetchAffiliations();
+      onClose();
+    } catch (error) {
+      const _error = error as CustomError;
+      if (_error.statusCode === 409) {
+        enqueueSnackbar(`Affiliation '${data.affiliation}' already exists`, {
+          variant: 'error',
+        });
+      } else {
+        enqueueSnackbar(
+          `Failed to add affiliation ${data.affiliation}: ${_error}`,
+          {
+            variant: 'error',
+          }
+        );
+      }
+      onClose();
+    }
   };
 
   return (
