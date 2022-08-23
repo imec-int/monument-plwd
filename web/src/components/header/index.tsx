@@ -80,6 +80,13 @@ export const Header: React.FC<IHeader> = ({ tabTitle, isPublic }) => {
                     </Link>
                   </li>
                 ) : null}
+                {canManageCarecircle ? (
+                  <li>
+                    <Link href={`${basePath}/plwd`}>
+                      <div className="justify-between">PLWD Info</div>
+                    </Link>
+                  </li>
+                ) : null}
                 {hasAccessToMultipleCarecircles ? (
                   <li>
                     <Link href="/switch">
