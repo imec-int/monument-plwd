@@ -24,9 +24,9 @@ variables:
     value: 'monument-activity-web-app'
   - name: 'loginServer'
     value: 'monumentactivity.azurecr.io'
-  - name: trivyVersion
-    value: 0.29.2
   - group: monument-diary
+  - name: trivyVersion
+    value: 0.31.2
   - name: postgis
     value: postgis/postgis:11-3.2-alpine
 
