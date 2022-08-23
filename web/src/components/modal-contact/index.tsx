@@ -20,7 +20,6 @@ import { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useAffiliations } from 'src/hooks/useAffiliations';
 import { useAppUserContext } from 'src/hooks/useAppUserContext';
-import { mutate } from 'swr';
 import * as yup from 'yup';
 
 const userSchema = yup.object({
@@ -75,7 +74,7 @@ type IUserSchema = yup.InferType<typeof userSchema>;
 
 type IContactModalBase = {
   getUsers: () => Promise<void>;
-  addAffiliation: (affiliation: string) => Promise<void>;
+  addAffiliation?: (affiliation: string) => Promise<void>;
   onClose: () => void;
   onError?: (err: Error) => Promise<void> | void;
   onSuccess?: (data: IUserSchema) => Promise<void> | void;
