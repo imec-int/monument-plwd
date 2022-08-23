@@ -120,9 +120,9 @@ const Carecircle = () => {
                 <tr>
                   <th></th>
                   <th>Name</th>
-                  <th>Affiliation</th>
-                  <th>Email</th>
                   <th>Phone</th>
+                  <th>Email</th>
+                  <th>Affiliation</th>
                   {canManageCarecircle ? <th></th> : null}
                 </tr>
               </thead>
@@ -139,9 +139,9 @@ const Carecircle = () => {
                     <td>
                       {u.user.firstName} {u.user.lastName}
                     </td>
-                    <td>{u.affiliation}</td>
-                    <td>{u.user.email}</td>
                     <td>{u.user.phone}</td>
+                    <td>{u.user.email}</td>
+                    <td>{u.affiliation}</td>
                     {canManageCarecircle &&
                     u.affiliation !== Affiliation.PRIMARY_CARETAKER ? (
                       <td>
