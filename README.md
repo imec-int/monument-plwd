@@ -17,11 +17,9 @@ This web application is used to notify caretakers and carecircles of persons liv
   - [Start API](#api-application)
   - [Start Web application](#web-application)
 - [Documentation](#documentation)
-  - [API Reference](#api-reference)
-  - [Architecture](./ARCHITECTURE.md)
   - [Terminology](#terminology)
+  - [Location Tracking](#location-tracking)
   - [Testing](#testing)
-  - [Deploying](#table-of-contents)
 - [Contributing](#contributing)
 - [Code of conduct](#code-of-conduct)
 - [License](#license)
@@ -303,6 +301,18 @@ The web application should now be available [here](http://localhost:3000).
 - Caretaker: A person who is taking care of the person with disabilities added by the primary caretaker, those persons have an account created on Auth0 and can connect to the platform, their permissions on the platform will be restricted to what the primary caretaker decides
 - Carecircle: The group of caretakers related to the person with disabilities
 - External Contact: A person that can be contacted in case of an emergency during an event but who is not part of the carecircle and so cannot connect to the platform
+
+### Location tracking
+
+For this project it is critical to track the realtime location of a person living with disability (PLWD). For this we opted to use a smartwatch called the [Kompy watch](https://www.safetytracer.eu/the-kompy/kompy-watch-en).
+
+Each watch has a built-in e-sim that allows constant communication and location updates be sent to their server, which in turn sends those location updates to our backend which we then use to determine if a PLWD is - for example - late for an event.
+
+Since each Kompy watch has their own e-sim, they all have their own IMEI number as well. This IMEI number is used as the unique identifier and can be linked to a single PLWD.
+
+Within this project when a primary caretaker does the sign-up he will have the opportunity to fill in an IMEI number for a Kompy watch and link it to the PLWD he or she is taking care of.
+
+It is of course possible to add other watches or location tracking devices to fill in your needs but currently within this codebase only the Kompy watches are supported by default.
 
 ### Testing
 
