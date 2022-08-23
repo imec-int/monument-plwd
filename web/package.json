@@ -30,7 +30,7 @@
     "dayjs": "^1.11.5",
     "framer-motion": "^6.5.1",
     "mapbox-gl": "^2.9.2",
-    "next": "12.2.2",
+    "next": "12.2.5",
     "next-compose-plugins": "^2.2.1",
     "next-translate": "^1.5.0",
     "next-transpile-modules": "^9.0.0",
