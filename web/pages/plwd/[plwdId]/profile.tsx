@@ -277,7 +277,7 @@ const Profile = () => {
                   }`}
                   defaultValue={value?.description}
                   language="en"
-                  onPlaceSelected={(place: any) => {
+                  onPlaceSelected={(place) => {
                     onChange({
                       description: place.formatted_address,
                       geometry: {
@@ -291,6 +291,7 @@ const Profile = () => {
                   options={{
                     types: ['address'],
                   }}
+                  placeholder="Enter address"
                 />
               )}
               rules={{ required: true }}

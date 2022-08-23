@@ -286,6 +286,57 @@ describe('LogController', () => {
         expect(spyOnHasNotificationForEvent).toBeCalledTimes(0);
     });
 
+    it('Should not trigger a notification for an event that started 15 minutes ago has no address', async () => {
+        const notificationService = new MockCompositeNotificationService(
+            notificationRepository,
+            config
+        ).withConsoleLogService();
+
+        const calendarEvent = new CalendarEventBuilder()
+            .withAddress(undefined)
+            .withExternalContacts([])
+            .withPLWD(plwd.id)
+            .withCreatedBy(caretaker.id)
+            .withStartTime(subMinutes(new Date(), 15).toISOString())
+            .build();
+
+        const createdCalendarEvent = await calendarEventRepository.insert(calendarEvent);
+        const ongoingDailyCalendarEvent = await calendarEventRepository.getById(createdCalendarEvent.id);
+
+        const spyOngetOngoingEventsByPlwdId = jest.spyOn(calendarEventRepository, 'getOngoingEventsByPlwdId');
+        const spyOnNotifyForEvent = jest.spyOn(notificationService, 'notifyForEvent');
+        const spyOnIsWithinDistance = jest.spyOn(locationRepository, 'isWithinDistance');
+
+        const locationLogs = [
+            {
+                id: '004169c5-6e0f-46e8-86ff-290d6f46e6b2',
+                timestamp: '2022-04-04T07:49:24.639Z',
+                payload: coordinatesToLocationLogPayload(userOutsideGeofenceCoordinate),
+                user: plwd.watchId,
+                type: LogEvent.LOCATION,
+            },
+        ];
+        const locations = locationLogs.map(mapToLocation);
+
+        await handleLocations({
+            calendarEventRepository,
+            locationRepository,
+            locations,
+            notificationService,
+            plwdRepository,
+            userRepository,
+        });
+
+        const notifications = await notificationRepository.get();
+        expect(notifications).toHaveLength(0);
+
+        await calendarEventRepository.deleteById(ongoingDailyCalendarEvent.id);
+
+        expect(spyOngetOngoingEventsByPlwdId).toBeCalledTimes(1);
+        expect(spyOnIsWithinDistance).toBeCalledTimes(0);
+        expect(spyOnNotifyForEvent).toBeCalledTimes(0);
+    });
+
     it('Should trigger a notification for an event that started 15 minutes ago and user is not within range of 150 meters of event', async () => {
         const notificationService = new MockCompositeNotificationService(
             notificationRepository,
@@ -343,9 +394,10 @@ describe('LogController', () => {
         expect(spyOnIsWithinDistance).toBeCalledTimes(1);
         expect(spyOnNotifyForEvent).toBeCalledTimes(1);
         expect(spyOnNotifyForEvent).toBeCalledWith({
-            recipients,
             event: ongoingDailyCalendarEvent,
+            location: locations[0].location,
             plwd,
+            recipients,
         } as INotifyForEventNotificationService);
         expect(spyOnHasNotificationForEvent).toBeCalledTimes(2);
 
@@ -426,9 +478,10 @@ describe('LogController', () => {
         expect(spyOnIsWithinDistance).toBeCalledTimes(1);
         expect(spyOnNotifyForEvent).toBeCalledTimes(1);
         expect(spyOnNotifyForEvent).toBeCalledWith({
-            recipients,
             event: ongoingDailyCalendarEvent,
+            location: locations[0].location,
             plwd,
+            recipients,
         } as INotifyForEventNotificationService);
         expect(spyOnHasNotificationForEvent).toBeCalledTimes(4);
 
@@ -539,9 +592,10 @@ describe('LogController', () => {
         expect(spyOnIsWithinDistance).toBeCalledTimes(2);
         expect(spyOnNotifyForEvent).toBeCalledTimes(2);
         expect(spyOnNotifyForEvent).toBeCalledWith({
-            recipients: [...externalContactRecipients, ...carecircleRecipients],
             event: ongoingDailyCalendarEvent,
+            location: locations[0].location,
             plwd,
+            recipients: [...externalContactRecipients, ...carecircleRecipients],
         } as INotifyForEventNotificationService);
         expect(spyOnHasNotificationForEvent).toBeCalledTimes(6);
         expect(spyOnInsertNotificationForEvent).toBeCalledTimes(3);

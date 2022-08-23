@@ -15,7 +15,7 @@ export type CarecircleMemberId = string;
 export type ExternalContactId = string;
 
 export type CalendarEventBase = {
-    address: IAddress;
+    address?: IAddress;
     createdBy: string;
     endTime: string;
     id: string;

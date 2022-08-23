@@ -1,4 +1,4 @@
-import { Container, Header } from '@components';
+import { Container, Header, LinkGoogleMap } from '@components';
 import { Ilocation, ILocationWithAddress } from '@interfaces';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
@@ -109,7 +109,13 @@ const LocationTrack: React.FC = () => {
             </div>
           )}
           <h2 className="card-title mb-2">Last known location</h2>
-          <p className="mb-4">{locations[0].address}</p>
+          <div className="flex gap-2">
+            <p className="mb-4">{locations[0].address}</p>
+            <LinkGoogleMap
+              lat={locations[0]?.location.lat}
+              lng={locations[0]?.location.lng}
+            />
+          </div>
           <div className="w-full h-4/6 flex gap-4 mb-8 min-h-[420px] max-h-[540px]">
             <div className="flex-1 rounded-xl min-h-full overflow-hidden shadow-xl">
               <Map currentLocation={locations[0]} locations={locations} />

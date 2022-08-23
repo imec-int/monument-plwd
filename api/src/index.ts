@@ -17,6 +17,7 @@ import createPlwdRepository from './repositories/PlwdRepository';
 import createExternalContactsRepository from './repositories/ExternalContactsRepository';
 import { RestApiBasedAuth0Service } from './services/RestApiBasedAuth0Service';
 import { createKompyAuthorizationMiddleware } from './auth/kompy-authorization-middleware';
+import createAffiliationRepository from './repositories/AffiliationRepository';
 
 (async () => {
     const config = createConfiguration();
@@ -35,6 +36,7 @@ import { createKompyAuthorizationMiddleware } from './auth/kompy-authorization-m
     const locationRepository = createLocationRepository(db);
     const notificationRepository = createNotificationRepository(db);
     const userRepository = createUserRepository(db);
+    const affiliationRepository = createAffiliationRepository(db);
     const carecircleMemberRepository = createCarecircleMemberRepository(db);
     const plwdRepository = createPlwdRepository(db);
     const externalContactRepository = createExternalContactsRepository(db);
@@ -68,6 +70,7 @@ import { createKompyAuthorizationMiddleware } from './auth/kompy-authorization-m
                 notificationService,
                 plwdRepository,
                 userRepository,
+                affiliationRepository,
             })
         );
 
