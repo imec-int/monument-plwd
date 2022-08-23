@@ -1,3 +1,9 @@
+import { AffiliationRepository } from './../repositories/AffiliationRepository';
+import {
+    AffiliationController,
+    AffiliationControllerAuthorizationService,
+    createAffiliationValidationSchema,
+} from './../controllers/AffiliationController';
 import { LogController } from './../controllers/LogController';
 import Router from 'koa-router';
 import Koa from 'koa';
@@ -143,6 +149,7 @@ export const authenticatedRoutes = ({
     notificationService,
     plwdRepository,
     userRepository,
+    affiliationRepository,
 }: {
     auth0Service: Auth0Service;
     authorizationMiddleware: Koa.Middleware;
@@ -155,6 +162,7 @@ export const authenticatedRoutes = ({
     notificationService: CompositeNotificationService;
     plwdRepository: PlwdRepository;
     userRepository: UserRepository;
+    affiliationRepository: AffiliationRepository;
 }) => {
     /**
      * Configuration of the router
@@ -181,6 +189,23 @@ export const authenticatedRoutes = ({
         plwdRepository,
         carecircleMemberRepository,
         calendarEventRepository
+    );
+
+    /**
+     * Affiliations
+     */
+    const affiliationAuthorizationService = new AffiliationControllerAuthorizationService(authService);
+    const affiliationController = new AffiliationController(affiliationRepository);
+    router.get(
+        '/affiliations/:plwdId',
+        affiliationAuthorizationService.canAccessAffiliationsForPlwd,
+        affiliationController.getAffiliationsByPlwdId
+    );
+    router.post(
+        '/affiliation/:plwdId',
+        validateRequest(createAffiliationValidationSchema),
+        affiliationAuthorizationService.canManageAffiliationsForPlwd,
+        affiliationController.createAffiliation
     );
 
     /**

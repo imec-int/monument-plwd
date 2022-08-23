@@ -23,6 +23,7 @@ export { Paragraph } from './paragraph';
 
 // Modals
 export { Modal, ModalActions } from './modal';
+export { ModalAffiliation } from './modal-affiliation';
 export { ModalContact } from './modal-contact';
 export { ModalContactDelete } from './modal-contact-delete';
 export { ModalEventDelete } from './modal-event-delete';

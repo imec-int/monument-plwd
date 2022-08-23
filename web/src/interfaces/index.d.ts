@@ -124,3 +124,9 @@ export interface Ilocation {
   timestamp: string | Date;
   watchId: string;
 }
+
+export interface IAffiliation {
+  affiliation: string;
+  id: string;
+  plwdId: string;
+}

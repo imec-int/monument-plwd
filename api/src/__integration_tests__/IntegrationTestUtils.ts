@@ -17,6 +17,7 @@ import createCarecircleMemberRepository from '../repositories/CarecircleMemberRe
 import { createConfiguration } from '../utils/config';
 import createPlwdRepository from '../repositories/PlwdRepository';
 import createExternalContactsRepository from '../repositories/ExternalContactsRepository';
+import createAffiliationRepository from '../repositories/AffiliationRepository';
 import { MockAuth0Service } from './MockAuth0Service';
 import { createKompyAuthorizationMiddleware } from '../auth/kompy-authorization-middleware';
 
@@ -57,6 +58,7 @@ export const initTestSetup = async () => {
     const calendarEventRepository = createCalendarEventRepository(database);
     const locationRepository = createLocationRepository(database);
     const userRepository = createUserRepository(database);
+    const affiliationRepository = createAffiliationRepository(database);
     const notificationRepository = createNotificationRepository(database);
     const carecircleMemberRepository = createCarecircleMemberRepository(database);
     const plwdRepository = createPlwdRepository(database);
@@ -83,6 +85,7 @@ export const initTestSetup = async () => {
         .use(unauthenticatedRoutes({ calendarEventRepository, locationRepository, plwdRepository }))
         .use(
             authenticatedRoutes({
+                affiliationRepository,
                 auth0Service,
                 authorizationMiddleware,
                 calendarEventRepository,
@@ -116,6 +119,7 @@ export const initTestSetup = async () => {
         database,
         mockJwtHandler: mockAuthorizationHeaderTransform,
         repositories: {
+            affiliationRepository,
             calendarEventRepository,
             carecircleMemberRepository,
             externalContactRepository,
