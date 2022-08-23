@@ -14,7 +14,6 @@ import dayjs from 'dayjs';
 import { CustomError } from 'lib/CustomError';
 import { fetchWrapper } from 'lib/fetch';
 import { useSnackbar } from 'notistack';
-import { useEffect } from 'react';
 import Autocomplete from 'react-google-autocomplete';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { useModal } from 'src/hooks/useModal';
@@ -89,7 +88,6 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
     getValues,
     handleSubmit,
     register,
-    setValue,
     watch,
   } = useForm<IFormCalendarEvent>({
     defaultValues: {
@@ -107,14 +105,6 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
 
   const watchStartTime = watch('startTimeValue');
   const watchAddADestination = watch('addADestination');
-
-  useEffect(() => {
-    // Reset the address and contacts values when a user switches between toggles
-    if (!watchAddADestination) {
-      setValue('address', null);
-      setValue('contacts', []);
-    }
-  }, [setValue, watchAddADestination]);
 
   const { fields, append } = useFieldArray<IFormCalendarEvent>({
     name: 'contacts',
@@ -166,16 +156,20 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
 
   const onSubmit = async (data: IFormCalendarEvent) => {
     try {
-      const carecircleMemberIds = data.contacts
-        .filter((c) => c.checked && c.caretakerId)
-        .map((c) => c.caretakerId);
+      const carecircleMemberIds = data.addADestination
+        ? data.contacts
+            .filter((c) => c.checked && c.caretakerId)
+            .map((c) => c.caretakerId)
+        : [];
 
-      const externalContactIds = data.contacts
-        .filter((c) => c.checked && c.externalContactId)
-        .map((c) => c.externalContactId);
+      const externalContactIds = data.addADestination
+        ? data.contacts
+            .filter((c) => c.checked && c.externalContactId)
+            .map((c) => c.externalContactId)
+        : [];
 
       const event = {
-        address: data.address,
+        address: data.addADestination ? data.address : null,
         carecircleMemberIds,
         externalContactIds,
         endTime: data.endTimeValue,
