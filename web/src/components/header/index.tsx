@@ -73,13 +73,11 @@ export const Header: React.FC<IHeader> = ({ tabTitle, isPublic }) => {
                 className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
                 tabIndex={0}
               >
-                {canManageCarecircle ? (
-                  <li>
-                    <Link href={`${basePath}/profile`}>
-                      <div className="justify-between">Profile</div>
-                    </Link>
-                  </li>
-                ) : null}
+                <li>
+                  <Link href={`${basePath}/profile`}>
+                    <div className="justify-between">Profile</div>
+                  </Link>
+                </li>
                 {canManageCarecircle ? (
                   <li>
                     <Link href={`${basePath}/plwd`}>

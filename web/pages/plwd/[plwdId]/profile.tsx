@@ -10,12 +10,10 @@ import { UserRole } from '@enum';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { CustomError } from 'lib/CustomError';
 import { fetchWrapper } from 'lib/fetch';
-import { useRouter } from 'next/router';
 import { useSnackbar } from 'notistack';
-import { ReactElement, useEffect } from 'react';
+import { ReactElement } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppUserContext } from 'src/hooks/useAppUserContext';
-import { usePermissions } from 'src/hooks/usePermissions';
 import { useUserValidationSchema } from 'src/hooks/useUserValidationSchema';
 import * as yup from 'yup';
 
@@ -26,8 +24,6 @@ export const getServerSideProps = withPageAuthRequired();
 const Profile = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { user, plwd } = useAppUserContext();
-  const { canManageCarecircle } = usePermissions();
-  const router = useRouter();
   const userInfoSchema = useUserValidationSchema();
 
   const {
@@ -72,14 +68,6 @@ const Profile = () => {
       });
     }
   };
-
-  useEffect(() => {
-    if (!canManageCarecircle) {
-      router.push(`/plwd/${plwd.id}`);
-    }
-  }, [canManageCarecircle, router, plwd.id]);
-
-  if (!canManageCarecircle) return null;
 
   const role =
     plwd.caretakerId === user.id ? (
