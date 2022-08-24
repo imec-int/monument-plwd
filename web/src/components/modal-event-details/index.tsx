@@ -46,12 +46,12 @@ const eventSchema = yup.object({
         }),
       }),
     })
-    .nullable()
     .when('addADestination', {
       is: true,
       then: (schema) => schema.required(),
       otherwise: (schema) => schema.optional(),
-    }),
+    })
+    .default(undefined),
 });
 
 type IFormCalendarEvent = yup.InferType<typeof eventSchema>;
