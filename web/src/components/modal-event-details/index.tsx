@@ -258,6 +258,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
                   name="startTimeValue"
                   render={({ field: { value, onChange } }) => (
                     <DateTimePicker
+                      ampm={false}
                       disablePast
                       disabled={
                         selectedEvent.id &&
@@ -279,6 +280,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
                   name="endTimeValue"
                   render={({ field: { value, onChange } }) => (
                     <DateTimePicker
+                      ampm={false}
                       disablePast
                       disabled={
                         selectedEvent.id &&
