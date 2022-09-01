@@ -41,6 +41,7 @@ export const ImageSetter: React.FC<IImageSetter> = ({
           <button
             className="btn absolute left-2 top-0 btn-secondary btn-circle btn-sm my-2"
             onClick={() => setBase64Image(undefined)}
+            type="button"
           >
             <svg
               className="h-6 w-6"
