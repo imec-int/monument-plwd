@@ -422,7 +422,7 @@ describe('LogController', () => {
     it('Should trigger a notification via email and text message for an event that started 15 minutes ago and user is not within range of 150 meters of event', async () => {
         const notificationService = new MockCompositeNotificationService(notificationRepository, config)
             .withEmailService()
-            .withTextMessageService();
+            .withConsoleLogService();
 
         const externalContact1 = await externalContactRepository.insert({ ...externalContactUser, plwdId: plwd.id });
         const externalContact2 = await externalContactRepository.insert({ ...externalContactUser2, plwdId: plwd.id });
@@ -507,7 +507,7 @@ describe('LogController', () => {
             eventId: ongoingDailyCalendarEvent.id,
             id: notification3.id,
             plwdId: plwd.id,
-            type: INotificationType.TEXT_MESSAGE,
+            type: INotificationType.CONSOLE,
         } as INotification);
         expect(notification4).toEqual({
             contactUserId: externalContact2.id,
@@ -515,7 +515,7 @@ describe('LogController', () => {
             eventId: ongoingDailyCalendarEvent.id,
             id: notification4.id,
             plwdId: plwd.id,
-            type: INotificationType.TEXT_MESSAGE,
+            type: INotificationType.CONSOLE,
         } as INotification);
     });
 
