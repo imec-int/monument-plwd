@@ -2,8 +2,8 @@ import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 
 interface IImageSetter {
-  base64image: string | undefined;
-  setBase64Image: (base64image: string | undefined) => void;
+  base64image: string | null | undefined;
+  setBase64Image: (base64image: string | null) => void;
   label?: string;
   height?: string;
   width?: string;
@@ -40,7 +40,11 @@ export const ImageSetter: React.FC<IImageSetter> = ({
           />
           <button
             className="btn absolute left-2 top-0 btn-secondary btn-circle btn-sm my-2"
-            onClick={() => setBase64Image(undefined)}
+            onClick={(e) => {
+              e.preventDefault();
+              setBase64Image(null);
+            }}
+            type="button"
           >
             <svg
               className="h-6 w-6"
@@ -71,10 +75,10 @@ export const ImageSetter: React.FC<IImageSetter> = ({
             reader.readAsDataURL(blob);
             reader.onloadend = () => {
               const base64data = reader.result?.toString();
-              setBase64Image(base64data);
+              setBase64Image(base64data ?? null);
             };
           } else {
-            setBase64Image(undefined);
+            setBase64Image(null);
           }
         }}
         ref={fileInputRef}

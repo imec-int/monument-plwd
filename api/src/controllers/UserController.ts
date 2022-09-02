@@ -27,7 +27,7 @@ export const createUserValidationSchema = yup.object({
                     firstName: yup.string().required(),
                     lastName: yup.string().required(),
                     phone: yup.string().required(),
-                    picture: yup.string(),
+                    picture: yup.string().nullable(),
                     role: yup.string().required(),
                 })
                 .required(),
@@ -46,7 +46,7 @@ export const updateUserValidationSchema = yup.object({
                     firstName: yup.string().required(),
                     lastName: yup.string().required(),
                     phone: yup.string().required(),
-                    picture: yup.string(),
+                    picture: yup.string().nullable(),
                     role: yup.string().required(),
                 })
                 .required(),

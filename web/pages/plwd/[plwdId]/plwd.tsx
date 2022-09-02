@@ -146,6 +146,7 @@ const Plwd = () => {
               className={`input input-bordered w-96 ${
                 errors.watchId ? 'input-error' : ''
               }`}
+              maxLength={15}
               placeholder="IMEI / Watch ID"
               type="text"
             />
