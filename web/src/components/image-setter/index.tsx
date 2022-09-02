@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 
 interface IImageSetter {
-  base64image: string | undefined;
+  base64image: string | null | undefined;
   setBase64Image: (base64image: string | null) => void;
   label?: string;
   height?: string;
