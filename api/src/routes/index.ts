@@ -51,6 +51,7 @@ import { DefaultAuthorizationService } from '../auth/AuthorizationService';
 import { Auth0Service } from '../services/RestApiBasedAuth0Service';
 import { KompyEvent } from '../models/Kompy';
 import { validateRequest } from '../middleware/validation';
+import { MailService, MailServiceInterface } from '../services/MailService';
 
 export const unauthenticatedRoutes = ({
     calendarEventRepository,
@@ -147,10 +148,12 @@ export const authenticatedRoutes = ({
     logRepository,
     notificationRepository,
     notificationService,
+    mailService,
     plwdRepository,
     userRepository,
     affiliationRepository,
 }: {
+    affiliationRepository: AffiliationRepository;
     auth0Service: Auth0Service;
     authorizationMiddleware: Koa.Middleware;
     calendarEventRepository: CalendarEventRepository;
@@ -160,9 +163,9 @@ export const authenticatedRoutes = ({
     logRepository: LogRepository;
     notificationRepository: NotificationRepository;
     notificationService: CompositeNotificationService;
+    mailService: MailServiceInterface;
     plwdRepository: PlwdRepository;
     userRepository: UserRepository;
-    affiliationRepository: AffiliationRepository;
 }) => {
     /**
      * Configuration of the router
@@ -248,7 +251,9 @@ export const authenticatedRoutes = ({
     const carecircleMemberController = new CarecircleMemberController(
         carecircleMemberRepository,
         userRepository,
-        auth0Service
+        plwdRepository,
+        auth0Service,
+        mailService
     );
     router.get(
         '/carecircle-members/:plwdId',

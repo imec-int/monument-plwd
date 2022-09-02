@@ -18,6 +18,7 @@ import createExternalContactsRepository from './repositories/ExternalContactsRep
 import { RestApiBasedAuth0Service } from './services/RestApiBasedAuth0Service';
 import { createKompyAuthorizationMiddleware } from './auth/kompy-authorization-middleware';
 import createAffiliationRepository from './repositories/AffiliationRepository';
+import { MailService } from './services/MailService';
 
 (async () => {
     const config = createConfiguration();
@@ -50,6 +51,9 @@ import createAffiliationRepository from './repositories/AffiliationRepository';
     // Auth0
     const auth0Service = new RestApiBasedAuth0Service(config.auth0);
 
+    // SendGrid
+    const mailService = new MailService(config);
+
     const authorizationMiddleware = createAuthorizationMiddleware(config.auth0);
     const kompyAuthorizationMiddleware = createKompyAuthorizationMiddleware(config);
     const enabledKompyClientAPI = config.kompyClientAPI.enabled;
@@ -68,6 +72,7 @@ import createAffiliationRepository from './repositories/AffiliationRepository';
                 logRepository,
                 notificationRepository,
                 notificationService,
+                mailService,
                 plwdRepository,
                 userRepository,
                 affiliationRepository,

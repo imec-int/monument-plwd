@@ -132,7 +132,7 @@ export class RestApiBasedAuth0Service implements Auth0Service {
             email: email.toLowerCase(),
             name: user.name,
             password: generatePassword(24),
-            app_metadata: {},
+            app_metadata: { signUpInitiatedFromPlatform: true },
         };
         const createUserURL = concatUrls(this.auth0Config.m2m.baseUrl, '/api/v2/users');
         return await axios.post<Auth0User>(createUserURL, body, {
