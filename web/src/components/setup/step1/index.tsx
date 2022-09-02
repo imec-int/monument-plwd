@@ -23,7 +23,9 @@ export const SetupStep1: React.FC<ISetupStep> = ({ nextStep, userData }) => {
     control,
     formState: { errors, isSubmitting },
   } = useForm<IFormUserInfo>({
-    defaultValues: {},
+    defaultValues: {
+      email: userData.authenticatedUser.email ?? undefined,
+    },
     resolver: yupResolver(userInfoSchema),
   });
 
