@@ -7,7 +7,7 @@ export const usePlwdValidationSchema = () => {
     lastName: yup.string().required(),
     phone: formInputPhoneSchemaOptional,
     email: yup.string().email(),
-    picture: yup.string(),
+    picture: yup.string().nullable(),
     address: yup.object({
       description: yup.string(),
       geometry: yup.object({
@@ -17,6 +17,14 @@ export const usePlwdValidationSchema = () => {
         }),
       }),
     }),
-    watchId: yup.string().optional(),
+    watchId: yup
+      .string()
+      .test('len', 'Length must be exactly 15 digits', (value = '') => {
+        if (value.length === 0) return true;
+
+        return value.length === 15;
+      })
+      .optional()
+      .nullable(),
   });
 };
