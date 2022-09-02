@@ -24,7 +24,6 @@ export const usePlwdValidationSchema = () => {
 
         return value.length === 15;
       })
-      .optional()
       .nullable(),
   });
 };

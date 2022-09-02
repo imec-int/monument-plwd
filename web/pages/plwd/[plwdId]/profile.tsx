@@ -15,6 +15,7 @@ import { ReactElement } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppUserContext } from 'src/hooks/useAppUserContext';
 import { useUserValidationSchema } from 'src/hooks/useUserValidationSchema';
+import { useSWRConfig } from 'swr';
 import * as yup from 'yup';
 
 type IFormUserInfo = yup.InferType<ReturnType<typeof useUserValidationSchema>>;
@@ -22,6 +23,7 @@ type IFormUserInfo = yup.InferType<ReturnType<typeof useUserValidationSchema>>;
 export const getServerSideProps = withPageAuthRequired();
 
 const Profile = () => {
+  const { mutate } = useSWRConfig();
   const { enqueueSnackbar } = useSnackbar();
   const { user, plwd } = useAppUserContext();
   const userInfoSchema = useUserValidationSchema();
@@ -55,6 +57,7 @@ const Profile = () => {
         method: 'PATCH',
         body: JSON.stringify({ user: updatedUser }),
       });
+      await mutate(`/api/user/${user.auth0Id}`);
       enqueueSnackbar(
         `Successfully updated User ${data.firstName} ${data.lastName}!`,
         {
@@ -70,11 +73,11 @@ const Profile = () => {
   };
 
   const role =
-    plwd.caretakerId === user.id ? (
-      <p>Primary Caretaker</p>
-    ) : (
-      <p>{user.role === UserRole.ADMIN ? 'Admin' : 'Carecircle member'}</p>
-    );
+    plwd.caretakerId === user.id
+      ? 'Primary Caretaker'
+      : user.role === UserRole.ADMIN
+      ? 'Admin'
+      : 'Carecircle member';
 
   return (
     <Container>
