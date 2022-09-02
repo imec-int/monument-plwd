@@ -83,10 +83,16 @@ const Location = () => {
         <>
           <h2 className="card-title mb-2">Last known location</h2>
           <div className="flex gap-2">
-            <p className="mb-4">{currentLocationAddress}</p>
+            <p className="mb-4">
+              {currentLocationAddress} (
+              {currentLocation?.createdAt
+                ? dayjs(currentLocation.createdAt).format('DD-MM-YYYY HH:mm:ss')
+                : '-'}
+              )
+            </p>
             <LinkGoogleMap
-              lat={locations[0]?.location.lat}
-              lng={locations[0]?.location.lng}
+              lat={currentLocation?.location?.lat}
+              lng={currentLocation?.location?.lng}
             />
           </div>
           <div className="w-full h-4/6 flex gap-4 mb-8">
