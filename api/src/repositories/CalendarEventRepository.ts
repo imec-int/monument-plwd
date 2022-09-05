@@ -173,13 +173,15 @@ const addContactsToCalendarEvent = async (knex: Knex, event: CalendarEventWithCo
         )
         .join('carecircle_members', 'carecircle_members.id', 'calendar_events_carecircle_members.carecircle_member_id')
         .join('users', 'users.id', 'carecircle_members.user_id')
-        .where('calendar_events_carecircle_members.calendar_event_id', event.id);
+        .where('calendar_events_carecircle_members.calendar_event_id', event.id)
+        .andWhere('carecircle_members.plwd_user_id', event.plwdId);
     event.carecircleMembers = carecircleMembers.map(mapToCarecircleViewModel);
 
     const externalContacts = await knex('calendar_events_external_contacts')
         .select('id', 'first_name', 'last_name', 'phone', 'email', 'affiliation', 'plwd_user_id')
         .join('external_contacts', 'calendar_events_external_contacts.external_contact_id', 'external_contacts.id')
-        .where('calendar_events_external_contacts.calendar_event_id', event.id);
+        .where('calendar_events_external_contacts.calendar_event_id', event.id)
+        .andWhere('external_contacts.plwd_user_id', event.plwdId);
     event.externalContacts = externalContacts.map(mapToExternalContactViewModel);
 
     return event;
