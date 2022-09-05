@@ -20,7 +20,7 @@ export class MockMailService implements MailServiceInterface {
             from: this.config.notification.sendgrid.from,
             text: `
                 Hi ${user.firstName}, you have been invited to the carecircle of ${plwd.firstName} ${plwd.lastName}.
-                You can access the web application via this link: ${this.config.notification.baseUrl}plwd/${plwd.id}.
+                You can access the web application via this link: ${this.config.notification.baseUrl}.
             `,
         });
     }
