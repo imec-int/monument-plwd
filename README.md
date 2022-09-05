@@ -136,6 +136,42 @@ AUTH0_JWT_AUDIENCE='YOUR_AUTH0_AUDIENCE'
 AUTH0_JWT_DOMAIN='https://YOUR_AUTH0_DOMAIN.auth0.com'
 ```
 
+Finally, we need to add a custom action that is used to send password reset emails to users when they are invited to the platform.
+
+Go to `actions` > `Post-User Registration`, create a new custom action with the following code.
+
+```js
+const auth0 = require('auth0');
+
+/**
+* Handler that will be called during the execution of a PostUserRegistration flow.
+* We need to send password reset mails to users that were added via the platform itself.
+*
+* @param {Event} event - Details about the context and user that has registered.
+*/
+exports.onExecutePostUserRegistration = async (event) => {
+  if (event.user.app_metadata.signUpInitiatedFromPlatform) {
+    const authClient = new auth0.AuthenticationClient({
+      clientId: event.secrets.CLIENT_ID,
+      domain: event.secrets.DOMAIN,
+    });
+
+    const userAndConnection = {
+      connection: 'Username-Password-Authentication'
+      email: event.user.email,
+    };
+
+    await authClient.requestChangePasswordEmail(userAndConnection);
+  }
+};
+```
+
+Add `auth0@latest` as a dependency. And define 2 secret variables `CLIENT_ID` and `DOMAIN`.
+
+`CLIENT_ID` should contain the `AUTH0_CLIENT_ID` environment variable value, while `DOMAIN` should be the same as the `AUTH0_DOMAIN` environment variable value.
+
+Finally, deploy the action and drag it in the Post-User registration flow.
+
 ### Twilio and SendGrid
 
 To notify users about events this platform allows sending of notifications via emails and/or text messages (SMS/WhatsApp) This platform currently supports email via "SendGrid" and uses "Twilio" to send text messages (SMS) and WhatsApp messages.
