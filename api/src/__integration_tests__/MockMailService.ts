@@ -16,6 +16,7 @@ export class MockMailService implements MailServiceInterface {
 
     async sendCarecircleInvite({ user, plwd }: { user: IUser; plwd: IPlwd }) {
         await this.mailClient.send({
+            to: user.email,
             subject: 'Monument carecircle invitation',
             from: this.config.notification.sendgrid.from,
             text: `
