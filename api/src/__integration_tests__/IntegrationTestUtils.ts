@@ -20,6 +20,7 @@ import createExternalContactsRepository from '../repositories/ExternalContactsRe
 import createAffiliationRepository from '../repositories/AffiliationRepository';
 import { MockAuth0Service } from './MockAuth0Service';
 import { createKompyAuthorizationMiddleware } from '../auth/kompy-authorization-middleware';
+import { MockMailService } from './MockMailService';
 
 interface AuthorizationHeaderTransform {
     tokenToUser: (token: string) => Promise<User>;
@@ -78,6 +79,7 @@ export const initTestSetup = async () => {
         .withWhatsappMessageService();
 
     const auth0Service = new MockAuth0Service();
+    const mailService = new MockMailService(config);
 
     // Create the Koa app
     app.use(cors())
@@ -95,6 +97,7 @@ export const initTestSetup = async () => {
                 logRepository,
                 notificationRepository,
                 notificationService,
+                mailService,
                 plwdRepository,
                 userRepository,
             })

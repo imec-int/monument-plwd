@@ -135,7 +135,7 @@ const Profile = () => {
             </div>
           </div>
           <button
-            className={`w-40 m-auto mt-4 block btn btn-secondary${
+            className={`w-40 m-auto mt-4 btn btn-secondary${
               isSubmittingUser ? ' loading' : ''
             }`}
             type="submit"

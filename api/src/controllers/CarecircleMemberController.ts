@@ -6,9 +6,11 @@ import Koa, { Middleware } from 'koa';
 import * as yup from 'yup';
 import logger from '../utils/logger';
 import { DefaultAuthorizationService } from 'src/auth/AuthorizationService';
-import { Auth0Service } from 'src/services/RestApiBasedAuth0Service';
+import { Auth0Service } from '../services/RestApiBasedAuth0Service';
 import { UserRole } from '../models/UserRole';
 import { Affiliation, ICarecircleMemberBody } from '../models/CarecircleMember';
+import { PlwdRepository } from '../repositories/PlwdRepository';
+import { MailServiceInterface } from '../services/MailService';
 
 const requestUserContext = yup
     .object({
@@ -81,7 +83,9 @@ export class CarecircleMemberController {
     constructor(
         private carecircleMemberRepository: CarecircleMemberRepository,
         private userRepository: UserRepository,
-        private readonly auth0Service: Auth0Service
+        private plwdRepository: PlwdRepository,
+        private readonly auth0Service: Auth0Service,
+        private readonly mailService: MailServiceInterface
     ) {}
 
     getByPlwdId = async (ctx: Koa.ParameterizedContext) => {
@@ -225,6 +229,21 @@ export class CarecircleMemberController {
                 } as ICarecircleMemberBody;
                 await this.carecircleMemberRepository.addMember(carecircleMemberBody);
             }
+
+            const plwd = await this.plwdRepository.get(plwdId);
+
+            if (!plwd) {
+                ctx.status = 404;
+                ctx.message = 'Plwd not found';
+
+                return;
+            }
+
+            // Send an email to the user to notify that he/she was invited to a carecircle
+            await this.mailService.sendCarecircleInvite({
+                user,
+                plwd,
+            });
 
             ctx.status = 200;
             ctx.body = {
