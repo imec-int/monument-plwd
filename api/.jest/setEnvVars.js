@@ -2,7 +2,7 @@ process.env.MONUMENT_ACTIVITY_BASE_URL = 'http://localhost/';
 
 // SENDGRID config (used for emails notifications)
 process.env.SENDGRID_API_KEY = 'SG.dummykey';
-process.env.SENDGRID_FROM = 'naitan79@imec.be';
+process.env.SENDGRID_FROM = 'imec.apt+monument@gmail.com';
 
 // TWILIO config (used for text messages and WhatsApp notifications)
 // These are the twilio test credentials.
