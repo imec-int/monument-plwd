@@ -31,7 +31,6 @@ This web application is used to notify caretakers and carecircles of persons liv
 * [nvm](https://github.com/nvm-sh/nvm) or latest version of [NodeJS 16-lts](https://nodejs.org/en/download/)
 
 ## Getting started
----
 
 ### Basic Setup
 
@@ -224,7 +223,6 @@ You'll have to create an account [here](https://www.twilio.com/try-twilio) and [
 ### Mapbox and Google Maps API
 
 ## Mapbox
----
 
 To enable Mapbox which is used to display the locations on the map you will need to get an access token.
 Go to [Mapbox](https://mapbox.com/) and sign up with a new account if you don't already have one. Afterwards go into your account [Mapbox account](https://account.mapbox.com) and create an access token from the available button. Give it a suitable name and create your token.
@@ -235,7 +233,6 @@ NEXT_PUBLIC_MAPBOX_TOKEN=[MAPBOX_TOKEN]
 ```
 
 ## Google Maps API
----
 
 The Google Maps API allows you to use the different location inputs across the platform. To be able to use it you will are also required to create a token.
 For this you can visit the [Google Maps Platform](https://mapsplatform.google.com/).
@@ -248,7 +245,6 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=[GOOGLE_MAPS_API_KEY]
 ```
 
 ## Postgis
----
 
 This project uses [postgis](https://postgis.net/) for calculating distances and storing coordinates within postgres.
 
@@ -270,7 +266,7 @@ Next, run the command below in your terminal:
 After a few seconds the container should be up-and-running - you should see a `database system is ready to accept connections` log statement that confirms this. The container's volume data is stored in a `.volumes` folder.
 
 ### Postgis (Apple silicon)
----
+
 Postgis does not have an official ARM build for the docker image available on their Docker repository (see: https://github.com/postgis/docker-postgis/issues/216).
 
 To circumvent this issue you can build the image yourself as described below.
@@ -289,7 +285,7 @@ To circumvent this issue you can build the image yourself as described below.
 ```
 
 ### API application
----
+
 Finally, we're going to start up the actual application.
 
 If you're using `nvm` then you can execute the following command to make sure that you use the minimum required NodeJS version that this project requires.
@@ -329,7 +325,7 @@ After a few seconds the following log should appear in the terminal `compiled cl
 The web application should now be available [here](http://localhost:3000).
 
 ## Documentation
----
+
 
 ### Terminology
 - PLWD: person with disablity
