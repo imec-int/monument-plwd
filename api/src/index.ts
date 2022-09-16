@@ -19,6 +19,7 @@ import { RestApiBasedAuth0Service } from './services/RestApiBasedAuth0Service';
 import { createKompyAuthorizationMiddleware } from './auth/kompy-authorization-middleware';
 import createAffiliationRepository from './repositories/AffiliationRepository';
 import { MailService } from './services/MailService';
+import { SimulationController } from './controllers/SimulationController';
 
 (async () => {
     const config = createConfiguration();
@@ -57,12 +58,20 @@ import { MailService } from './services/MailService';
     const authorizationMiddleware = createAuthorizationMiddleware(config.auth0);
     const kompyAuthorizationMiddleware = createKompyAuthorizationMiddleware(config);
     const enabledKompyClientAPI = config.kompyClientAPI.enabled;
+    const simulationController = new SimulationController(
+        calendarEventRepository,
+        plwdRepository,
+        notificationService,
+        locationRepository,
+        config
+    );
 
     app.use(cors())
         .use(bodyParser())
         .use(unauthenticatedRoutes({ calendarEventRepository, locationRepository, plwdRepository }))
         .use(
             authenticatedRoutes({
+                affiliationRepository,
                 auth0Service,
                 authorizationMiddleware,
                 calendarEventRepository,
@@ -70,12 +79,12 @@ import { MailService } from './services/MailService';
                 externalContactRepository,
                 locationRepository,
                 logRepository,
+                mailService,
                 notificationRepository,
                 notificationService,
-                mailService,
                 plwdRepository,
+                simulationController,
                 userRepository,
-                affiliationRepository,
             })
         );
 

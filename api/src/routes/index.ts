@@ -139,6 +139,7 @@ export const kompyClientAPI = ({
 };
 
 export const authenticatedRoutes = ({
+    affiliationRepository,
     auth0Service,
     authorizationMiddleware,
     calendarEventRepository,
@@ -146,12 +147,12 @@ export const authenticatedRoutes = ({
     externalContactRepository,
     locationRepository,
     logRepository,
+    mailService,
     notificationRepository,
     notificationService,
-    mailService,
     plwdRepository,
+    simulationController,
     userRepository,
-    affiliationRepository,
 }: {
     affiliationRepository: AffiliationRepository;
     auth0Service: Auth0Service;
@@ -161,10 +162,11 @@ export const authenticatedRoutes = ({
     externalContactRepository: ExternalContactsRepository;
     locationRepository: LocationRepository;
     logRepository: LogRepository;
+    mailService: MailServiceInterface;
     notificationRepository: NotificationRepository;
     notificationService: CompositeNotificationService;
-    mailService: MailServiceInterface;
     plwdRepository: PlwdRepository;
+    simulationController: SimulationController;
     userRepository: UserRepository;
 }) => {
     /**
@@ -344,13 +346,6 @@ export const authenticatedRoutes = ({
     /**
      * Simulation
      */
-    const simulationController = new SimulationController(
-        calendarEventRepository,
-        plwdRepository,
-        notificationService,
-        locationRepository,
-        userRepository
-    );
     router.post('/simulation', simulationController.simulate);
 
     /**

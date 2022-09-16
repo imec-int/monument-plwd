@@ -21,6 +21,7 @@ import createAffiliationRepository from '../repositories/AffiliationRepository';
 import { MockAuth0Service } from './MockAuth0Service';
 import { createKompyAuthorizationMiddleware } from '../auth/kompy-authorization-middleware';
 import { MockMailService } from './MockMailService';
+import { SimulationController } from '../controllers/SimulationController';
 
 interface AuthorizationHeaderTransform {
     tokenToUser: (token: string) => Promise<User>;
@@ -81,6 +82,14 @@ export const initTestSetup = async () => {
     const auth0Service = new MockAuth0Service();
     const mailService = new MockMailService(config);
 
+    const simulationController = new SimulationController(
+        calendarEventRepository,
+        plwdRepository,
+        notificationService,
+        locationRepository,
+        config
+    );
+
     // Create the Koa app
     app.use(cors())
         .use(bodyParser())
@@ -99,6 +108,7 @@ export const initTestSetup = async () => {
                 notificationService,
                 mailService,
                 plwdRepository,
+                simulationController,
                 userRepository,
             })
         );
