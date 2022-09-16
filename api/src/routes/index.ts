@@ -51,7 +51,7 @@ import { DefaultAuthorizationService } from '../auth/AuthorizationService';
 import { Auth0Service } from '../services/RestApiBasedAuth0Service';
 import { KompyEvent } from '../models/Kompy';
 import { validateRequest } from '../middleware/validation';
-import { MailService, MailServiceInterface } from '../services/MailService';
+import { MailServiceInterface } from '../services/MailService';
 
 export const unauthenticatedRoutes = ({
     calendarEventRepository,

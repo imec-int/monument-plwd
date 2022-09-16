@@ -2,12 +2,7 @@ module.exports = {
     clearMocks: true,
     moduleFileExtensions: ['js', 'ts'],
     transform: {
-        '^.+\\.(ts)$': 'ts-jest',
-    },
-    globals: {
-        'ts-jest': {
-            tsconfig: 'tsconfig.json',
-        },
+        '^.+\\.(ts)$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
     },
     testTimeout: 20000,
     testMatch: ['**/__integration_tests__/*.test.+(ts|js)', '**/__tests__/*.test.+(ts|js)'],

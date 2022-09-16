@@ -180,7 +180,7 @@ export class PlwdController {
     };
 
     updatePlwd = async (ctx: Koa.ParameterizedContext) => {
-        const body = ctx.request.body as IPlwd;
+        const body = ctx.request.body as unknown as IPlwd;
 
         try {
             const user = await this.plwdRepository.update(body);
