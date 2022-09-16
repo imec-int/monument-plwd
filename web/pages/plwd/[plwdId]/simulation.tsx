@@ -58,7 +58,7 @@ const postSimulationStep = (data: {
 const SECOND = 1000; // note: 1000ms equals to 1s
 const WATCH_LOCATION_UPDATE_INTERVAL = 5000;
 const COUNTDOWN = WATCH_LOCATION_UPDATE_INTERVAL / SECOND;
-const MAX_DISTANCE = 250;
+const MAX_DISTANCE = Number(process.env.NEXT_PUBLIC_GEOFENCE_RADIUS ?? 0);
 
 const getLateDate = (startTime: string) => {
   const now = dayjs();
