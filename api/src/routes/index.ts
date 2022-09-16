@@ -52,6 +52,7 @@ import { Auth0Service } from '../services/RestApiBasedAuth0Service';
 import { KompyEvent } from '../models/Kompy';
 import { validateRequest } from '../middleware/validation';
 import { MailServiceInterface } from '../services/MailService';
+import { LocationHandlerService } from '../services/LocationHandlerService';
 
 export const unauthenticatedRoutes = ({
     calendarEventRepository,
@@ -86,21 +87,13 @@ export const unauthenticatedRoutes = ({
 };
 
 export const kompyClientAPI = ({
-    calendarEventRepository,
     kompyAuthorizationMiddleware,
     locationRepository,
     logRepository,
-    notificationService,
-    plwdRepository,
-    userRepository,
 }: {
-    calendarEventRepository: CalendarEventRepository;
     kompyAuthorizationMiddleware: Koa.Middleware;
     locationRepository: LocationRepository;
     logRepository: LogRepository;
-    notificationService: CompositeNotificationService;
-    plwdRepository: PlwdRepository;
-    userRepository: UserRepository;
 }) => {
     const router = new Router();
 
@@ -126,11 +119,7 @@ export const kompyClientAPI = ({
     });
 
     const logController = new LogController({
-        calendarEventRepository,
-        plwdRepository,
-        notificationService,
         locationRepository,
-        userRepository,
         logRepository,
     });
     router.post('/location', logController.postKompyLocation);
@@ -145,11 +134,11 @@ export const authenticatedRoutes = ({
     calendarEventRepository,
     carecircleMemberRepository,
     externalContactRepository,
+    locationHandlerService,
     locationRepository,
     logRepository,
     mailService,
     notificationRepository,
-    notificationService,
     plwdRepository,
     simulationController,
     userRepository,
@@ -160,6 +149,7 @@ export const authenticatedRoutes = ({
     calendarEventRepository: CalendarEventRepository;
     carecircleMemberRepository: CarecircleMemberRepository;
     externalContactRepository: ExternalContactsRepository;
+    locationHandlerService: LocationHandlerService;
     locationRepository: LocationRepository;
     logRepository: LogRepository;
     mailService: MailServiceInterface;
@@ -352,11 +342,7 @@ export const authenticatedRoutes = ({
      * Logs
      */
     const logController = new LogController({
-        calendarEventRepository,
-        plwdRepository,
-        notificationService,
         locationRepository,
-        userRepository,
         logRepository,
     });
     router.post('/log/report.json', logController.postLog);

@@ -1,4 +1,3 @@
-import { IConfig } from '../utils/config';
 import { NotificationRepository } from '../repositories/NotificationRepository';
 import { Knex } from 'knex';
 import { subMinutes } from 'date-fns';
@@ -9,7 +8,6 @@ import { initTestSetup, MockAuthorizationHeaderTransform } from './IntegrationTe
 import { StartedPostgisContainer } from './PostgisContainer';
 import { CalendarEventBuilder, formatToCalendarAddress } from './seed-data/events';
 import { caretakerUser, externalContactUser, externalContactUser2, plwdUser } from './seed-data/users';
-import { handleLocations } from '../services/LocationHandlers';
 import { LocationRepository } from '../repositories/LocationRepository';
 import { INotifyForEventNotificationService } from '../services/NotificationService';
 import { LogEvent } from '../models/Log';
@@ -29,6 +27,7 @@ import { ExternalContactsRepository } from '../repositories/ExternalContactsRepo
 import { mapToLocation } from '../controllers/LogController';
 import { CarecircleMemberRepository } from 'src/repositories/CarecircleMemberRepository';
 import { caretakerMembership } from './seed-data/carecircleMembership';
+import { LocationHandlerService } from '../services/LocationHandlerService';
 
 let container: StartedPostgisContainer;
 let userRepository: UserRepository;
@@ -40,7 +39,10 @@ let notificationRepository: NotificationRepository;
 let carecircleMemberRepository: CarecircleMemberRepository;
 let plwdRepository: PlwdRepository;
 let database: Knex;
-let config: IConfig;
+let locationHandlerService: LocationHandlerService;
+let locationHandlerServiceWithOnlyConsoleNotifications: LocationHandlerService;
+let notificationService: MockCompositeNotificationService;
+let notificationServiceWithOnlyLogging: MockCompositeNotificationService;
 
 let caretaker: IUser;
 let plwd: IPlwd;
@@ -53,7 +55,6 @@ const coordinatesToLocationLogPayload = (coordinates: ICoordinate) =>
 
 beforeAll(async () => {
     ({
-        config,
         container,
         database,
         repositories: {
@@ -64,6 +65,12 @@ beforeAll(async () => {
             notificationRepository,
             plwdRepository,
             userRepository,
+        },
+        services: {
+            locationHandlerService,
+            locationHandlerServiceWithOnlyConsoleNotifications,
+            notificationService,
+            notificationServiceWithOnlyLogging,
         },
         mockJwtHandler: jwt,
     } = await initTestSetup());
@@ -193,10 +200,6 @@ describe('LogController', () => {
 
         const createdEvent = await calendarEventRepository.insert(calendarEvent);
         const ongoingDailyCalendarEvent = await calendarEventRepository.getById(createdEvent.id);
-        const notificationService = new MockCompositeNotificationService(
-            notificationRepository,
-            config
-        ).withConsoleLogService();
 
         const spyOngetOngoingEventsByPlwdId = jest.spyOn(calendarEventRepository, 'getOngoingEventsByPlwdId');
         const spyOnNotifyForEvent = jest.spyOn(notificationService, 'notifyForEvent');
@@ -214,14 +217,7 @@ describe('LogController', () => {
         ];
         const locations = locationLogs.map(mapToLocation);
 
-        await handleLocations({
-            calendarEventRepository,
-            locationRepository,
-            locations,
-            notificationService,
-            plwdRepository,
-            userRepository,
-        });
+        await locationHandlerService.handleLocations(locations);
 
         await calendarEventRepository.deleteById(ongoingDailyCalendarEvent.id);
         await externalContactRepository.remove(externalContact1.id);
@@ -237,11 +233,6 @@ describe('LogController', () => {
         const externalContact1 = await externalContactRepository.insert({ ...externalContactUser, plwdId: plwd.id });
         const externalContact2 = await externalContactRepository.insert({ ...externalContactUser2, plwdId: plwd.id });
 
-        const notificationService = new MockCompositeNotificationService(
-            notificationRepository,
-            config
-        ).withConsoleLogService();
-
         const calendarEvent = new CalendarEventBuilder()
             .withAddress(formatToCalendarAddress({ description: 'Somewhere in Bruges', location: eventCoordinates }))
             .withExternalContacts([externalContact1.id, externalContact2.id])
@@ -252,7 +243,7 @@ describe('LogController', () => {
         const ongoingDailyCalendarEvent = await calendarEventRepository.insert(calendarEvent);
 
         const spyOngetOngoingEventsByPlwdId = jest.spyOn(calendarEventRepository, 'getOngoingEventsByPlwdId');
-        const spyOnNotifyForEvent = jest.spyOn(notificationService, 'notifyForEvent');
+        const spyOnNotifyForEvent = jest.spyOn(notificationServiceWithOnlyLogging, 'notifyForEvent');
         const spyOnIsWithinDistance = jest.spyOn(locationRepository, 'isWithinDistance');
         const spyOnHasNotificationForEvent = jest.spyOn(notificationRepository, 'hasNotificationForEvent');
 
@@ -267,14 +258,7 @@ describe('LogController', () => {
         ];
         const locations = locationLogs.map(mapToLocation);
 
-        await handleLocations({
-            calendarEventRepository,
-            locationRepository,
-            locations,
-            notificationService,
-            plwdRepository,
-            userRepository,
-        });
+        await locationHandlerServiceWithOnlyConsoleNotifications.handleLocations(locations);
 
         await calendarEventRepository.deleteById(ongoingDailyCalendarEvent.id);
         await externalContactRepository.remove(externalContact1.id);
@@ -287,11 +271,6 @@ describe('LogController', () => {
     });
 
     it('Should not trigger a notification for an event that started 15 minutes ago has no address', async () => {
-        const notificationService = new MockCompositeNotificationService(
-            notificationRepository,
-            config
-        ).withConsoleLogService();
-
         const calendarEvent = new CalendarEventBuilder()
             .withAddress(undefined)
             .withExternalContacts([])
@@ -304,7 +283,7 @@ describe('LogController', () => {
         const ongoingDailyCalendarEvent = await calendarEventRepository.getById(createdCalendarEvent.id);
 
         const spyOngetOngoingEventsByPlwdId = jest.spyOn(calendarEventRepository, 'getOngoingEventsByPlwdId');
-        const spyOnNotifyForEvent = jest.spyOn(notificationService, 'notifyForEvent');
+        const spyOnNotifyForEvent = jest.spyOn(notificationServiceWithOnlyLogging, 'notifyForEvent');
         const spyOnIsWithinDistance = jest.spyOn(locationRepository, 'isWithinDistance');
 
         const locationLogs = [
@@ -318,14 +297,7 @@ describe('LogController', () => {
         ];
         const locations = locationLogs.map(mapToLocation);
 
-        await handleLocations({
-            calendarEventRepository,
-            locationRepository,
-            locations,
-            notificationService,
-            plwdRepository,
-            userRepository,
-        });
+        await locationHandlerServiceWithOnlyConsoleNotifications.handleLocations(locations);
 
         const notifications = await notificationRepository.get();
         expect(notifications).toHaveLength(0);
@@ -338,11 +310,6 @@ describe('LogController', () => {
     });
 
     it('Should trigger a notification for an event that started 15 minutes ago and user is not within range of 150 meters of event', async () => {
-        const notificationService = new MockCompositeNotificationService(
-            notificationRepository,
-            config
-        ).withConsoleLogService();
-
         const externalContact1 = await externalContactRepository.insert({ ...externalContactUser, plwdId: plwd.id });
         const externalContact2 = await externalContactRepository.insert({ ...externalContactUser2, plwdId: plwd.id });
 
@@ -358,7 +325,7 @@ describe('LogController', () => {
         const ongoingDailyCalendarEvent = await calendarEventRepository.getById(createdCalendarEvent.id);
 
         const spyOngetOngoingEventsByPlwdId = jest.spyOn(calendarEventRepository, 'getOngoingEventsByPlwdId');
-        const spyOnNotifyForEvent = jest.spyOn(notificationService, 'notifyForEvent');
+        const spyOnNotifyForEvent = jest.spyOn(notificationServiceWithOnlyLogging, 'notifyForEvent');
         const spyOnIsWithinDistance = jest.spyOn(locationRepository, 'isWithinDistance');
         const spyOnHasNotificationForEvent = jest.spyOn(notificationRepository, 'hasNotificationForEvent');
 
@@ -373,14 +340,7 @@ describe('LogController', () => {
         ];
         const locations = locationLogs.map(mapToLocation);
 
-        await handleLocations({
-            calendarEventRepository,
-            locationRepository,
-            locations,
-            notificationService,
-            plwdRepository,
-            userRepository,
-        });
+        await locationHandlerServiceWithOnlyConsoleNotifications.handleLocations(locations);
 
         const [notification1, notification2] = await notificationRepository.get();
         const recipients = await externalContactRepository.getByPlwdId(plwd.id);
@@ -419,11 +379,7 @@ describe('LogController', () => {
         });
     });
 
-    it('Should trigger a notification via email and text message for an event that started 15 minutes ago and user is not within range of 150 meters of event', async () => {
-        const notificationService = new MockCompositeNotificationService(notificationRepository, config)
-            .withEmailService()
-            .withConsoleLogService();
-
+    it('Should trigger a notification via email and console output for an event that started 15 minutes ago and user is not within range of 150 meters of event', async () => {
         const externalContact1 = await externalContactRepository.insert({ ...externalContactUser, plwdId: plwd.id });
         const externalContact2 = await externalContactRepository.insert({ ...externalContactUser2, plwdId: plwd.id });
 
@@ -454,14 +410,7 @@ describe('LogController', () => {
         ];
         const locations = locationLogs.map(mapToLocation);
 
-        await handleLocations({
-            calendarEventRepository,
-            locationRepository,
-            locations,
-            notificationService,
-            plwdRepository,
-            userRepository,
-        });
+        await locationHandlerService.handleLocations(locations);
 
         const notifications = await notificationRepository.get();
         expect(notifications).toHaveLength(4);
@@ -520,11 +469,6 @@ describe('LogController', () => {
     });
 
     it('Should not send the notification twice to the same user for the same event', async () => {
-        const notificationService = new MockCompositeNotificationService(
-            notificationRepository,
-            config
-        ).withConsoleLogService();
-
         const externalContact1 = await externalContactRepository.insert({ ...externalContactUser, plwdId: plwd.id });
         const externalContact2 = await externalContactRepository.insert({ ...externalContactUser2, plwdId: plwd.id });
 
@@ -543,7 +487,7 @@ describe('LogController', () => {
         const ongoingDailyCalendarEvent = await calendarEventRepository.getById(createdCalendarEvent.id);
 
         const spyOngetOngoingEventsByPlwdId = jest.spyOn(calendarEventRepository, 'getOngoingEventsByPlwdId');
-        const spyOnNotifyForEvent = jest.spyOn(notificationService, 'notifyForEvent');
+        const spyOnNotifyForEvent = jest.spyOn(notificationServiceWithOnlyLogging, 'notifyForEvent');
         const spyOnIsWithinDistance = jest.spyOn(locationRepository, 'isWithinDistance');
         const spyOnHasNotificationForEvent = jest.spyOn(notificationRepository, 'hasNotificationForEvent');
         const spyOnInsertNotificationForEvent = jest.spyOn(notificationRepository, 'insert');
@@ -559,23 +503,9 @@ describe('LogController', () => {
         ];
         const locations = locationLogs.map(mapToLocation);
 
-        await handleLocations({
-            calendarEventRepository,
-            locationRepository,
-            locations,
-            notificationService,
-            plwdRepository,
-            userRepository,
-        });
+        await locationHandlerServiceWithOnlyConsoleNotifications.handleLocations(locations);
 
-        await handleLocations({
-            calendarEventRepository,
-            locationRepository,
-            locations,
-            notificationService,
-            plwdRepository,
-            userRepository,
-        });
+        await locationHandlerServiceWithOnlyConsoleNotifications.handleLocations(locations);
 
         const notifications = await notificationRepository.get();
         expect(notifications).toHaveLength(3);

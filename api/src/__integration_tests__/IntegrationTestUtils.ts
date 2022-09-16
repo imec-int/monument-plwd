@@ -22,6 +22,7 @@ import { MockAuth0Service } from './MockAuth0Service';
 import { createKompyAuthorizationMiddleware } from '../auth/kompy-authorization-middleware';
 import { MockMailService } from './MockMailService';
 import { SimulationController } from '../controllers/SimulationController';
+import { LocationHandlerService } from '../services/LocationHandlerService';
 
 interface AuthorizationHeaderTransform {
     tokenToUser: (token: string) => Promise<User>;
@@ -76,8 +77,29 @@ export const initTestSetup = async () => {
 
     const notificationService = new MockCompositeNotificationService(notificationRepository, config)
         .withEmailService()
-        .withTextMessageService()
-        .withWhatsappMessageService();
+        .withConsoleLogService();
+
+    const notificationServiceWithOnlyLogging = new MockCompositeNotificationService(
+        notificationRepository,
+        config
+    ).withConsoleLogService();
+
+    // Instantiate the LocationHandler service
+    const locationHandlerService = new LocationHandlerService(
+        calendarEventRepository,
+        config,
+        locationRepository,
+        notificationService,
+        plwdRepository
+    );
+
+    const locationHandlerServiceWithOnlyConsoleNotifications = new LocationHandlerService(
+        calendarEventRepository,
+        config,
+        locationRepository,
+        notificationServiceWithOnlyLogging,
+        plwdRepository
+    );
 
     const auth0Service = new MockAuth0Service();
     const mailService = new MockMailService(config);
@@ -102,6 +124,7 @@ export const initTestSetup = async () => {
                 calendarEventRepository,
                 carecircleMemberRepository,
                 externalContactRepository,
+                locationHandlerService,
                 locationRepository,
                 logRepository,
                 notificationRepository,
@@ -115,13 +138,9 @@ export const initTestSetup = async () => {
 
     app.use(
         kompyClientAPI({
-            calendarEventRepository,
             kompyAuthorizationMiddleware,
             locationRepository,
             logRepository,
-            notificationService,
-            plwdRepository,
-            userRepository,
         })
     );
 
@@ -141,6 +160,12 @@ export const initTestSetup = async () => {
             notificationRepository,
             plwdRepository,
             userRepository,
+        },
+        services: {
+            locationHandlerService,
+            locationHandlerServiceWithOnlyConsoleNotifications,
+            notificationService,
+            notificationServiceWithOnlyLogging,
         },
     };
 };

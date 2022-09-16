@@ -10,7 +10,7 @@ interface IMapGeofence {
 
 export const MapGeofence: React.FC<IMapGeofence> = ({ coordinates }) => {
   const center = coordinates;
-  const radius = 150;
+  const radius = 250;
   const options = { units: CircleUnitOption };
   const geofence = circle(center, radius, options);
 

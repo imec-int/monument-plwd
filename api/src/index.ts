@@ -20,6 +20,7 @@ import { createKompyAuthorizationMiddleware } from './auth/kompy-authorization-m
 import createAffiliationRepository from './repositories/AffiliationRepository';
 import { MailService } from './services/MailService';
 import { SimulationController } from './controllers/SimulationController';
+import { LocationHandlerService } from './services/LocationHandlerService';
 
 (async () => {
     const config = createConfiguration();
@@ -49,6 +50,15 @@ import { SimulationController } from './controllers/SimulationController';
         .withTextMessageService()
         .withWhatsappMessageService();
 
+    // Instantiate the LocationHandler service
+    const locationHandlerService = new LocationHandlerService(
+        calendarEventRepository,
+        config,
+        locationRepository,
+        notificationService,
+        plwdRepository
+    );
+
     // Auth0
     const auth0Service = new RestApiBasedAuth0Service(config.auth0);
 
@@ -77,6 +87,7 @@ import { SimulationController } from './controllers/SimulationController';
                 calendarEventRepository,
                 carecircleMemberRepository,
                 externalContactRepository,
+                locationHandlerService,
                 locationRepository,
                 logRepository,
                 mailService,
@@ -91,13 +102,9 @@ import { SimulationController } from './controllers/SimulationController';
     if (enabledKompyClientAPI) {
         app.use(
             kompyClientAPI({
-                calendarEventRepository,
                 kompyAuthorizationMiddleware,
                 locationRepository,
                 logRepository,
-                notificationService,
-                plwdRepository,
-                userRepository,
             })
         );
     }
