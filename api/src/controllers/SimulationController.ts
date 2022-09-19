@@ -103,7 +103,7 @@ export class SimulationController {
 
             if (isWithinDistance) {
                 logger.info(
-                    `[handleLocations] - PLWD [${plwd.id}] is within ${this.config.notification.geofenceRadius} meters from the event, nothing more to report.`,
+                    `[simulate] - PLWD [${plwd.id}] is within ${this.config.notification.geofenceRadius} meters from the event, nothing more to report.`,
                     { coordinateA, coordinateB }
                 );
                 ctx.status = 200;
@@ -111,7 +111,7 @@ export class SimulationController {
             }
 
             logger.info(
-                `[handleLocations] - PLWD [${plwd.id}] seems to be lost, sending notification to contact persons(s) and caretaker`
+                `[simulate] - PLWD [${plwd.id}] seems to be lost, sending notification to contact persons(s) and caretaker`
             );
             const { externalContacts, carecircleMembers } = calendarEvent;
 

@@ -10,6 +10,7 @@ export interface CalendarEventRepository {
     get(): Promise<CalendarEventWithContacts[]>;
     getById(id: string): Promise<CalendarEventWithContacts>;
     getByPlwdId(plwdId: string): Promise<CalendarEventWithContacts[]>;
+    getOngoingEvents(): Promise<CalendarEventWithContacts[]>;
     getOngoingEventsByPlwdId(plwdId: string): Promise<CalendarEventWithContacts[]>;
     insert(calendarEvent: CalendarEvent): Promise<CalendarEvent>;
     update(calendarEvent: CalendarEvent): Promise<CalendarEvent>;
@@ -217,6 +218,22 @@ const deleteById = (knex: Knex) => {
     };
 };
 
+const getOngoingEvents = (knex: Knex) => {
+    return async () => {
+        const message = 'Fetching ongoing calendar events';
+        const profiler = logger.startTimer();
+        const now = new Date();
+        const result = await knex(table)
+            .select('*')
+            .andWhereNot('address', null)
+            .where('start_time', '<=', now)
+            .andWhere('end_time', '>=', now);
+        const mappedEvents = result.map(mapToCalendarEventWithContacts);
+        profiler.done({ message });
+        return Promise.all(mappedEvents.map((event) => addContactsToCalendarEvent(knex, event)));
+    };
+};
+
 const getOngoingEventsByPlwdId = (knex: Knex) => {
     return async (plwdId: string) => {
         const message = `Fetching ongoing calendar events for user [${plwdId}]`;
@@ -240,6 +257,7 @@ const createCalendarEventRepository = (knex: Knex) => {
         get: get(knex),
         getById: getById(knex),
         getByPlwdId: getByPlwdId(knex),
+        getOngoingEvents: getOngoingEvents(knex),
         getOngoingEventsByPlwdId: getOngoingEventsByPlwdId(knex),
         insert: insert(knex),
         update: update(knex),

@@ -17,7 +17,7 @@ const table = 'locations';
 export interface LocationRepository {
     deleteById(id: string): Promise<void>;
     get(): Promise<ILocation[]>;
-    getByWatchId(watchId: string): Promise<ILocation[]>;
+    getByWatchId(watchId: string, maxTimestamp?: Date): Promise<ILocation[]>;
     getPublicLocation(event: CalendarEventWithContacts, watchId: string): Promise<ILocation[]>;
     insert(locationsEvents: ILocation[]): Promise<void>;
     isWithinDistance({ coordinateA, coordinateB, distance }: isWithinDistanceFunction): Promise<boolean>;
@@ -35,10 +35,10 @@ export const mapToViewModel = (data: any): ILocation => {
 };
 
 const getByWatchId = (knex: Knex) => {
-    return async (watchId: string) => {
+    return async (watchId: string, maxTimestamp: Date | undefined) => {
         const message = `Fetching locations for plwd with watchId [${watchId}]`;
         const profiler = logger.startTimer();
-        const result = await knex(table)
+        const query = knex(table)
             .select(
                 'created_at AS createdAt',
                 'id',
@@ -48,6 +48,12 @@ const getByWatchId = (knex: Knex) => {
             )
             .where('watch_id', watchId)
             .orderBy('timestamp', 'desc');
+
+        if (maxTimestamp) {
+            query.where('timestamp', '>=', maxTimestamp);
+        }
+
+        const result = await query;
         profiler.done({ message });
         return result.map(mapToViewModel);
     };

@@ -7,6 +7,9 @@ import { IConfig } from '../utils/config';
 import isAfter from 'date-fns/isAfter';
 import add from 'date-fns/add';
 import logger from '../utils/logger';
+import { CalendarEventWithContacts } from '../models/CalendarEvent';
+import { sub } from 'date-fns';
+import { IPlwd } from '../models/Plwd';
 
 export class LocationHandlerService {
     constructor(
@@ -17,88 +20,91 @@ export class LocationHandlerService {
         private readonly plwdRepository: PlwdRepository
     ) {}
 
-    async handleLocations(locations: ILocation[]) {
-        // Take last location (note: locations.at(-1) fails because of ts-jest...)
-        const lastLocation = locations[locations.length - 1] as ILocation;
+    async sendNotifications() {
+        const now = new Date();
+        const ongoingEvents = await this.calendarEventRepository.getOngoingEvents();
 
-        const watchId = lastLocation.watchId;
-        if (!watchId) {
-            logger.error('[handleLocations] - No watchId specified for the current location...', { lastLocation });
-            return;
-        }
-
-        const plwd = await this.plwdRepository.getByWatchId(watchId);
-        if (!plwd) {
-            logger.error(`[handleLocations] - PLWD not found for watchId [${watchId}]`);
-            return;
-        }
-
-        // Fetch current calendar events for a plwd by plwdId, normally there should only be one
-        // but let's handle the case where there are multiple at once as well...
-        const ongoingEvents = await this.calendarEventRepository.getOngoingEventsByPlwdId(plwd.id);
         if (ongoingEvents.length === 0) {
-            logger.info(`[handleLocations] - PLWD [${plwd.id}] does not have any ongoing events`);
-            return;
+            logger.info(`[sendNotifications] - No ongoing events found at ${now.toISOString()}`);
         }
 
         for await (const ongoingEvent of ongoingEvents) {
             // Check if event has surpassed the 10 minutes mark since the start of the event
             const start = new Date(ongoingEvent.startTime);
             const notificationThresholdTime = add(start, { minutes: this.config.notification.triggerDelay });
-            const now = new Date();
 
             // 10 minutes have not yet passed, then we can exit early
             if (!isAfter(now, notificationThresholdTime)) {
                 logger.info(
-                    `[handleLocations] - Event start time has not passed the allowed ${this.config.notification.triggerDelay} minutes delay`,
+                    `[sendNotifications] - Event start time has not passed the allowed ${this.config.notification.triggerDelay} minutes delay`,
                     ongoingEvent
                 );
                 return;
             }
 
-            // plwd is late, verify his location...
-            const ongoingEventLocation = ongoingEvent?.address?.geometry?.location as ICoordinate;
-            if (hasValidLocations(ongoingEventLocation, lastLocation.location)) {
-                const coordinateA = ongoingEventLocation;
-                const coordinateB = lastLocation.location;
-                // Check if users's last sent position is within X amount of meters distance of event location
-                // using fancy POSTGIS SQL statement
-                const isWithinDistance = await this.locationRepository.isWithinDistance({
-                    coordinateA,
-                    coordinateB,
-                    distance: this.config.notification.geofenceRadius,
-                });
+            const plwd = await this.plwdRepository.get(ongoingEvent.plwdId);
 
-                if (isWithinDistance) {
-                    logger.info(
-                        `[handleLocations] - PLWD [${plwd.id}] is within ${this.config.notification.geofenceRadius} meters from the event, nothing more to report.`,
-                        { coordinateA, coordinateB }
-                    );
-                    return;
-                } else {
-                    logger.info(
-                        `[handleLocations] - PLWD [${plwd.id}] seems to be lost, sending notification to contact persons(s) and caretaker`
-                    );
-
-                    const { externalContacts, carecircleMembers } = ongoingEvent;
-
-                    const recipients = [...externalContacts, ...carecircleMembers];
-
-                    // Send notification to the contact and caretaker
-                    await this.notificationService.notifyForEvent({
-                        event: ongoingEvent,
-                        location: coordinateB,
-                        plwd,
-                        recipients,
-                    });
-                }
-            } else {
-                logger.error(`[handleLocations] - geometry data is invalid`, {
-                    coordinateA: ongoingEvent?.address?.geometry,
-                    coordinateB: lastLocation.location,
-                });
+            if (!plwd) {
+                logger.warn(`[sendNotifications] - Plwd "[${ongoingEvent.plwdId}]" not found!`);
                 return;
             }
+
+            // Fetch locations via plwd.watchId
+            const maxTimestamp = sub(new Date(ongoingEvent.startTime), {
+                minutes: this.config.notification.locationMaxTimestamp,
+            });
+            const locations = await this.locationRepository.getByWatchId(plwd.watchId, maxTimestamp);
+
+            if (locations.length > 0) {
+                await this.handleLocations(ongoingEvent, plwd, locations);
+            }
+        }
+    }
+
+    async handleLocations(ongoingEvent: CalendarEventWithContacts, plwd: IPlwd, locations: ILocation[]) {
+        const lastKnownLocation = locations[locations.length - 1] as ILocation;
+        const ongoingEventLocation = ongoingEvent?.address?.geometry?.location as ICoordinate;
+
+        if (hasValidLocations(ongoingEventLocation, lastKnownLocation.location)) {
+            const coordinateA = ongoingEventLocation;
+            const coordinateB = lastKnownLocation.location;
+            // Check if users's last sent position is within X amount of meters distance of event location
+            // using fancy POSTGIS SQL statement
+            const isWithinDistance = await this.locationRepository.isWithinDistance({
+                coordinateA,
+                coordinateB,
+                distance: this.config.notification.geofenceRadius,
+            });
+
+            if (isWithinDistance) {
+                logger.info(
+                    `[handleLocations] - PLWD [${plwd.id}] is within ${this.config.notification.geofenceRadius} meters from the event, nothing more to report.`,
+                    { coordinateA, coordinateB }
+                );
+                return;
+            } else {
+                logger.info(
+                    `[handleLocations] - PLWD [${plwd.id}] seems to be lost, sending notification to contact persons(s) and/or caretaker`
+                );
+
+                const { externalContacts, carecircleMembers } = ongoingEvent;
+
+                const recipients = [...externalContacts, ...carecircleMembers];
+
+                // Send notification to the contact and caretaker
+                await this.notificationService.notifyForEvent({
+                    event: ongoingEvent,
+                    location: coordinateB,
+                    plwd,
+                    recipients,
+                });
+            }
+        } else {
+            logger.error(`[handleLocations] - geometry data is invalid`, {
+                coordinateA: ongoingEvent?.address?.geometry,
+                coordinateB: lastKnownLocation.location,
+            });
+            return;
         }
     }
 }
