@@ -21,6 +21,7 @@ import createAffiliationRepository from './repositories/AffiliationRepository';
 import { MailService } from './services/MailService';
 import { SimulationController } from './controllers/SimulationController';
 import { LocationHandlerService } from './services/LocationHandlerService';
+import { initializeCronJob } from './utils/cron';
 
 (async () => {
     const config = createConfiguration();
@@ -75,6 +76,8 @@ import { LocationHandlerService } from './services/LocationHandlerService';
         locationRepository,
         config
     );
+
+    initializeCronJob(locationHandlerService);
 
     app.use(cors())
         .use(bodyParser())
