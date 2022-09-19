@@ -20,7 +20,9 @@ export function createConfiguration() {
             baseUrl: env.MONUMENT_ACTIVITY_BASE_URL as string,
             geofenceRadius: Number(env.GEOFENCE_RADIUS ?? 0) as number,
             triggerDelay: Number(env.NOTIFICATION_TRIGGER_DELAY ?? 0) as number,
-            locationMaxTimestamp: Number(env.LOCATION_MAX_TIMESTAMP ?? 60) as number,
+            maxTimeBetweenLastLocationTimestampAndEventStart: Number(
+                env.MAX_TIME_BETWEEN_LAST_LOCATION_TIMESTAMP_AND_EVENT_START ?? 60
+            ) as number,
             sendgrid: {
                 apiKey: env.SENDGRID_API_KEY as string,
                 enabled: env.SENDGRID_ENABLE === 'true',

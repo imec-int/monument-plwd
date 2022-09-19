@@ -51,7 +51,7 @@ export class LocationHandlerService {
 
             // Fetch locations via plwd.watchId
             const maxTimestamp = sub(new Date(ongoingEvent.startTime), {
-                minutes: this.config.notification.locationMaxTimestamp,
+                minutes: this.config.notification.maxTimeBetweenLastLocationTimestampAndEventStart,
             });
             const locations = await this.locationRepository.getByWatchId(plwd.watchId, maxTimestamp);
 
