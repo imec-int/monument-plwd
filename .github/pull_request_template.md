@@ -17,4 +17,3 @@
 - [ ] My code follows the code style of this project.
 - [ ] I have updated the documentation according to my changes.
 - [ ] I have added tests to cover my changes.
-- [ ] I have added the Jira card reference as a prefix to the title of the PR.

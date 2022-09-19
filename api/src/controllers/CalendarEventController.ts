@@ -69,7 +69,7 @@ export class CalendarEventController {
     ) {}
 
     postCalendarEvent = async (ctx: Koa.ParameterizedContext) => {
-        const body = ctx.request.body as CalendarEvent;
+        const body = ctx.request.body as unknown as CalendarEvent;
 
         try {
             const calendarEvent = await this.calendarEventRepository.insert(body);
@@ -83,7 +83,7 @@ export class CalendarEventController {
     };
 
     patchCalendarEvent = async (ctx: Koa.ParameterizedContext) => {
-        const body = ctx.request.body as CalendarEvent;
+        const body = ctx.request.body as unknown as CalendarEvent;
 
         try {
             const calendarEvent = await this.calendarEventRepository.update(body);

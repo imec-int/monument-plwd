@@ -1,5 +1,10 @@
 process.env.MONUMENT_ACTIVITY_BASE_URL = 'http://localhost/';
 
+// Notification trigger config
+process.env.GEOFENCE_RADIUS = 150; // in meters
+process.env.NOTIFICATION_TRIGGER_DELAY = 10; // in minutes
+process.env.MAX_TIME_BETWEEN_LAST_LOCATION_TIMESTAMP_AND_EVENT_START = 60; // in minutes
+
 // SENDGRID config (used for emails notifications)
 process.env.SENDGRID_API_KEY = 'SG.dummykey';
 process.env.SENDGRID_FROM = 'dummy+monument@gmail.com';

@@ -10,7 +10,7 @@ export type IConfig = ReturnType<typeof createConfiguration>;
 export function createConfiguration() {
     const env = process.env;
     return {
-        port: env.PORT || 8080,
+        port: env.PORT ?? 8080,
         developmentMode: env.DEVELOPMENT_MODE === 'true',
         logLevel: (env.LOG_LEVEL || 'info') as LogLevel,
         db: {
@@ -18,6 +18,11 @@ export function createConfiguration() {
         },
         notification: {
             baseUrl: env.MONUMENT_ACTIVITY_BASE_URL as string,
+            geofenceRadius: Number(env.GEOFENCE_RADIUS ?? 0) as number,
+            triggerDelay: Number(env.NOTIFICATION_TRIGGER_DELAY ?? 0) as number,
+            maxTimeBetweenLastLocationTimestampAndEventStart: Number(
+                env.MAX_TIME_BETWEEN_LAST_LOCATION_TIMESTAMP_AND_EVENT_START ?? 60
+            ) as number,
             sendgrid: {
                 apiKey: env.SENDGRID_API_KEY as string,
                 enabled: env.SENDGRID_ENABLE === 'true',

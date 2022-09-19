@@ -1,8 +1,3 @@
-import { CompositeNotificationService } from './../services/NotificationService';
-import { CalendarEventRepository } from './../repositories/CalendarEventRepository';
-import { UserRepository } from 'src/repositories/UserRepository';
-import { PlwdRepository } from './../repositories/PlwdRepository';
-import { handleLocations } from './../services/LocationHandlers';
 import { LocationRepository } from './../repositories/LocationRepository';
 import { ILocation } from './../models/Locations';
 import { randomUUID } from 'crypto';
@@ -15,10 +10,6 @@ import { KompyLocation } from '../models/Kompy';
 interface ILogController {
     logRepository: LogRepository;
     locationRepository: LocationRepository;
-    plwdRepository: PlwdRepository;
-    userRepository: UserRepository;
-    calendarEventRepository: CalendarEventRepository;
-    notificationService: CompositeNotificationService;
 }
 
 export class LogController {
@@ -33,16 +24,6 @@ export class LogController {
 
             const locations = logs.map(mapToLocation);
             await this.props.locationRepository.insert(locations);
-
-            // Call async method that validates that the PLWD is in range of the expected location
-            handleLocations({
-                calendarEventRepository: this.props.calendarEventRepository,
-                locationRepository: this.props.locationRepository,
-                locations,
-                notificationService: this.props.notificationService,
-                plwdRepository: this.props.plwdRepository,
-                userRepository: this.props.userRepository,
-            });
 
             ctx.status = 200;
         } catch (error) {
@@ -63,16 +44,6 @@ export class LogController {
             if (locationLogs.length > 0) {
                 const locations = locationLogs.map(mapToLocation);
                 await this.props.locationRepository.insert(locations);
-
-                // Call async method that validates that the PLWD is in range of the expected location
-                handleLocations({
-                    calendarEventRepository: this.props.calendarEventRepository,
-                    locationRepository: this.props.locationRepository,
-                    locations,
-                    notificationService: this.props.notificationService,
-                    plwdRepository: this.props.plwdRepository,
-                    userRepository: this.props.userRepository,
-                });
             }
 
             ctx.status = 200;

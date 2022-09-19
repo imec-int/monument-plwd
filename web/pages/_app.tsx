@@ -5,7 +5,6 @@ import '@fullcalendar/timegrid/main.css';
 
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { motion } from 'framer-motion';
 import { CustomError } from 'lib/CustomError';
 import { NextPage } from 'next';
 import { AppProps } from 'next/app';
@@ -32,34 +31,19 @@ function MyApp({ Component, pageProps, router }: AppPropsWithLayout) {
       </Head>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <SnackbarProvider maxSnack={3}>
-          <motion.div
-            animate="animate"
-            initial="initial"
-            key={router.route}
-            style={{ background: '000' }}
-            variants={{
-              initial: {
-                opacity: 0,
-              },
-              animate: {
-                opacity: 1,
+          <SWRConfig
+            value={{
+              onError: (error: CustomError) => {
+                if (error.statusCode === 401) {
+                  router.push('/api/auth/logout');
+
+                  return;
+                }
               },
             }}
           >
-            <SWRConfig
-              value={{
-                onError: (error: CustomError) => {
-                  if (error.statusCode === 401) {
-                    router.push('/api/auth/logout');
-
-                    return;
-                  }
-                },
-              }}
-            >
-              {getLayout(<Component {...pageProps} />)}
-            </SWRConfig>
-          </motion.div>
+            {getLayout(<Component {...pageProps} />)}
+          </SWRConfig>
         </SnackbarProvider>
       </LocalizationProvider>
     </>

@@ -58,7 +58,7 @@ const postSimulationStep = (data: {
 const SECOND = 1000; // note: 1000ms equals to 1s
 const WATCH_LOCATION_UPDATE_INTERVAL = 5000;
 const COUNTDOWN = WATCH_LOCATION_UPDATE_INTERVAL / SECOND;
-const MAX_DISTANCE = 150;
+const MAX_DISTANCE = Number(process.env.NEXT_PUBLIC_GEOFENCE_RADIUS ?? 0);
 
 const getLateDate = (startTime: string) => {
   const now = dayjs();
@@ -116,11 +116,16 @@ const Simulation = () => {
     }
   }, []);
 
+  const calendarEventsWithDestination = useMemo(
+    () => calendarEvents.filter((e) => e.address),
+    [calendarEvents]
+  );
+
   const endpoint: { startTime: string; lng: number; lat: number } | undefined =
     useMemo(() => {
       if (!watchSelectedEventId) return undefined;
 
-      const selectedEvent = calendarEvents.find(
+      const selectedEvent = calendarEventsWithDestination.find(
         (c) => c.id === watchSelectedEventId
       );
 
@@ -134,7 +139,7 @@ const Simulation = () => {
         ...location,
         startTime: selectedEvent.startTime,
       };
-    }, [calendarEvents, watchSelectedEventId, flyToPoint]);
+    }, [calendarEventsWithDestination, watchSelectedEventId, flyToPoint]);
 
   const onAddPoint = useCallback(() => {
     setValue('points', [
@@ -401,13 +406,14 @@ const Simulation = () => {
                 className="select select-bordered w-full"
                 disabled={isRunningSimulation}
               >
-                {[{ id: '', title: 'Select event' }, ...calendarEvents].map(
-                  (event) => (
-                    <option key={event.id} value={event.id}>
-                      {event.title}
-                    </option>
-                  )
-                )}
+                {[
+                  { id: '', title: 'Select event' },
+                  ...calendarEventsWithDestination,
+                ].map((event) => (
+                  <option key={event.id} value={event.id}>
+                    {event.title}
+                  </option>
+                ))}
               </select>
             </div>
             {endpoint ? (

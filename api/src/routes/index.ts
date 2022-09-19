@@ -51,7 +51,8 @@ import { DefaultAuthorizationService } from '../auth/AuthorizationService';
 import { Auth0Service } from '../services/RestApiBasedAuth0Service';
 import { KompyEvent } from '../models/Kompy';
 import { validateRequest } from '../middleware/validation';
-import { MailService, MailServiceInterface } from '../services/MailService';
+import { MailServiceInterface } from '../services/MailService';
+import { LocationHandlerService } from '../services/LocationHandlerService';
 
 export const unauthenticatedRoutes = ({
     calendarEventRepository,
@@ -86,21 +87,13 @@ export const unauthenticatedRoutes = ({
 };
 
 export const kompyClientAPI = ({
-    calendarEventRepository,
     kompyAuthorizationMiddleware,
     locationRepository,
     logRepository,
-    notificationService,
-    plwdRepository,
-    userRepository,
 }: {
-    calendarEventRepository: CalendarEventRepository;
     kompyAuthorizationMiddleware: Koa.Middleware;
     locationRepository: LocationRepository;
     logRepository: LogRepository;
-    notificationService: CompositeNotificationService;
-    plwdRepository: PlwdRepository;
-    userRepository: UserRepository;
 }) => {
     const router = new Router();
 
@@ -126,11 +119,7 @@ export const kompyClientAPI = ({
     });
 
     const logController = new LogController({
-        calendarEventRepository,
-        plwdRepository,
-        notificationService,
         locationRepository,
-        userRepository,
         logRepository,
     });
     router.post('/location', logController.postKompyLocation);
@@ -139,19 +128,20 @@ export const kompyClientAPI = ({
 };
 
 export const authenticatedRoutes = ({
+    affiliationRepository,
     auth0Service,
     authorizationMiddleware,
     calendarEventRepository,
     carecircleMemberRepository,
     externalContactRepository,
+    locationHandlerService,
     locationRepository,
     logRepository,
-    notificationRepository,
-    notificationService,
     mailService,
+    notificationRepository,
     plwdRepository,
+    simulationController,
     userRepository,
-    affiliationRepository,
 }: {
     affiliationRepository: AffiliationRepository;
     auth0Service: Auth0Service;
@@ -159,12 +149,14 @@ export const authenticatedRoutes = ({
     calendarEventRepository: CalendarEventRepository;
     carecircleMemberRepository: CarecircleMemberRepository;
     externalContactRepository: ExternalContactsRepository;
+    locationHandlerService: LocationHandlerService;
     locationRepository: LocationRepository;
     logRepository: LogRepository;
+    mailService: MailServiceInterface;
     notificationRepository: NotificationRepository;
     notificationService: CompositeNotificationService;
-    mailService: MailServiceInterface;
     plwdRepository: PlwdRepository;
+    simulationController: SimulationController;
     userRepository: UserRepository;
 }) => {
     /**
@@ -344,24 +336,13 @@ export const authenticatedRoutes = ({
     /**
      * Simulation
      */
-    const simulationController = new SimulationController(
-        calendarEventRepository,
-        plwdRepository,
-        notificationService,
-        locationRepository,
-        userRepository
-    );
     router.post('/simulation', simulationController.simulate);
 
     /**
      * Logs
      */
     const logController = new LogController({
-        calendarEventRepository,
-        plwdRepository,
-        notificationService,
         locationRepository,
-        userRepository,
         logRepository,
     });
     router.post('/log/report.json', logController.postLog);

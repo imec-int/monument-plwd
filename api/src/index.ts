@@ -19,6 +19,9 @@ import { RestApiBasedAuth0Service } from './services/RestApiBasedAuth0Service';
 import { createKompyAuthorizationMiddleware } from './auth/kompy-authorization-middleware';
 import createAffiliationRepository from './repositories/AffiliationRepository';
 import { MailService } from './services/MailService';
+import { SimulationController } from './controllers/SimulationController';
+import { LocationHandlerService } from './services/LocationHandlerService';
+import { initializeCronJob } from './utils/cron';
 
 (async () => {
     const config = createConfiguration();
@@ -48,6 +51,15 @@ import { MailService } from './services/MailService';
         .withTextMessageService()
         .withWhatsappMessageService();
 
+    // Instantiate the LocationHandler service
+    const locationHandlerService = new LocationHandlerService(
+        calendarEventRepository,
+        config,
+        locationRepository,
+        notificationService,
+        plwdRepository
+    );
+
     // Auth0
     const auth0Service = new RestApiBasedAuth0Service(config.auth0);
 
@@ -57,38 +69,45 @@ import { MailService } from './services/MailService';
     const authorizationMiddleware = createAuthorizationMiddleware(config.auth0);
     const kompyAuthorizationMiddleware = createKompyAuthorizationMiddleware(config);
     const enabledKompyClientAPI = config.kompyClientAPI.enabled;
+    const simulationController = new SimulationController(
+        calendarEventRepository,
+        plwdRepository,
+        notificationService,
+        locationRepository,
+        config
+    );
+
+    initializeCronJob(locationHandlerService);
 
     app.use(cors())
         .use(bodyParser())
         .use(unauthenticatedRoutes({ calendarEventRepository, locationRepository, plwdRepository }))
         .use(
             authenticatedRoutes({
+                affiliationRepository,
                 auth0Service,
                 authorizationMiddleware,
                 calendarEventRepository,
                 carecircleMemberRepository,
                 externalContactRepository,
+                locationHandlerService,
                 locationRepository,
                 logRepository,
+                mailService,
                 notificationRepository,
                 notificationService,
-                mailService,
                 plwdRepository,
+                simulationController,
                 userRepository,
-                affiliationRepository,
             })
         );
 
     if (enabledKompyClientAPI) {
         app.use(
             kompyClientAPI({
-                calendarEventRepository,
                 kompyAuthorizationMiddleware,
                 locationRepository,
                 logRepository,
-                notificationService,
-                plwdRepository,
-                userRepository,
             })
         );
     }

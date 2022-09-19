@@ -81,6 +81,7 @@ jobs:
           script: |
             echo "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$(NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)" > web/.env.local
             echo "NEXT_PUBLIC_MAPBOX_TOKEN=$(NEXT_PUBLIC_MAPBOX_TOKEN)" >> web/.env.local
+            echo "NEXT_PUBLIC_GEOFENCE_RADIUS=$(NEXT_PUBLIC_GEOFENCE_RADIUS)" >> web/.env.local
 
       - task: Docker@2
         displayName: Docker Build and Push Image
