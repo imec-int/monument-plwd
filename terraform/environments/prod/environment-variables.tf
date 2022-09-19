@@ -10,6 +10,10 @@ variable "MONUMENT_ACTIVITY_BASE_URL" {}
 
 variable "LOG_LEVEL" {}
 
+variable "GEOFENCE_RADIUS" {}
+variable "MAX_TIME_BETWEEN_LAST_LOCATION_TIMESTAMP_AND_EVENT_START" {}
+variable "NOTIFICATION_TRIGGER_DELAY" {}
+
 variable "SENDGRID_API_KEY" {}
 variable "SENDGRID_ENABLE" {}
 variable "SENDGRID_FROM" {}

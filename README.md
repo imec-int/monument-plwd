@@ -346,6 +346,12 @@ Within this project when a primary caretaker does the sign-up he will have the o
 
 It is of course possible to add other watches or location tracking devices to fill in your needs but currently within this codebase only the Kompy watches are supported by default.
 
+### Notifications
+
+Notifications are sent when a PLWD is not within the specified geofence radius at the time of an ongoing event.
+
+A cronjob runs each minute to check if a PLWD is too late for an ongoing event.
+
 ### Testing
 
 This project includes some integration tests, you can find them [here](./src/__integration_tests__/).
