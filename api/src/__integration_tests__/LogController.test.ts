@@ -125,6 +125,7 @@ describe('LogController', () => {
             timestamp: locationLogs[0].timestamp,
             watchId: plwd.watchId,
         } as ILocation);
+        await locationRepository.deleteById(storedLocation.id);
     });
 
     it('Should return true when 2 points are within 150m distance between each other (+/- 145m distance)', async () => {
