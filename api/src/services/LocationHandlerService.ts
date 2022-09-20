@@ -62,7 +62,7 @@ export class LocationHandlerService {
     }
 
     async handleLocations(ongoingEvent: CalendarEventWithContacts, plwd: IPlwd, locations: ILocation[]) {
-        const lastKnownLocation = locations[locations.length - 1] as ILocation;
+        const [lastKnownLocation] = locations;
         const ongoingEventLocation = ongoingEvent?.address?.geometry?.location as ICoordinate;
 
         if (hasValidLocations(ongoingEventLocation, lastKnownLocation.location)) {
