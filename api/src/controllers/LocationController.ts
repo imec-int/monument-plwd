@@ -1,5 +1,5 @@
 import Koa, { Middleware } from 'koa';
-import { addMinutes } from 'date-fns';
+import { addHours } from 'date-fns';
 import logger from '../utils/logger';
 import { LocationRepository } from './../repositories/LocationRepository';
 import { PlwdRepository } from 'src/repositories/PlwdRepository';
@@ -70,9 +70,9 @@ export class LocationController {
             const startTime = formatDateWithoutSecondsAndMilliseconds(new Date(event.startTime));
             const now = formatDateWithoutSecondsAndMilliseconds(new Date());
             const formattedEndTime = formatDateWithoutSecondsAndMilliseconds(new Date(event.endTime));
-            const endTimePlus20Minutes = addMinutes(formattedEndTime, 20);
+            const endTimePlus4Hours = addHours(formattedEndTime, 4);
 
-            if (now < startTime || now > endTimePlus20Minutes) {
+            if (now < startTime || now > endTimePlus4Hours) {
                 ctx.status = 403;
                 ctx.message = `Event ${event.id} is not active`;
 

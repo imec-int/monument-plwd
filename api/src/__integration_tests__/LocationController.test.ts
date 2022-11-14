@@ -300,8 +300,8 @@ describe('LocationController', () => {
     });
 
     it('Should not allow to fetch locations from an event that has finished', async () => {
-        const startTime = subMinutes(new Date(), 41).toISOString();
-        const endTime = subMinutes(new Date(), 21).toISOString();
+        const startTime = subMinutes(new Date(), 300).toISOString();
+        const endTime = subMinutes(new Date(), 241).toISOString();
 
         const calendarEvent = new CalendarEventBuilder()
             .withStartTime(startTime)
