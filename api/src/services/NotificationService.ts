@@ -47,7 +47,6 @@ export const constructNotificationMessage = ({
     baseUrl,
     calendarEvent,
     contactPersons,
-    location,
     plwd,
     recipient,
 }: {
