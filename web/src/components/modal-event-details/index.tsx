@@ -251,7 +251,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
             <div className="flex">
               <div className="mr-4">
                 <label className="label">
-                  <span className="label-text">Start time</span>
+                  <span className="label-text">Start of the appointment</span>
                 </label>
                 <Controller
                   control={control}
@@ -273,7 +273,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
               </div>
               <div>
                 <label className="label">
-                  <span className="label-text">End time</span>
+                  <span className="label-text">End of the appointment</span>
                 </label>
                 <Controller
                   control={control}
