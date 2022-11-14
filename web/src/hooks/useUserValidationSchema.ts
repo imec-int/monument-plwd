@@ -1,5 +1,5 @@
 import { formInputPhoneSchema } from '@schema';
-import { validatePictureSchema } from 'src/validation';
+import { pictureValidationSchema } from 'src/validation';
 import * as yup from 'yup';
 
 export const useUserValidationSchema = () => {
@@ -8,6 +8,6 @@ export const useUserValidationSchema = () => {
     firstName: yup.string().required(),
     lastName: yup.string().required(),
     phone: formInputPhoneSchema,
-    picture: validatePictureSchema,
+    picture: pictureValidationSchema,
   });
 };

@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-export const validatePictureSchema = yup
+export const pictureValidationSchema = yup
   .string()
   .nullable()
   .test(

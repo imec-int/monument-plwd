@@ -20,6 +20,7 @@ import { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useAffiliations } from 'src/hooks/useAffiliations';
 import { useAppUserContext } from 'src/hooks/useAppUserContext';
+import { pictureValidationSchema } from 'src/validation';
 import * as yup from 'yup';
 
 const userSchema = yup.object({
@@ -27,18 +28,7 @@ const userSchema = yup.object({
   firstName: yup.string().required(),
   lastName: yup.string().required(),
   phone: formInputPhoneSchema,
-  picture: yup
-    .string()
-    .nullable()
-    .test(
-      'exceedsAllowedLimit',
-      'Image size is too large, maximum allowed size is 600kb',
-      (value) => {
-        if (!value) return true;
-
-        return value.length < 900000;
-      }
-    ),
+  picture: pictureValidationSchema,
   affiliation: yup.string().required(),
   email: yup.string().email().required(),
   id: yup.string(),

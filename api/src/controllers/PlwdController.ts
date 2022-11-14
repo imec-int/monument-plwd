@@ -65,14 +65,7 @@ export const updatePlwdValidationSchema = yup.object({
             id: yup.string().required(),
             lastName: yup.string().required(),
             phone: yup.string().nullable(),
-            picture: yup
-                .string()
-                .nullable()
-                .test('exceedsAllowedLimit', 'Image size is too large, maximum allowed size is 600kb', (value) => {
-                    if (!value) return true;
-
-                    return value.length < 900000;
-                }),
+            picture: pictureValidationSchema,
             watchId: yup.string().nullable(),
         })
         .required(),

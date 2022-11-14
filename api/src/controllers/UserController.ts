@@ -47,18 +47,7 @@ export const updateUserValidationSchema = yup.object({
                     firstName: yup.string().required(),
                     lastName: yup.string().required(),
                     phone: yup.string().required(),
-                    picture: yup
-                        .string()
-                        .nullable()
-                        .test(
-                            'exceedsAllowedLimit',
-                            'Image size is too large, maximum allowed size is 600kb',
-                            (value) => {
-                                if (!value) return true;
-
-                                return value.length < 900000;
-                            }
-                        ),
+                    picture: pictureValidationSchema,
                     role: yup.string().required(),
                 })
                 .required(),
