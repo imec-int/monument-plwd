@@ -16,7 +16,7 @@ export const LinkGoogleMap: React.FC<ILinkGoogleMap> = ({ lat, lng }) => {
         rel="noopener noreferrer"
         target="_blank"
       >
-        See on Google Maps
+        Navigate to this location via Google Maps
         <svg
           className="h-6 w-6"
           fill="none"
