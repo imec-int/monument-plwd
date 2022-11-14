@@ -1,13 +1,13 @@
 import 'react-phone-number-input/style.css';
 
-import { Container, FormInputPhone, ImageSetter } from '@components';
+import { Container, FormInputPhone, ImageSetterController } from '@components';
 import { UserRole } from '@enum';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ISetupStep } from '@interfaces';
 import { CustomError } from 'lib/CustomError';
 import { fetchWrapper } from 'lib/fetch';
 import { useSnackbar } from 'notistack';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useUserValidationSchema } from 'src/hooks/useUserValidationSchema';
 import * as yup from 'yup';
 
@@ -113,19 +113,7 @@ export const SetupStep1: React.FC<ISetupStep> = ({ nextStep, userData }) => {
         </div>
         <FormInputPhone control={control} errors={errors} required />
         <div className="mt-2">
-          <Controller
-            control={control}
-            name="picture"
-            render={({ field: { value, onChange } }) => (
-              <ImageSetter
-                base64image={value}
-                label="Upload avatar (optional)"
-                setBase64Image={(base64) => {
-                  onChange(base64);
-                }}
-              />
-            )}
-          />
+          <ImageSetterController control={control} name="picture" />
         </div>
         <button
           className={`w-40 mt-8 m-auto btn btn-secondary${

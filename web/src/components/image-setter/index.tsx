@@ -1,8 +1,10 @@
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
+import { FieldError } from 'react-hook-form';
 
 interface IImageSetter {
   base64image: string | null | undefined;
+  error?: FieldError | undefined;
   setBase64Image: (base64image: string | null) => void;
   label?: string;
   height?: string;
@@ -11,6 +13,7 @@ interface IImageSetter {
 
 export const ImageSetter: React.FC<IImageSetter> = ({
   base64image,
+  error,
   setBase64Image,
   label = 'Upload image',
   height = 'h-[120px]',
@@ -26,7 +29,7 @@ export const ImageSetter: React.FC<IImageSetter> = ({
   }, [base64image]);
 
   return (
-    <div>
+    <div className="flex flex-col">
       <label className="label">
         <span className="label-text">{label}</span>
       </label>
@@ -64,7 +67,7 @@ export const ImageSetter: React.FC<IImageSetter> = ({
         </div>
       )}
       <input
-        className="cursor-pointer float-left"
+        className="cursor-pointer"
         name="imageUpload"
         onChange={async (event) => {
           const file = event.target.files?.[0];
@@ -84,6 +87,11 @@ export const ImageSetter: React.FC<IImageSetter> = ({
         ref={fileInputRef}
         type="file"
       />
+      {error ? (
+        <p className="label-text-alt text-error mt-2 text-left">
+          {error.message}
+        </p>
+      ) : null}
     </div>
   );
 };

@@ -2,7 +2,7 @@ import 'react-phone-number-input/style.css';
 
 import {
   FormInputPhone,
-  ImageSetter,
+  ImageSetterController,
   Modal,
   ModalActions,
   ModalAffiliation,
@@ -27,7 +27,18 @@ const userSchema = yup.object({
   firstName: yup.string().required(),
   lastName: yup.string().required(),
   phone: formInputPhoneSchema,
-  picture: yup.string(),
+  picture: yup
+    .string()
+    .nullable()
+    .test(
+      'exceedsAllowedLimit',
+      'Image size is too large, maximum allowed size is 600kb',
+      (value) => {
+        if (!value) return true;
+
+        return value.length < 900000;
+      }
+    ),
   affiliation: yup.string().required(),
   email: yup.string().email().required(),
   id: yup.string(),
@@ -313,19 +324,7 @@ const ModalContactEdit = ({
             </Tooltip>
           </div>
           <div className="mt-2">
-            <Controller
-              control={control}
-              name="picture"
-              render={({ field: { value, onChange } }) => (
-                <ImageSetter
-                  base64image={value}
-                  label="Upload avatar"
-                  setBase64Image={(base64) => {
-                    onChange(base64);
-                  }}
-                />
-              )}
-            />
+            <ImageSetterController control={control} name="picture" />
           </div>
           <div className="grid grid-cols-3 gap-4 mt-2 w-full">
             <div className="form-control">
@@ -634,19 +633,7 @@ const ModalContactAdd = ({
           <div className="flex items-end">
             <div className="mt-2 flex-1">
               <div className="max-w-[280px] overflow-hidden">
-                <Controller
-                  control={control}
-                  name="picture"
-                  render={({ field: { value, onChange } }) => (
-                    <ImageSetter
-                      base64image={value}
-                      label="Upload avatar"
-                      setBase64Image={(base64) => {
-                        onChange(base64);
-                      }}
-                    />
-                  )}
-                />
+                <ImageSetterController control={control} name="picture" />
               </div>
             </div>
             {showAddUserToCarecircleToggle ? (

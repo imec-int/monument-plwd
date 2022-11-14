@@ -14,10 +14,11 @@ export const ImageSetterController: React.FC<IImageSetterController> = ({
     <Controller
       control={control}
       name={name}
-      render={({ field: { value, onChange } }) => (
+      render={({ field: { value, onChange }, fieldState }) => (
         <ImageSetter
           base64image={value}
-          label="Upload avatar (optional)"
+          error={fieldState.error}
+          label="Upload image (optional)"
           setBase64Image={(base64) => {
             onChange(base64);
           }}
