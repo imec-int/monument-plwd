@@ -14,6 +14,7 @@ import { useExternalContacts } from 'src/hooks/useExternalContacts';
 import { useAppUserContext } from 'src/hooks/useAppUserContext';
 import { useCalendarEvents } from 'src/hooks/useCalendarEvents';
 import { usePermissions } from 'src/hooks/usePermissions';
+import dayjs from 'dayjs';
 
 export const Calendar: React.FC<ICalendar> = ({
   initialView,
@@ -41,10 +42,11 @@ export const Calendar: React.FC<ICalendar> = ({
       title: e.title,
       extendedProps: {
         address: e.address,
+        caretakers: e.carecircleMembers.map((c) => c.id),
+        date: e.date,
         externalContacts: e.externalContacts.map((c) => c.id),
         pickedUp: e.pickedUp,
         repeat: e.repeat,
-        caretakers: e.carecircleMembers.map((c) => c.id),
       },
     }));
   }, [data]);
@@ -65,8 +67,17 @@ export const Calendar: React.FC<ICalendar> = ({
     setSelectedEvent(event.event);
   }, []);
 
-  const triggerEmptyEvent = useCallback(
-    () => eventClick({ event: {} }),
+  const triggerEmptyEvent = useCallback(() => {
+    eventClick({ event: {} });
+  }, [eventClick]);
+
+  const clickGridCell = useCallback(
+    (event) => {
+      const start = dayjs(event.start).add(8, 'hour');
+      const end = dayjs(event.start).add(9, 'hour');
+      const mutatedEvent = { ...event, start, end };
+      eventClick({ event: mutatedEvent });
+    },
     [eventClick]
   );
 
@@ -109,7 +120,7 @@ export const Calendar: React.FC<ICalendar> = ({
         height={height || '500px'}
         initialView={initialView || 'dayGridMonth'}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        select={triggerEmptyEvent}
+        select={clickGridCell}
         selectable
         {...fieldProps}
       />

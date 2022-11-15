@@ -9,11 +9,12 @@ import { RepeatEvent } from '@constants';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { IModalEventDetails } from '@interfaces';
 import { TextField, Tooltip } from '@mui/material';
-import { DateTimePicker } from '@mui/x-date-pickers';
+import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { CustomError } from 'lib/CustomError';
 import { fetchWrapper } from 'lib/fetch';
 import { useSnackbar } from 'notistack';
+import { useEffect } from 'react';
 import Autocomplete from 'react-google-autocomplete';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { useModal } from 'src/hooks/useModal';
@@ -32,8 +33,30 @@ const eventSchema = yup.object({
       })
     )
     .required(),
+  dateValue: yup.date().required(),
   startTimeValue: yup.date().required(),
-  endTimeValue: yup.date().required(),
+  endTimeValue: yup
+    .date()
+    .required()
+    .test(
+      'endTimeIsInvalid',
+      'End of the appointment should be after the start of the appointment',
+      (value, context) => {
+        if (value && context.parent.startTimeValue) {
+          const { startTimeValue } = context.parent;
+          const startTime =
+            typeof startTimeValue === 'string'
+              ? startTimeValue
+              : startTimeValue.toISOString();
+
+          return (
+            dayjs(value).isAfter(startTime) || dayjs(value).isSame(startTime)
+          );
+        }
+
+        return true;
+      }
+    ),
   title: yup.string().required(),
   repeat: yup.string().oneOf(Object.values(RepeatEvent)),
   address: yup
@@ -49,7 +72,7 @@ const eventSchema = yup.object({
     .when('addADestination', {
       is: true,
       then: (schema) => schema.required(),
-      otherwise: (schema) => schema.optional(),
+      otherwise: (schema) => schema.optional().nullable(),
     })
     .default(undefined),
 });
@@ -82,29 +105,37 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
     checked: selectedExternalContacts.includes(c.id),
   }));
   const defaultContacts = [...caretakersForForm, ...externalContactsForForm];
+  const nowAsDateObject = dayjs().toDate();
   const {
     control,
     formState: { errors, isSubmitting },
     getValues,
     handleSubmit,
     register,
+    setValue,
     watch,
   } = useForm<IFormCalendarEvent>({
     defaultValues: {
       addADestination: Boolean(selectedEvent.extendedProps?.address),
-      contacts: defaultContacts,
       address: selectedEvent.extendedProps?.address,
-      endTimeValue: selectedEvent.end || dayjs().toDate(),
+      contacts: defaultContacts,
+      dateValue:
+        selectedEvent.extendedProps?.date ??
+        selectedEvent.start ??
+        nowAsDateObject,
+      endTimeValue: selectedEvent.end ?? nowAsDateObject,
       // pickedUp: selectedEvent.extendedProps?.pickedUp,
       repeat: selectedEvent.extendedProps?.repeat || RepeatEvent.NEVER,
-      startTimeValue: selectedEvent.start || dayjs().toDate(),
+      startTimeValue: selectedEvent.start ?? nowAsDateObject,
       title: selectedEvent.title,
     },
     resolver: yupResolver(eventSchema),
   });
 
   const watchStartTime = watch('startTimeValue');
+  const watchEndTime = watch('endTimeValue');
   const watchAddADestination = watch('addADestination');
+  const watchDate = watch('dateValue');
 
   const { fields, append } = useFieldArray<IFormCalendarEvent>({
     name: 'contacts',
@@ -172,6 +203,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
         address: data.addADestination ? data.address : null,
         carecircleMemberIds,
         externalContactIds,
+        date: data.dateValue,
         endTime: data.endTimeValue,
         id: selectedEvent.id,
         // pickedUp: data.pickedUp,
@@ -225,6 +257,29 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
     dayjs(watchStartTime).isBefore(sevenAm) ||
     dayjs(watchStartTime).isAfter(eightPm);
 
+  // update start and endtime when the date changes
+  useEffect(() => {
+    if (watchDate) {
+      if (watchStartTime) {
+        const startTime = dayjs(watchStartTime);
+        const newStartTime = dayjs(watchDate)
+          .hour(startTime.hour())
+          .minute(startTime.minute())
+          .second(startTime.second());
+        setValue('startTimeValue', newStartTime.toDate());
+      }
+
+      if (watchEndTime) {
+        const endTime = dayjs(watchEndTime);
+        const newEndTime = dayjs(watchDate)
+          .hour(endTime.hour())
+          .minute(endTime.minute())
+          .second(endTime.second());
+        setValue('endTimeValue', newEndTime.toDate());
+      }
+    }
+  }, [watchDate, setValue]); // eslint-disable-line
+
   return (
     <div>
       <Modal boxClassName="max-w-5xl" onSubmit={handleSubmit(onSubmit)}>
@@ -247,22 +302,48 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
               type="text"
             />
           </div>
+          <div className="flex">
+            <div className="mr-4">
+              <label className="label">
+                <span className="label-text">Date*</span>
+              </label>
+              <Controller
+                control={control}
+                name="dateValue"
+                render={({ field: { value, onChange } }) => (
+                  <DatePicker
+                    disablePast
+                    disabled={
+                      selectedEvent.id &&
+                      dayjs(getValues('startTimeValue')).isBefore(
+                        nowAsDateObject
+                      )
+                    }
+                    onChange={onChange}
+                    renderInput={(props) => <TextField {...props} />}
+                    value={value}
+                  />
+                )}
+              />
+            </div>
+          </div>
           <div>
             <div className="flex">
               <div className="mr-4">
                 <label className="label">
-                  <span className="label-text">Start time</span>
+                  <span className="label-text">Start of the appointment*</span>
                 </label>
                 <Controller
                   control={control}
                   name="startTimeValue"
                   render={({ field: { value, onChange } }) => (
-                    <DateTimePicker
+                    <TimePicker
                       ampm={false}
-                      disablePast
                       disabled={
                         selectedEvent.id &&
-                        dayjs(getValues('startTimeValue')).isBefore(new Date())
+                        dayjs(getValues('startTimeValue')).isBefore(
+                          nowAsDateObject
+                        )
                       }
                       onChange={onChange}
                       renderInput={(props) => <TextField {...props} />}
@@ -273,18 +354,19 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
               </div>
               <div>
                 <label className="label">
-                  <span className="label-text">End time</span>
+                  <span className="label-text">End of the appointment*</span>
                 </label>
                 <Controller
                   control={control}
                   name="endTimeValue"
                   render={({ field: { value, onChange } }) => (
-                    <DateTimePicker
+                    <TimePicker
                       ampm={false}
-                      disablePast
                       disabled={
                         selectedEvent.id &&
-                        dayjs(getValues('endTimeValue')).isBefore(new Date())
+                        dayjs(getValues('endTimeValue')).isBefore(
+                          nowAsDateObject
+                        )
                       }
                       onChange={onChange}
                       renderInput={(props) => <TextField {...props} />}
@@ -294,6 +376,11 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
                 />
               </div>
             </div>
+            {errors.endTimeValue ? (
+              <p className="label-text-alt text-error mt-2">
+                {errors.endTimeValue.message}
+              </p>
+            ) : null}
             {!hasErrors && isEventNightTime ? (
               <p className="text-warning mt-2">
                 Warning: Your event starts before 7am or after 8pm

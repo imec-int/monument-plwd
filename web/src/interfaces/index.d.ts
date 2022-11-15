@@ -26,6 +26,7 @@ export interface ICalendar {
 export interface IEvent {
   address: any; // TODO: add correct type
   contactUserId: string;
+  date: string;
   endTime: string;
   id: string;
   pickedUp: boolean;

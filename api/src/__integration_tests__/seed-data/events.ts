@@ -26,6 +26,7 @@ export class CalendarEventBuilder {
         address: { description: 'Event location', geometry: { location: eventCoordinates } },
         carecircleMemberIds: [],
         createdBy: '',
+        date: new Date().toISOString(),
         endTime: addHours(new Date(), 1).toISOString(),
         externalContactIds: [],
         id: '',

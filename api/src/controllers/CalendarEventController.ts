@@ -18,6 +18,20 @@ export const createCalendarEventValidationSchema = yup.object({
         .object({
             carecircleMemberIds: yup.array().of(yup.string()).required(),
             externalContactIds: yup.array().of(yup.string()).required(),
+            date: yup.string().required(),
+            startTime: yup.string().required(),
+            endTime: yup
+                .string()
+                .required()
+                .test(
+                    'endTimeIsInvalid',
+                    'End of the appointment should be after the start of the appointment',
+                    (value, context) => {
+                        if (!value) return false;
+
+                        return value >= context.parent.startTime;
+                    }
+                ),
         })
         .required(),
 });
