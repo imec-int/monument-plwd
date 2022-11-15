@@ -14,6 +14,7 @@ import dayjs from 'dayjs';
 import { CustomError } from 'lib/CustomError';
 import { fetchWrapper } from 'lib/fetch';
 import { useSnackbar } from 'notistack';
+import { useEffect } from 'react';
 import Autocomplete from 'react-google-autocomplete';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { useModal } from 'src/hooks/useModal';
@@ -111,13 +112,17 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
     getValues,
     handleSubmit,
     register,
+    setValue,
     watch,
   } = useForm<IFormCalendarEvent>({
     defaultValues: {
       addADestination: Boolean(selectedEvent.extendedProps?.address),
       address: selectedEvent.extendedProps?.address,
       contacts: defaultContacts,
-      dateValue: selectedEvent.extendedProps?.date ?? selectedEvent.start,
+      dateValue:
+        selectedEvent.extendedProps?.date ??
+        selectedEvent.start ??
+        nowAsDateObject,
       endTimeValue: selectedEvent.end ?? nowAsDateObject,
       // pickedUp: selectedEvent.extendedProps?.pickedUp,
       repeat: selectedEvent.extendedProps?.repeat || RepeatEvent.NEVER,
@@ -128,7 +133,9 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
   });
 
   const watchStartTime = watch('startTimeValue');
+  const watchEndTime = watch('endTimeValue');
   const watchAddADestination = watch('addADestination');
+  const watchDate = watch('dateValue');
 
   const { fields, append } = useFieldArray<IFormCalendarEvent>({
     name: 'contacts',
@@ -249,6 +256,31 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
   const isEventNightTime =
     dayjs(watchStartTime).isBefore(sevenAm) ||
     dayjs(watchStartTime).isAfter(eightPm);
+
+  // update start and endtime when the date changes
+  useEffect(() => {
+    if (watchDate) {
+      if (watchStartTime) {
+        const startTime = dayjs(watchStartTime);
+        const newStartTime = dayjs(watchDate)
+          .hour(startTime.hour())
+          .minute(startTime.minute())
+          .second(startTime.second());
+        setValue('startTimeValue', newStartTime.toDate());
+      }
+
+      if (watchEndTime) {
+        const endTime = dayjs(watchEndTime);
+        const newEndTime = dayjs(watchDate)
+          .hour(endTime.hour())
+          .minute(endTime.minute())
+          .second(endTime.second());
+        setValue('endTimeValue', newEndTime.toDate());
+      }
+    }
+  }, [watchDate, setValue]); // eslint-disable-line
+
+  console.warn(getValues());
 
   return (
     <div>
