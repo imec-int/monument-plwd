@@ -4,9 +4,9 @@
  */
 exports.up = async function (knex) {
     await knex.table('notifications').del();
-    await knex.table('external_contacts').del();
     await knex.table('calendar_events_external_contacts').del();
     await knex.table('calendar_events_carecircle_members').del();
+    await knex.table('external_contacts').del();
     await knex.table('calendar_events').del();
 };
 
