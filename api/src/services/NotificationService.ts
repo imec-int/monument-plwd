@@ -47,7 +47,6 @@ export const constructNotificationMessage = ({
     baseUrl,
     calendarEvent,
     contactPersons,
-    location,
     plwd,
     recipient,
 }: {
@@ -58,21 +57,17 @@ export const constructNotificationMessage = ({
     plwd: IPlwd;
     recipient: Recipient;
 }) => `
-Hi ${recipient.user.firstName} ${recipient.user.lastName},
+Hi ${recipient.user.firstName},
         
-${plwd.firstName} ${plwd.lastName} is late for the appointment "${calendarEvent.title}".
+${plwd.firstName} is late for the appointment "${calendarEvent.title}".
 
-It is possible that ${plwd.firstName} ${plwd.lastName} got lost.
+It is possible that ${plwd.firstName} got lost.
 
-Via this link ${baseUrl}location/track/${calendarEvent.id} you have access to ${plwd.firstName} ${plwd.lastName}${
-    plwd.lastName.endsWith('s') ? "'" : "'s"
+Via this link ${baseUrl}location/track/${calendarEvent.id} you have access to ${plwd.firstName}${
+    plwd.firstName.endsWith('s') ? "'" : "'s"
 } location.
 
-You can see the direction on Google Maps via this link https://www.google.com/maps/dir/?api=1&destination=${
-    location.lat
-},${location.lng}
-
-${plwd.phone ? `Via this number ${plwd.phone} you can contact ${plwd.firstName} ${plwd.lastName}.` : ''}
+${plwd.phone ? `Via this number ${plwd.phone} you can contact ${plwd.firstName}.` : ''}
 
 ${contactPersons
     .map(
