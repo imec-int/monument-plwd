@@ -17,6 +17,7 @@ export type ExternalContactId = string;
 export type CalendarEventBase = {
     address?: IAddress;
     createdBy: string;
+    date: string;
     endTime: string;
     id: string;
     pickedUp: boolean;

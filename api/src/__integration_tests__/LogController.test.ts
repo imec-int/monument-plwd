@@ -227,10 +227,10 @@ describe('LogController', () => {
         await externalContactRepository.remove(externalContact1.id);
         await externalContactRepository.remove(externalContact2.id);
 
-        expect(spyOngetOngoingEvents).toBeCalledTimes(1);
-        expect(spyOnIsWithinDistance).toBeCalledTimes(0);
-        expect(spyOnNotifyForEvent).toBeCalledTimes(0);
-        expect(spyOnHasNotificationForEvent).toBeCalledTimes(0);
+        expect(spyOngetOngoingEvents).toHaveBeenCalledTimes(1);
+        expect(spyOnIsWithinDistance).toHaveBeenCalledTimes(0);
+        expect(spyOnNotifyForEvent).toHaveBeenCalledTimes(0);
+        expect(spyOnHasNotificationForEvent).toHaveBeenCalledTimes(0);
     });
 
     it('Should not trigger a notification for an event that only started 15 minutes ago and when user is within range of 150m of event', async () => {
@@ -271,10 +271,10 @@ describe('LogController', () => {
         await externalContactRepository.remove(externalContact1.id);
         await externalContactRepository.remove(externalContact2.id);
 
-        expect(spyOngetOngoingEvents).toBeCalledTimes(1);
-        expect(spyOnIsWithinDistance).toBeCalledTimes(1);
-        expect(spyOnNotifyForEvent).toBeCalledTimes(0);
-        expect(spyOnHasNotificationForEvent).toBeCalledTimes(0);
+        expect(spyOngetOngoingEvents).toHaveBeenCalledTimes(1);
+        expect(spyOnIsWithinDistance).toHaveBeenCalledTimes(1);
+        expect(spyOnNotifyForEvent).toHaveBeenCalledTimes(0);
+        expect(spyOnHasNotificationForEvent).toHaveBeenCalledTimes(0);
     });
 
     it('Should not trigger a notification for an event that started 15 minutes ago has no address', async () => {
@@ -314,9 +314,9 @@ describe('LogController', () => {
         await locationRepository.deleteById(storedLocation.id);
         await calendarEventRepository.deleteById(ongoingDailyCalendarEvent.id);
 
-        expect(spyOngetOngoingEvents).toBeCalledTimes(1);
-        expect(spyOnIsWithinDistance).toBeCalledTimes(0);
-        expect(spyOnNotifyForEvent).toBeCalledTimes(0);
+        expect(spyOngetOngoingEvents).toHaveBeenCalledTimes(1);
+        expect(spyOnIsWithinDistance).toHaveBeenCalledTimes(0);
+        expect(spyOnNotifyForEvent).toHaveBeenCalledTimes(0);
     });
 
     it('Should trigger a notification for an event that started 15 minutes ago and user is not within range of 150 meters of event', async () => {
@@ -363,16 +363,16 @@ describe('LogController', () => {
         await externalContactRepository.remove(externalContact1.id);
         await externalContactRepository.remove(externalContact2.id);
 
-        expect(spyOngetOngoingEvents).toBeCalledTimes(1);
-        expect(spyOnIsWithinDistance).toBeCalledTimes(1);
-        expect(spyOnNotifyForEvent).toBeCalledTimes(1);
-        expect(spyOnNotifyForEvent).toBeCalledWith({
+        expect(spyOngetOngoingEvents).toHaveBeenCalledTimes(1);
+        expect(spyOnIsWithinDistance).toHaveBeenCalledTimes(1);
+        expect(spyOnNotifyForEvent).toHaveBeenCalledTimes(1);
+        expect(spyOnNotifyForEvent).toHaveBeenCalledWith({
             event: ongoingDailyCalendarEvent,
             location: locations[0].location,
             plwd,
             recipients,
         } as INotifyForEventNotificationService);
-        expect(spyOnHasNotificationForEvent).toBeCalledTimes(2);
+        expect(spyOnHasNotificationForEvent).toHaveBeenCalledTimes(2);
 
         expect(notification1).toEqual({
             contactUserId: externalContact1.id,
@@ -439,16 +439,16 @@ describe('LogController', () => {
         await externalContactRepository.remove(externalContact1.id);
         await externalContactRepository.remove(externalContact2.id);
 
-        expect(spyOngetOngoingEvents).toBeCalledTimes(1);
-        expect(spyOnIsWithinDistance).toBeCalledTimes(1);
-        expect(spyOnNotifyForEvent).toBeCalledTimes(1);
-        expect(spyOnNotifyForEvent).toBeCalledWith({
+        expect(spyOngetOngoingEvents).toHaveBeenCalledTimes(1);
+        expect(spyOnIsWithinDistance).toHaveBeenCalledTimes(1);
+        expect(spyOnNotifyForEvent).toHaveBeenCalledTimes(1);
+        expect(spyOnNotifyForEvent).toHaveBeenCalledWith({
             event: ongoingDailyCalendarEvent,
             location: locations[0].location,
             plwd,
             recipients,
         } as INotifyForEventNotificationService);
-        expect(spyOnHasNotificationForEvent).toBeCalledTimes(4);
+        expect(spyOnHasNotificationForEvent).toHaveBeenCalledTimes(4);
 
         expect(notification1).toEqual({
             contactUserId: externalContact1.id,
@@ -537,17 +537,17 @@ describe('LogController', () => {
         await externalContactRepository.remove(externalContact1.id);
         await externalContactRepository.remove(externalContact2.id);
 
-        expect(spyOngetOngoingEvents).toBeCalledTimes(2);
-        expect(spyOnIsWithinDistance).toBeCalledTimes(2);
-        expect(spyOnNotifyForEvent).toBeCalledTimes(2);
-        expect(spyOnNotifyForEvent).toBeCalledWith({
+        expect(spyOngetOngoingEvents).toHaveBeenCalledTimes(2);
+        expect(spyOnIsWithinDistance).toHaveBeenCalledTimes(2);
+        expect(spyOnNotifyForEvent).toHaveBeenCalledTimes(2);
+        expect(spyOnNotifyForEvent).toHaveBeenCalledWith({
             event: ongoingDailyCalendarEvent,
             location: locations[0].location,
             plwd,
             recipients: [...externalContactRecipients, ...carecircleRecipients],
         } as INotifyForEventNotificationService);
-        expect(spyOnHasNotificationForEvent).toBeCalledTimes(6);
-        expect(spyOnInsertNotificationForEvent).toBeCalledTimes(3);
+        expect(spyOnHasNotificationForEvent).toHaveBeenCalledTimes(6);
+        expect(spyOnInsertNotificationForEvent).toHaveBeenCalledTimes(3);
 
         expect(notification1).toEqual({
             contactUserId: externalContact1.id,
@@ -608,9 +608,9 @@ describe('LogController', () => {
 
         await locationHandlerService.sendNotifications();
 
-        expect(spyOngetOngoingEvents).toBeCalledTimes(1);
-        expect(spyOnIsWithinDistance).toBeCalledTimes(1);
-        expect(spyOnNotifyForEvent).toBeCalledTimes(1);
+        expect(spyOngetOngoingEvents).toHaveBeenCalledTimes(1);
+        expect(spyOnIsWithinDistance).toHaveBeenCalledTimes(1);
+        expect(spyOnNotifyForEvent).toHaveBeenCalledTimes(1);
 
         const notifications = await notificationRepository.get();
         expect(notifications).toHaveLength(2);
@@ -656,9 +656,9 @@ describe('LogController', () => {
 
         await locationHandlerService.sendNotifications();
 
-        expect(spyOngetOngoingEvents).toBeCalledTimes(1);
-        expect(spyOnIsWithinDistance).toBeCalledTimes(0);
-        expect(spyOnNotifyForEvent).toBeCalledTimes(0);
+        expect(spyOngetOngoingEvents).toHaveBeenCalledTimes(1);
+        expect(spyOnIsWithinDistance).toHaveBeenCalledTimes(0);
+        expect(spyOnNotifyForEvent).toHaveBeenCalledTimes(0);
 
         const [storedLocation] = await locationRepository.get();
         await locationRepository.deleteById(storedLocation.id);

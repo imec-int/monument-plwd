@@ -22,6 +22,7 @@ const mapToCalendarEventWithContacts = (data: any): CalendarEventWithContacts =>
     address: JSON.parse(data.address),
     carecircleMembers: [],
     createdBy: data.created_by,
+    date: data.date,
     endTime: data.end_time,
     externalContacts: [],
     id: data.id,
@@ -42,6 +43,7 @@ const insert = (knex: Knex) => {
                     id,
                     address: calendarEvent.address,
                     end_time: calendarEvent.endTime,
+                    date: calendarEvent.date,
                     picked_up: calendarEvent.pickedUp,
                     repeat: calendarEvent.repeat,
                     start_time: calendarEvent.startTime,
@@ -93,10 +95,11 @@ const update = (knex: Knex) => {
                 await trx(table)
                     .update({
                         address: calendarEvent.address,
+                        date: calendarEvent.date,
+                        end_time: calendarEvent.endTime,
                         picked_up: calendarEvent.pickedUp,
                         repeat: calendarEvent.repeat,
                         start_time: calendarEvent.startTime,
-                        end_time: calendarEvent.endTime,
                         title: calendarEvent.title,
                         updated_at: now,
                     })
