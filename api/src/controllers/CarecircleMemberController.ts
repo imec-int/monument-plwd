@@ -11,6 +11,7 @@ import { UserRole } from '../models/UserRole';
 import { Affiliation, ICarecircleMemberBody } from '../models/CarecircleMember';
 import { PlwdRepository } from '../repositories/PlwdRepository';
 import { MailServiceInterface } from '../services/MailService';
+import { pictureValidationSchema } from '../utils/validation';
 
 const requestUserContext = yup
     .object({
@@ -31,7 +32,7 @@ export const createCarecircleMemberValidationSchema = yup.object({
                     firstName: yup.string().required(),
                     lastName: yup.string().required(),
                     phone: yup.string().required(),
-                    picture: yup.string(),
+                    picture: pictureValidationSchema,
                     role: yup.string(),
                 })
                 .required(),
