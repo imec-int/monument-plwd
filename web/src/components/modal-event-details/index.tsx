@@ -96,7 +96,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
       addADestination: Boolean(selectedEvent.extendedProps?.address),
       address: selectedEvent.extendedProps?.address,
       contacts: defaultContacts,
-      dateValue: selectedEvent.extendedProps?.start ?? selectedEvent.start,
+      dateValue: selectedEvent.extendedProps?.date ?? selectedEvent.start,
       endTimeValue: selectedEvent.end ?? nowAsDateObject,
       // pickedUp: selectedEvent.extendedProps?.pickedUp,
       repeat: selectedEvent.extendedProps?.repeat || RepeatEvent.NEVER,
@@ -228,8 +228,6 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
   const isEventNightTime =
     dayjs(watchStartTime).isBefore(sevenAm) ||
     dayjs(watchStartTime).isAfter(eightPm);
-
-  console.warn(getValues());
 
   return (
     <div>

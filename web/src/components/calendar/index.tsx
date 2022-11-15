@@ -43,6 +43,7 @@ export const Calendar: React.FC<ICalendar> = ({
       extendedProps: {
         address: e.address,
         caretakers: e.carecircleMembers.map((c) => c.id),
+        date: e.date,
         externalContacts: e.externalContacts.map((c) => c.id),
         pickedUp: e.pickedUp,
         repeat: e.repeat,
