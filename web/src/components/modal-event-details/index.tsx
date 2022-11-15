@@ -9,7 +9,7 @@ import { RepeatEvent } from '@constants';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { IModalEventDetails } from '@interfaces';
 import { TextField, Tooltip } from '@mui/material';
-import { DateTimePicker } from '@mui/x-date-pickers';
+import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { CustomError } from 'lib/CustomError';
 import { fetchWrapper } from 'lib/fetch';
@@ -32,6 +32,7 @@ const eventSchema = yup.object({
       })
     )
     .required(),
+  dateValue: yup.date().required(),
   startTimeValue: yup.date().required(),
   endTimeValue: yup.date().required(),
   title: yup.string().required(),
@@ -82,6 +83,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
     checked: selectedExternalContacts.includes(c.id),
   }));
   const defaultContacts = [...caretakersForForm, ...externalContactsForForm];
+  const nowAsDateObject = dayjs().toDate();
   const {
     control,
     formState: { errors, isSubmitting },
@@ -92,12 +94,13 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
   } = useForm<IFormCalendarEvent>({
     defaultValues: {
       addADestination: Boolean(selectedEvent.extendedProps?.address),
-      contacts: defaultContacts,
       address: selectedEvent.extendedProps?.address,
-      endTimeValue: selectedEvent.end || dayjs().toDate(),
+      contacts: defaultContacts,
+      dateValue: selectedEvent.extendedProps?.start ?? selectedEvent.start,
+      endTimeValue: selectedEvent.end ?? nowAsDateObject,
       // pickedUp: selectedEvent.extendedProps?.pickedUp,
       repeat: selectedEvent.extendedProps?.repeat || RepeatEvent.NEVER,
-      startTimeValue: selectedEvent.start || dayjs().toDate(),
+      startTimeValue: selectedEvent.start ?? nowAsDateObject,
       title: selectedEvent.title,
     },
     resolver: yupResolver(eventSchema),
@@ -225,6 +228,8 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
     dayjs(watchStartTime).isBefore(sevenAm) ||
     dayjs(watchStartTime).isAfter(eightPm);
 
+  console.warn(getValues());
+
   return (
     <div>
       <Modal boxClassName="max-w-5xl" onSubmit={handleSubmit(onSubmit)}>
@@ -247,22 +252,48 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
               type="text"
             />
           </div>
+          <div className="flex">
+            <div className="mr-4">
+              <label className="label">
+                <span className="label-text">Date*</span>
+              </label>
+              <Controller
+                control={control}
+                name="dateValue"
+                render={({ field: { value, onChange } }) => (
+                  <DatePicker
+                    disablePast
+                    disabled={
+                      selectedEvent.id &&
+                      dayjs(getValues('startTimeValue')).isBefore(
+                        nowAsDateObject
+                      )
+                    }
+                    onChange={onChange}
+                    renderInput={(props) => <TextField {...props} />}
+                    value={value}
+                  />
+                )}
+              />
+            </div>
+          </div>
           <div>
             <div className="flex">
               <div className="mr-4">
                 <label className="label">
-                  <span className="label-text">Start of the appointment</span>
+                  <span className="label-text">Start of the appointment*</span>
                 </label>
                 <Controller
                   control={control}
                   name="startTimeValue"
                   render={({ field: { value, onChange } }) => (
-                    <DateTimePicker
+                    <TimePicker
                       ampm={false}
-                      disablePast
                       disabled={
                         selectedEvent.id &&
-                        dayjs(getValues('startTimeValue')).isBefore(new Date())
+                        dayjs(getValues('startTimeValue')).isBefore(
+                          nowAsDateObject
+                        )
                       }
                       onChange={onChange}
                       renderInput={(props) => <TextField {...props} />}
@@ -273,18 +304,19 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
               </div>
               <div>
                 <label className="label">
-                  <span className="label-text">End of the appointment</span>
+                  <span className="label-text">End of the appointment*</span>
                 </label>
                 <Controller
                   control={control}
                   name="endTimeValue"
                   render={({ field: { value, onChange } }) => (
-                    <DateTimePicker
+                    <TimePicker
                       ampm={false}
-                      disablePast
                       disabled={
                         selectedEvent.id &&
-                        dayjs(getValues('endTimeValue')).isBefore(new Date())
+                        dayjs(getValues('endTimeValue')).isBefore(
+                          nowAsDateObject
+                        )
                       }
                       onChange={onChange}
                       renderInput={(props) => <TextField {...props} />}

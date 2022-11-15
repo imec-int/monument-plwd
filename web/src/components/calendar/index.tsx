@@ -65,8 +65,12 @@ export const Calendar: React.FC<ICalendar> = ({
     setSelectedEvent(event.event);
   }, []);
 
-  const triggerEmptyEvent = useCallback(
-    () => eventClick({ event: {} }),
+  const triggerEmptyEvent = useCallback(() => {
+    eventClick({ event: {} });
+  }, [eventClick]);
+
+  const clickGridCell = useCallback(
+    (event) => eventClick({ event }),
     [eventClick]
   );
 
@@ -109,7 +113,7 @@ export const Calendar: React.FC<ICalendar> = ({
         height={height || '500px'}
         initialView={initialView || 'dayGridMonth'}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        select={triggerEmptyEvent}
+        select={clickGridCell}
         selectable
         {...fieldProps}
       />
