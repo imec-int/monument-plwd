@@ -1,3 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+button.fc-button.fc-newCalendarEvent-button.fc-button-primary,
+button.fc-button.fc-newCalendarEvent-button.fc-button-primary:active {
+    background-color: rgb(240, 0, 184);
+    border-color: rgb(240, 0, 184);
+}

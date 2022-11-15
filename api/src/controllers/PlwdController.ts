@@ -9,6 +9,7 @@ import logger from '../utils/logger';
 import { IPlwd } from 'src/models/Plwd';
 import { IUser } from 'src/models/User';
 import { DefaultAuthorizationService } from '../auth/AuthorizationService';
+import { pictureValidationSchema } from '../utils/validation';
 
 const requestUserContext = yup
     .object({
@@ -47,7 +48,7 @@ export const createPlwdValidationSchema = yup.object({
             firstName: yup.string().required(),
             lastName: yup.string().required(),
             phone: yup.string().nullable(),
-            picture: yup.string().nullable(),
+            picture: pictureValidationSchema,
             watchId: yup.string().nullable(),
         })
         .required(),
@@ -64,7 +65,7 @@ export const updatePlwdValidationSchema = yup.object({
             id: yup.string().required(),
             lastName: yup.string().required(),
             phone: yup.string().nullable(),
-            picture: yup.string().nullable(),
+            picture: pictureValidationSchema,
             watchId: yup.string().nullable(),
         })
         .required(),

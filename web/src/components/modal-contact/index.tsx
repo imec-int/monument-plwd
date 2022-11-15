@@ -2,7 +2,7 @@ import 'react-phone-number-input/style.css';
 
 import {
   FormInputPhone,
-  ImageSetter,
+  ImageSetterController,
   Modal,
   ModalActions,
   ModalAffiliation,
@@ -20,6 +20,7 @@ import { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useAffiliations } from 'src/hooks/useAffiliations';
 import { useAppUserContext } from 'src/hooks/useAppUserContext';
+import { pictureValidationSchema } from 'src/validation';
 import * as yup from 'yup';
 
 const userSchema = yup.object({
@@ -27,7 +28,7 @@ const userSchema = yup.object({
   firstName: yup.string().required(),
   lastName: yup.string().required(),
   phone: formInputPhoneSchema,
-  picture: yup.string(),
+  picture: pictureValidationSchema,
   affiliation: yup.string().required(),
   email: yup.string().email().required(),
   id: yup.string(),
@@ -313,19 +314,7 @@ const ModalContactEdit = ({
             </Tooltip>
           </div>
           <div className="mt-2">
-            <Controller
-              control={control}
-              name="picture"
-              render={({ field: { value, onChange } }) => (
-                <ImageSetter
-                  base64image={value}
-                  label="Upload avatar"
-                  setBase64Image={(base64) => {
-                    onChange(base64);
-                  }}
-                />
-              )}
-            />
+            <ImageSetterController control={control} name="picture" />
           </div>
           <div className="grid grid-cols-3 gap-4 mt-2 w-full">
             <div className="form-control">
@@ -634,19 +623,7 @@ const ModalContactAdd = ({
           <div className="flex items-end">
             <div className="mt-2 flex-1">
               <div className="max-w-[280px] overflow-hidden">
-                <Controller
-                  control={control}
-                  name="picture"
-                  render={({ field: { value, onChange } }) => (
-                    <ImageSetter
-                      base64image={value}
-                      label="Upload avatar"
-                      setBase64Image={(base64) => {
-                        onChange(base64);
-                      }}
-                    />
-                  )}
-                />
+                <ImageSetterController control={control} name="picture" />
               </div>
             </div>
             {showAddUserToCarecircleToggle ? (

@@ -48,8 +48,6 @@ const Plwd = () => {
     resolver: yupResolver(plwdInfoSchema),
   });
 
-  console.warn(errors);
-
   const onSubmit = async (data: IFormPlwdInfo) => {
     try {
       const updatedUser = {

@@ -9,6 +9,7 @@ import { IUser } from 'src/models/User';
 import { DefaultAuthorizationService } from '../auth/AuthorizationService';
 import { Auth0Service } from 'src/services/RestApiBasedAuth0Service';
 import { ICarecircleMember } from 'src/models/CarecircleMember';
+import { pictureValidationSchema } from '../utils/validation';
 
 const requestUserContext = yup
     .object({
@@ -27,7 +28,7 @@ export const createUserValidationSchema = yup.object({
                     firstName: yup.string().required(),
                     lastName: yup.string().required(),
                     phone: yup.string().required(),
-                    picture: yup.string().nullable(),
+                    picture: pictureValidationSchema,
                     role: yup.string().required(),
                 })
                 .required(),
@@ -46,7 +47,7 @@ export const updateUserValidationSchema = yup.object({
                     firstName: yup.string().required(),
                     lastName: yup.string().required(),
                     phone: yup.string().required(),
-                    picture: yup.string().nullable(),
+                    picture: pictureValidationSchema,
                     role: yup.string().required(),
                 })
                 .required(),
