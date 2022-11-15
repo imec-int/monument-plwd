@@ -34,7 +34,28 @@ const eventSchema = yup.object({
     .required(),
   dateValue: yup.date().required(),
   startTimeValue: yup.date().required(),
-  endTimeValue: yup.date().required(),
+  endTimeValue: yup
+    .date()
+    .required()
+    .test(
+      'endTimeIsInvalid',
+      'End of the appointment should be after the start of the appointment',
+      (value, context) => {
+        if (value && context.parent.startTimeValue) {
+          const { startTimeValue } = context.parent;
+          const startTime =
+            typeof startTimeValue === 'string'
+              ? startTimeValue
+              : startTimeValue.toISOString();
+
+          return (
+            dayjs(value).isAfter(startTime) || dayjs(value).isSame(startTime)
+          );
+        }
+
+        return true;
+      }
+    ),
   title: yup.string().required(),
   repeat: yup.string().oneOf(Object.values(RepeatEvent)),
   address: yup
@@ -325,6 +346,11 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
                 />
               </div>
             </div>
+            {errors.endTimeValue ? (
+              <p className="label-text-alt text-error mt-2">
+                {errors.endTimeValue.message}
+              </p>
+            ) : null}
             {!hasErrors && isEventNightTime ? (
               <p className="text-warning mt-2">
                 Warning: Your event starts before 7am or after 8pm
