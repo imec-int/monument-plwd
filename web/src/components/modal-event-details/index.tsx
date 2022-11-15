@@ -280,8 +280,6 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
     }
   }, [watchDate, setValue]); // eslint-disable-line
 
-  console.warn(getValues());
-
   return (
     <div>
       <Modal boxClassName="max-w-5xl" onSubmit={handleSubmit(onSubmit)}>
