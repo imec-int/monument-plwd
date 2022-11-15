@@ -50,7 +50,7 @@ const eventSchema = yup.object({
     .when('addADestination', {
       is: true,
       then: (schema) => schema.required(),
-      otherwise: (schema) => schema.optional(),
+      otherwise: (schema) => schema.optional().nullable(),
     })
     .default(undefined),
 });
