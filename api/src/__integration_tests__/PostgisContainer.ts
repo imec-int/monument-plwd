@@ -46,9 +46,11 @@ export class PostgisContainer extends GenericContainer {
 
     public async start(): Promise<StartedPostgisContainer> {
         this.withExposedPorts(...(this.hasExposedPorts ? this.ports : [POSTGRES_PORT]))
-            .withEnv('POSTGRES_DB', this.database)
-            .withEnv('POSTGRES_USER', this.username)
-            .withEnv('POSTGRES_PASSWORD', this.password)
+            .withEnvironment({
+                POSTGRES_DB: this.database,
+                POSTGRES_USER: this.username,
+                POSTGRES_PASSWORD: this.password,
+            })
             .withStartupTimeout(120_000);
 
         return new StartedPostgisContainer(await super.start(), this.database, this.username, this.password);
