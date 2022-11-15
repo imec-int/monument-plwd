@@ -175,6 +175,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
         address: data.addADestination ? data.address : null,
         carecircleMemberIds,
         externalContactIds,
+        date: data.dateValue,
         endTime: data.endTimeValue,
         id: selectedEvent.id,
         // pickedUp: data.pickedUp,
