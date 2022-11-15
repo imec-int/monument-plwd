@@ -65,17 +65,22 @@ export const Calendar: React.FC<ICalendar> = ({
     setSelectedEvent(event.event);
   }, []);
 
+  const triggerEmptyEvent = useCallback(
+    () => eventClick({ event: {} }),
+    [eventClick]
+  );
+
   const calendarCustomButtons = useMemo(
     () =>
       canManageCalendar
         ? {
             new: {
               text: 'Add event',
-              click: () => eventClick({ event: {} }),
+              click: triggerEmptyEvent,
             },
           }
         : undefined,
-    [canManageCalendar, eventClick]
+    [canManageCalendar, triggerEmptyEvent]
   );
 
   return (
@@ -91,6 +96,7 @@ export const Calendar: React.FC<ICalendar> = ({
         />
       ) : null}
       <FullCalendar
+        allDaySlot={false}
         customButtons={calendarCustomButtons}
         eventClick={canManageCalendar ? eventClick : undefined}
         eventTimeFormat={{
@@ -103,6 +109,8 @@ export const Calendar: React.FC<ICalendar> = ({
         height={height || '500px'}
         initialView={initialView || 'dayGridMonth'}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+        select={triggerEmptyEvent}
+        selectable
         {...fieldProps}
       />
     </div>
