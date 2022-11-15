@@ -55,7 +55,7 @@ export const Calendar: React.FC<ICalendar> = ({
     ...(headerToolbarEnabled && {
       headerToolbar: {
         center: canManageCalendar
-          ? 'new dayGridMonth,timeGridWeek,timeGridDay'
+          ? 'newCalendarEvent dayGridMonth,timeGridWeek,timeGridDay'
           : 'dayGridMonth,timeGridWeek,timeGridDay',
       },
     }),
@@ -74,7 +74,7 @@ export const Calendar: React.FC<ICalendar> = ({
     () =>
       canManageCalendar
         ? {
-            new: {
+            newCalendarEvent: {
               text: 'Add event',
               click: triggerEmptyEvent,
             },
