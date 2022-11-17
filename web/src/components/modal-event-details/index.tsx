@@ -17,6 +17,7 @@ import { useSnackbar } from 'notistack';
 import { useEffect } from 'react';
 import Autocomplete from 'react-google-autocomplete';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useAppUserContext } from 'src/hooks/useAppUserContext';
 import { useModal } from 'src/hooks/useModal';
 import { mutate } from 'swr';
 import * as yup from 'yup';
@@ -88,6 +89,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
   setSelectedEvent,
 }) => {
   const { enqueueSnackbar } = useSnackbar();
+  const { user } = useAppUserContext();
   const selectedCaretakers = selectedEvent.extendedProps
     ? selectedEvent.extendedProps.caretakers
     : [];
@@ -104,7 +106,20 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
     externalContactId: c.id,
     checked: selectedExternalContacts.includes(c.id),
   }));
-  const defaultContacts = [...caretakersForForm, ...externalContactsForForm];
+  // When there is no id yet, we assume we're in the creation mode of the modal
+  const isCreating = !selectedEvent.id;
+  // When creating an event we should check the current user as a contact person by default
+  const caretakersContactsArray = isCreating
+    ? caretakersForForm.map((c) => ({
+        ...c,
+        checked: c.user.id === user.id ? true : c.checked,
+      }))
+    : caretakersForForm;
+  const defaultContacts = [
+    ...caretakersContactsArray,
+    ...externalContactsForForm,
+  ];
+
   const nowAsDateObject = dayjs().toDate();
   const {
     control,
