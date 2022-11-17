@@ -116,8 +116,8 @@ const LocationTrack: React.FC = () => {
               lng={locations[0]?.location.lng}
             />
           </div>
-          <div className="w-full flex flex-col md:flex-row gap-4 mb-8 h-[420px]">
-            <div className="flex-1 rounded-xl overflow-hidden shadow-xl">
+          <div className="w-full flex flex-col md:flex-row gap-4 mb-8 h-full md:h-[420px]">
+            <div className="flex-grow h-[320px] md:h-full rounded-xl overflow-hidden shadow-xl w-full">
               <Map currentLocation={locations[0]} locations={locations} />
             </div>
             <div className="max-w-md">
