@@ -25,9 +25,9 @@ const Home = () => {
   return (
     <Container>
       <Header tabTitle="Monument - Home" />
-      <div className="flex gap-8">
+      <div className="flex flex-col lg:flex-row gap-8">
         <div>
-          <div className="mb-4">
+          <div className="mb-4 w-full">
             <CardProfile profile={plwd} showCTA={canAccessLocation} />
           </div>
           <CardCareTakers

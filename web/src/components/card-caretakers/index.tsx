@@ -39,7 +39,7 @@ export const CardCareTakers = ({
   const sortedCarecircle = sortCarecircleMembers(carecircle);
 
   return (
-    <div className="card w-96 bg-base-100 shadow-xl">
+    <div className="card w-full lg:w-96 bg-base-100 shadow-xl">
       <div className="card-body">
         <div className="flex items-center">
           <h2 className="card-title">Caretakers</h2>

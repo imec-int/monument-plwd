@@ -86,9 +86,9 @@ const Plwd = () => {
   return (
     <Container>
       <Header tabTitle="Monument - PLWD Info" />
-      <div className="m-auto flex gap-4">
+      <div className="m-auto flex gap-4 w-full max-w-lg">
         <form
-          className="card p-8 bg-base-100 shadow-xl my-8"
+          className="card p-8 bg-base-100 shadow-xl my-8 w-full"
           onSubmit={handleSubmit(onSubmit)}
         >
           <h2 className="card-title mb-2 mt-8">PLWD Info</h2>
@@ -101,7 +101,7 @@ const Plwd = () => {
             </label>
             <input
               {...register('firstName', { required: true })}
-              className={`input input-bordered w-96 ${
+              className={`input input-bordered w-full ${
                 errors.firstName ? 'input-error' : ''
               }`}
               placeholder="First Name"
@@ -114,7 +114,7 @@ const Plwd = () => {
             </label>
             <input
               {...register('lastName', { required: true })}
-              className={`input input-bordered w-96 ${
+              className={`input input-bordered w-full ${
                 errors.lastName ? 'input-error' : ''
               }`}
               placeholder="First Name"
@@ -128,7 +128,7 @@ const Plwd = () => {
             </label>
             <input
               {...register('email', { required: true })}
-              className={`input input-bordered w-96 ${
+              className={`input input-bordered w-full ${
                 errors.email ? 'input-error' : ''
               }`}
               placeholder="Email"
@@ -141,7 +141,7 @@ const Plwd = () => {
             </label>
             <input
               {...register('watchId')}
-              className={`input input-bordered w-96 ${
+              className={`input input-bordered w-full ${
                 errors.watchId ? 'input-error' : ''
               }`}
               maxLength={15}

@@ -576,27 +576,29 @@ const ModalContactAdd = ({
               </label>
             ) : null}
           </div>
+          <FormInputPhone control={control} errors={errors} />
           <div className="flex mt-2 gap-4 items-end">
-            <FormInputPhone control={control} errors={errors} />
             <div className="form-control w-full">
               <label className="label">
                 <span className="label-text">Affiliation</span>
               </label>
-              <Controller
-                control={control}
-                name="affiliation"
-                render={({ field: { value, onChange } }) => (
-                  <select
-                    className="select select-bordered"
-                    onChange={onChange}
-                    value={value}
-                  >
-                    {Object.values(availableAffiliations).map((text) => (
-                      <option key={text}>{text}</option>
-                    ))}
-                  </select>
-                )}
-              />
+              <div className="w-full">
+                <Controller
+                  control={control}
+                  name="affiliation"
+                  render={({ field: { value, onChange } }) => (
+                    <select
+                      className="select select-bordered w-full"
+                      onChange={onChange}
+                      value={value}
+                    >
+                      {Object.values(availableAffiliations).map((text) => (
+                        <option key={text}>{text}</option>
+                      ))}
+                    </select>
+                  )}
+                />
+              </div>
             </div>
             <Tooltip title="Add a new affiliation">
               <div

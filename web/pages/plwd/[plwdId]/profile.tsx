@@ -82,9 +82,9 @@ const Profile = () => {
   return (
     <Container>
       <Header tabTitle="Monument - Profile" />
-      <div className="m-auto flex gap-4">
+      <div className="m-auto flex gap-4 w-full max-w-lg">
         <form
-          className="card p-8 bg-base-100 shadow-xl my-8 flex flex-column content-end"
+          className="card p-8 bg-base-100 shadow-xl my-8 flex flex-column content-end w-full"
           onSubmit={handleSubmitUser(onSubmitUser)}
         >
           <div className="flex-1">
@@ -98,7 +98,7 @@ const Profile = () => {
               </label>
               <input
                 {...registerUser('firstName', { required: true })}
-                className={`input input-bordered w-96 ${
+                className={`input input-bordered w-full ${
                   errorsUser.firstName ? 'input-error' : ''
                 }`}
                 placeholder="First Name"
@@ -111,7 +111,7 @@ const Profile = () => {
               </label>
               <input
                 {...registerUser('lastName', { required: true })}
-                className={`input input-bordered w-96 ${
+                className={`input input-bordered w-full ${
                   errorsUser.lastName ? 'input-error' : ''
                 }`}
                 placeholder="Last Name"
@@ -125,7 +125,7 @@ const Profile = () => {
               </label>
               <input
                 {...registerUser('email', { required: true })}
-                className={`input input-bordered w-96 ${
+                className={`input input-bordered w-full ${
                   errorsUser.email ? 'input-error' : ''
                 }`}
                 disabled

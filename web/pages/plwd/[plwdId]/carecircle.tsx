@@ -114,7 +114,7 @@ const Carecircle = () => {
               Add new contact
             </a>
           ) : null}
-          <div className="overflow-x-auto">
+          <div className="hidden lg:block">
             <table className="table w-full">
               <thead>
                 <tr>
@@ -161,6 +161,57 @@ const Carecircle = () => {
             </table>
           </div>
         </div>
+      </div>
+      <div className="block lg:hidden mt-4 flex flex-col gap-4">
+        {users.map((u, i) => (
+          <div
+            className="card w-full bg-base-100 shadow-xl overflow-scroll"
+            key={i}
+          >
+            <div className="card-body">
+              <div className="flex flex-row justify-between">
+                <div className="flex flex-row">
+                  <Avatar
+                    firstName={u.user.firstName}
+                    lastName={u.user.lastName}
+                    picture={u.user.picture}
+                  />
+                  <div className="flex flex-col ml-4">
+                    <div className="flex flex-col">
+                      <h2 className="card-title mb-2">
+                        {u.user.firstName} {u.user.lastName}
+                      </h2>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <p className="card-subtitle text-base-content text-opacity-50">
+                        {u.user.phone}
+                      </p>
+                      <p className="card-subtitle text-base-content text-opacity-50">
+                        {u.user.email}
+                      </p>
+                      <p className="card-subtitle text-base-content text-opacity-50">
+                        {u.affiliation}
+                      </p>
+                    </div>
+                    {canManageCarecircle &&
+                    u.affiliation !== Affiliation.PRIMARY_CARETAKER ? (
+                      <div className="flex flex-row mt-4">
+                        <EditButton
+                          className="mr-2"
+                          onClick={() => onEditContactCallback(u)}
+                        />
+                        <DeleteButton
+                          className="btn-error"
+                          onClick={() => onDeleteContactCallback(u)}
+                        />
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
       {contactToDelete ? (
         <ModalContactDelete
