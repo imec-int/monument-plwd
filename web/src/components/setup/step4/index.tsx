@@ -83,7 +83,7 @@ export const SetupStep4: React.FC<Props> = ({ previousStep, userData }) => {
   return (
     <Container>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="card m-auto w-[40rem] text-center p-8 bg-base-100 shadow-xl my-8">
+        <div className="card m-auto w-full lg:w-[40rem] text-center p-8 bg-base-100 shadow-xl my-8">
           <h2 className="card-title text-center my-4 m-auto">
             Kompy watch setup
           </h2>

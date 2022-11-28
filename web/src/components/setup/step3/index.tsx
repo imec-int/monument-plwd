@@ -12,7 +12,7 @@ export const SetupStep3: React.FC<ISetupStep> = ({ nextStep }) => {
 
   return (
     <Container>
-      <div className="card m-auto w-[40rem] text-center p-8 bg-base-100 shadow-xl my-8">
+      <div className="card m-auto w-full lg:w-[40rem] text-center p-8 bg-base-100 shadow-xl my-8">
         <h2 className="card-title text-center my-4 m-auto">Watch setup</h2>
         <p>
           To use this webapp, you will first need to setup the watch. You can

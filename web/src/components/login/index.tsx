@@ -21,13 +21,13 @@ export const Login: React.FC = () => {
           <h2 className="card-title">{t('loginTitle')}</h2>
           <p className="mb-4">{t('loginDescription')}</p>
           <p>{t('loginDescription2')}</p>
-          <div className="card-actions mt-8 gap-4">
+          <div className="card-actions mt-8 gap-4 flex-col flex lg:flex-row">
             <Link href={'/api/auth/login?returnTo=/switch'}>
               <button className="btn btn-secondary w-28">
                 {t('loginButton')}
               </button>
             </Link>
-            <label className="text-gray-400 mt-2">-</label>
+            <label className="text-gray-400 mt-2 hidden lg:block">-</label>
             <Link href={'/api/signup?returnTo=/setup'}>
               <button className="btn btn-secondary w-28">
                 {t('signUpButton')}
