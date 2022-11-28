@@ -102,7 +102,7 @@ const Setup = ({ user: authenticatedUser }: Props) => {
   return (
     <Container>
       <Header isPublic={true} tabTitle="Monument - Setup" />
-      <ul className="steps w-[32rem] pb-4 m-auto">
+      <ul className="steps w-full lg:w-[32rem] pb-4 m-auto">
         <li className="step step-secondary">My profile</li>
         <li className={`step ${step > 1 ? 'step-secondary' : ''}`}>
           PLWD details

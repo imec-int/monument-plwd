@@ -10,7 +10,7 @@ export const CardProfile = ({
   profile: IPlwd;
 }) => {
   return (
-    <div className="card w-96 bg-base-100 shadow-xl items-center">
+    <div className="card w-full lg:w-96 bg-base-100 shadow-xl items-center">
       <div className="avatar items-center mt-8">
         <Avatar
           firstName={profile.firstName}

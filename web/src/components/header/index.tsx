@@ -19,6 +19,33 @@ export const Header: React.FC<IHeader> = ({ tabTitle, isPublic }) => {
 
   const basePath = `/plwd/${plwd.id}`;
 
+  const navLinks = (
+    <>
+      <li>
+        <Link href={basePath}>{t('home')}</Link>
+      </li>
+      <li>
+        <Link href={`${basePath}/location`}>{t('location')}</Link>
+      </li>
+      {canAccessCalendar ? (
+        <li>
+          <Link href={`${basePath}/calendar`}>{t('calendar')}</Link>
+        </li>
+      ) : null}
+      {canAccessCarecircle ? (
+        <li>
+          <Link href={`${basePath}/carecircle`}>{t('carecircle')}</Link>
+        </li>
+      ) : null}
+      <li>
+        <Link href={`${basePath}/simulation`}>{t('simulation')}</Link>
+      </li>
+      <li>
+        <Link href={`${basePath}/help`}>{t('help')}</Link>
+      </li>
+    </>
+  );
+
   return (
     <div className="navbar bg-base-100 p-0 mx-0 mt-4 mb-4">
       <Head>
@@ -38,30 +65,33 @@ export const Header: React.FC<IHeader> = ({ tabTitle, isPublic }) => {
             </Link>
           </div>
           <div className="flex-none">
-            <ul className="menu menu-horizontal p-0">
-              <li>
-                <Link href={basePath}>{t('home')}</Link>
-              </li>
-              <li>
-                <Link href={`${basePath}/location`}>{t('location')}</Link>
-              </li>
-              {canAccessCalendar ? (
-                <li>
-                  <Link href={`${basePath}/calendar`}>{t('calendar')}</Link>
-                </li>
-              ) : null}
-              {canAccessCarecircle ? (
-                <li>
-                  <Link href={`${basePath}/carecircle`}>{t('carecircle')}</Link>
-                </li>
-              ) : null}
-              <li>
-                <Link href={`${basePath}/simulation`}>{t('simulation')}</Link>
-              </li>
-              <li>
-                <Link href={`${basePath}/help`}>{t('help')}</Link>
-              </li>
+            <ul className="hidden lg:flex menu menu-horizontal p-0">
+              {navLinks}
             </ul>
+            <div className="dropdown dropdown-end ml-2">
+              <button className="block lg:hidden btn btn-ghost">
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+              <ul
+                className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+                tabIndex={0}
+              >
+                {navLinks}
+              </ul>
+            </div>
             <NotificationBadge />
             <div className="dropdown dropdown-end ml-2">
               <ProfileAvatar
