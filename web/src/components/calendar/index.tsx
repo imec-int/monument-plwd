@@ -16,6 +16,20 @@ import { useCalendarEvents } from 'src/hooks/useCalendarEvents';
 import { usePermissions } from 'src/hooks/usePermissions';
 import dayjs from 'dayjs';
 
+const styles = {
+  section: {
+    fontSize: '18px',
+    color: '#292b2c',
+    backgroundColor: '#fff',
+    padding: '0 20px',
+  },
+  wrapper: {
+    textAlign: 'center',
+    margin: '0 auto',
+    marginTop: '50px',
+  },
+};
+
 export const Calendar: React.FC<ICalendar> = ({
   initialView,
   height,
@@ -56,9 +70,11 @@ export const Calendar: React.FC<ICalendar> = ({
   const fieldProps = {
     ...(headerToolbarEnabled && {
       headerToolbar: {
+        left: 'title',
         center: canManageCalendar
           ? 'newCalendarEvent dayGridMonth,timeGridWeek,timeGridDay'
           : 'dayGridMonth,timeGridWeek,timeGridDay',
+        right: 'today prev,next',
       },
     }),
   };
@@ -117,7 +133,7 @@ export const Calendar: React.FC<ICalendar> = ({
           minute: '2-digit',
         }}
         events={calendarEvents}
-        height={height || '500px'}
+        height={height || '680px'}
         initialView={initialView || 'dayGridMonth'}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         select={clickGridCell}

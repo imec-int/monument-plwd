@@ -3,3 +3,34 @@ button.fc-button.fc-newCalendarEvent-button.fc-button-primary:active {
     background-color: rgb(240, 0, 184);
     border-color: rgb(240, 0, 184);
 }
+
+@media (max-width:1024px)  {
+    .fc-header-toolbar.fc-toolbar {
+        flex-direction: column;
+        align-items: start;
+        gap: 4;
+    }
+
+    .fc-header-toolbar.fc-toolbar .fc-toolbar-chunk {
+        margin-bottom: 8px;
+    }
+
+    .fc-newCalendarEvent-button.fc-button.fc-button-primary {
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    .fc-header-toolbar.fc-toolbar .fc-button-group {
+        margin-left: 0;
+        margin-bottom: 8px;
+    }
+
+    .fc-today-button.fc-button.fc-button-primary {
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+    .fc .fc-col-header-cell-cushion {
+        font-size: 10px;
+        font-weight: 900;
+    }
+}
