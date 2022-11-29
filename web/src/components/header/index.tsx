@@ -1,6 +1,7 @@
 import { NotificationBadge } from '@components';
 import { ProfileAvatar } from '@components/avatar';
 import Head from 'next/head';
+import Image from 'next/image';
 import Link from 'next/link';
 import useTranslation from 'next-translate/useTranslation';
 import { useAppUserContext } from 'src/hooks/useAppUserContext';
@@ -53,14 +54,26 @@ export const Header: React.FC<IHeader> = ({ tabTitle, isPublic }) => {
       </Head>
       {isPublic ? (
         <Link href="/">
-          <div className="btn btn-ghost normal-case text-xl p-0">Monument</div>
+          <div className="cursor-pointer">
+            <Image
+              alt="Monument logo"
+              layout="fill"
+              objectFit="contain"
+              src="/images/interreg-logo.svg"
+            />
+          </div>
         </Link>
       ) : (
         <>
           <div className="flex-1">
             <Link href={basePath}>
-              <div className="btn btn-ghost normal-case text-xl p-0">
-                Monument
+              <div className="cursor-pointer">
+                <Image
+                  alt="Monument logo"
+                  height="64"
+                  src="/images/interreg-logo.svg"
+                  width="200"
+                />
               </div>
             </Link>
           </div>

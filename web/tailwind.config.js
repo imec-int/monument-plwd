@@ -16,7 +16,15 @@ module.exports = {
   plugins: [require('daisyui')],
   daisyui: {
     styled: true,
-    themes: true,
+    themes: [
+      {
+        light: {
+          ...require('daisyui/src/colors/themes')['[data-theme=light]'],
+          secondary: '#E1196F',
+          'secondary-hover': '#B61159',
+        },
+      },
+    ],
     base: true,
     utils: true,
     logs: true,

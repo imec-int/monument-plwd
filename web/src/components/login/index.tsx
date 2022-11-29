@@ -9,12 +9,12 @@ export const Login: React.FC = () => {
   return (
     <div className="items-center flex flex-auto justify-center h-screen">
       <div className="card w-[26rem] bg-base-100 shadow-xl">
-        <div className="px-10 pt-10 relative w-xl h-24">
+        <div className="px-10 mt-10 relative w-xl h-24">
           <Image
             alt="Monument logo"
             layout="fill"
             objectFit="contain"
-            src="/images/logo.png"
+            src="/images/interreg-logo.svg"
           />
         </div>
         <div className="card-body items-center text-center">
