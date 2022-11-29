@@ -59,12 +59,12 @@ const Switch = ({ user }: Props) => {
       </Head>
       <div className="flex flex-col items-center gap-8">
         <div className="navbar bg-base-100">
-          <div className="px-10 pt-10 relative w-xl h-24">
+          <div className="px-10 mt-10 relative w-xl h-24">
             <Image
               alt="Monument logo"
               layout="fill"
               objectFit="contain"
-              src="/images/logo.png"
+              src="/images/interreg-logo.svg"
             />
           </div>
         </div>

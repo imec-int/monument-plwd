@@ -11,7 +11,6 @@ export { SetupStep4 } from './setup/step4';
 export { AppUserContext, userDefault } from './contexts/AppUserContext';
 
 // Buttons
-export { Button } from './button';
 export { DeleteButton } from './button-delete';
 export { EditButton } from './button-edit';
 

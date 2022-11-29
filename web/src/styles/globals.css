@@ -1,7 +1,7 @@
 button.fc-button.fc-newCalendarEvent-button.fc-button-primary,
 button.fc-button.fc-newCalendarEvent-button.fc-button-primary:active {
-    background-color: rgb(240, 0, 184);
-    border-color: rgb(240, 0, 184);
+    background-color: #E1196F;
+    border-color: #E1196F;
 }
 
 @media (max-width:1024px)  {
