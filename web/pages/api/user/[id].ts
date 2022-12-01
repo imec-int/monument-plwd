@@ -25,7 +25,7 @@ export default withApiAuthRequired(async (req, res) => {
       const response = await fetchWrapper(
         process.env.API_BASE_URL + `/user/${id}`,
         {
-          method: 'patch',
+          method: 'PATCH',
           body: req.body,
           headers: {
             Authorization: `Bearer ${accessToken}`,

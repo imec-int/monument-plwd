@@ -48,7 +48,7 @@ const postSimulationStep = (data: {
   point: ISimulationPoint;
 }) => {
   fetch('/api/simulation', {
-    method: 'post',
+    method: 'POST',
     body: JSON.stringify(data),
   });
 };
