@@ -13,13 +13,13 @@ export const ProfileAvatar: React.FC<IAvatar> = ({
   lastName,
 }) =>
   picture ? (
-    <div className="btn btn-ghost btn-circle avatar placeholder" tabIndex={0}>
+    <div className="btn btn-ghost btn-circle avatar placeholder" tabIndex={1}>
       <div className="rounded-full w-10 h-10">
         <Image alt="profile avatar" height={40} src={picture} width={40} />
       </div>
     </div>
   ) : (
-    <div className="btn btn-ghost btn-circle avatar placeholder" tabIndex={0}>
+    <div className="btn btn-ghost btn-circle avatar placeholder" tabIndex={1}>
       <div className="bg-neutral-focus text-neutral-content mask rounded-full w-10">
         <span className="">
           {firstName && lastName ? getInitials(firstName, lastName) : ''}

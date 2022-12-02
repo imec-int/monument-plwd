@@ -17,7 +17,7 @@ export const NotificationBadge = () => {
 
   return (
     <div className="dropdown dropdown-end">
-      <label className="btn btn-ghost btn-circle" tabIndex={0}>
+      <label className="btn btn-ghost btn-circle" tabIndex={3}>
         <div className="indicator">
           <svg
             className="h-6 w-6"
@@ -42,7 +42,7 @@ export const NotificationBadge = () => {
       </label>
       <div
         className="mt-3 card card-compact dropdown-content w-60 bg-base-100 shadow"
-        tabIndex={0}
+        tabIndex={3}
       >
         <div className="card-body">
           <span className="font-bold text-lg">
