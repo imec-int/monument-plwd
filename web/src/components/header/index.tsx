@@ -77,12 +77,12 @@ export const Header: React.FC<IHeader> = ({ tabTitle, isPublic }) => {
               </div>
             </Link>
           </div>
-          <div className="flex-none">
-            <ul className="hidden lg:flex menu menu-horizontal p-0">
-              {navLinks}
-            </ul>
+          <div>
             <div className="dropdown dropdown-end ml-2">
-              <button className="block lg:hidden btn btn-ghost">
+              <label
+                className="flex lg:hidden btn btn-ghost items-center"
+                tabIndex={0}
+              >
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -97,11 +97,14 @@ export const Header: React.FC<IHeader> = ({ tabTitle, isPublic }) => {
                     strokeLinejoin="round"
                   />
                 </svg>
-              </button>
+              </label>
               <ul
                 className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
                 tabIndex={0}
               >
+                {navLinks}
+              </ul>
+              <ul className="hidden lg:flex menu menu-horizontal p-0">
                 {navLinks}
               </ul>
             </div>
@@ -114,7 +117,7 @@ export const Header: React.FC<IHeader> = ({ tabTitle, isPublic }) => {
               />
               <ul
                 className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
-                tabIndex={0}
+                tabIndex={1}
               >
                 <li>
                   <Link href={`${basePath}/profile`}>

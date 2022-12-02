@@ -138,6 +138,7 @@ export const Calendar: React.FC<ICalendar> = ({
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         select={clickGridCell}
         selectConstraint={{ start: dayjs().subtract(1, 'day').toISOString() }}
+        selectLongPressDelay={1}
         selectable
         {...fieldProps}
       />
