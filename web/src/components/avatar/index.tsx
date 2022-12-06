@@ -14,7 +14,7 @@ export const ProfileAvatar: React.FC<IAvatar> = ({
 }) =>
   picture ? (
     <div className="btn btn-ghost btn-circle avatar placeholder" tabIndex={1}>
-      <div className="rounded-full w-40 h-40">
+      <div className="rounded-full max-w-40 max-h-40">
         <Image alt="profile avatar" height={40} src={picture} width={40} />
       </div>
     </div>
