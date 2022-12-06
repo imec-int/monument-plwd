@@ -10,7 +10,7 @@ export default withApiAuthRequired(async (req, res) => {
   try {
     if (req.method === 'POST') {
       const response = await fetchWrapper(process.env.API_BASE_URL + '/plwd', {
-        method: 'post',
+        method: 'POST',
         body: req.body,
         headers: {
           Authorization: `Bearer ${accessToken}`,

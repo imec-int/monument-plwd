@@ -14,7 +14,7 @@ export default withApiAuthRequired(async (req, res) => {
       const response = await fetchWrapper(
         process.env.API_BASE_URL + `/calendar-event/${plwdId}`,
         {
-          method: 'patch',
+          method: 'PATCH',
           body: req.body,
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -28,7 +28,7 @@ export default withApiAuthRequired(async (req, res) => {
       const response = await fetchWrapper(
         process.env.API_BASE_URL + `/calendar-event/${plwdId}`,
         {
-          method: 'post',
+          method: 'POST',
           body: req.body,
           headers: {
             Authorization: `Bearer ${accessToken}`,

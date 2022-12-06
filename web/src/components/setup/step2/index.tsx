@@ -56,7 +56,7 @@ export const SetupStep2: React.FC<ISetupStep> = ({ nextStep, userData }) => {
   return (
     <Container>
       <form
-        className="card m-auto w-[32rem] text-center p-8 bg-base-100 shadow-xl my-8 overflow-scroll"
+        className="card m-auto w-full lg:w-[32rem] text-center p-8 bg-base-100 shadow-xl my-8 overflow-scroll"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="m-auto">

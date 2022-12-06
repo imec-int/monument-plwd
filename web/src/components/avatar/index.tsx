@@ -14,7 +14,7 @@ export const ProfileAvatar: React.FC<IAvatar> = ({
 }) =>
   picture ? (
     <div className="btn btn-ghost btn-circle avatar placeholder" tabIndex={1}>
-      <div className="rounded-full w-10 h-10">
+      <div className="rounded-full w-40 h-40">
         <Image alt="profile avatar" height={40} src={picture} width={40} />
       </div>
     </div>
@@ -31,13 +31,13 @@ export const ProfileAvatar: React.FC<IAvatar> = ({
 export const Avatar: React.FC<IAvatar> = ({ picture, firstName, lastName }) =>
   picture ? (
     <div className="avatar items-center">
-      <div className="w-16 mask mask-squircle">
+      <div className="w-16 h-16 mask mask-squircle">
         <Image alt="avatar" layout="fill" src={picture} />
       </div>
     </div>
   ) : (
     <div className="avatar placeholder">
-      <div className="bg-neutral-focus text-neutral-content mask mask-squircle w-16">
+      <div className="bg-neutral-focus text-neutral-content mask mask-squircle w-16 h-16">
         <span className="text-xl">
           {firstName && lastName ? getInitials(firstName, lastName) : ''}
         </span>
