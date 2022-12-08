@@ -99,7 +99,7 @@ export const Header: React.FC<IHeader> = ({ tabTitle, isPublic }) => {
                 </svg>
               </label>
               <ul
-                className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+                className="menu menu-compact lg:hidden dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
                 tabIndex={0}
               >
                 {navLinks}
