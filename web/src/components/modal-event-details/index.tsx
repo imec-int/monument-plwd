@@ -8,8 +8,11 @@ import { InfoIcon } from '@components/icons/InfoIcon';
 import { RepeatEvent } from '@constants';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { IModalEventDetails } from '@interfaces';
-import { TextField, Tooltip } from '@mui/material';
-import * as MuiAutocompleteSelect from '@mui/material/Autocomplete';
+import {
+  Autocomplete as MuiAutocomplete,
+  TextField,
+  Tooltip,
+} from '@mui/material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { CustomError } from 'lib/CustomError';
@@ -22,8 +25,6 @@ import { useAppUserContext } from 'src/hooks/useAppUserContext';
 import { useModal } from 'src/hooks/useModal';
 import { mutate } from 'swr';
 import * as yup from 'yup';
-
-const MuiAutocomplete = MuiAutocompleteSelect.default;
 
 const eventSchema = yup.object({
   addADestination: yup.boolean().required(),
