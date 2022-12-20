@@ -8,7 +8,11 @@ import { InfoIcon } from '@components/icons/InfoIcon';
 import { RepeatEvent } from '@constants';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { IModalEventDetails } from '@interfaces';
-import { TextField, Tooltip } from '@mui/material';
+import {
+  Autocomplete as MuiAutocomplete,
+  TextField,
+  Tooltip,
+} from '@mui/material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { CustomError } from 'lib/CustomError';
@@ -87,6 +91,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
   plwd,
   selectedEvent,
   setSelectedEvent,
+  titleOptions,
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { user } = useAppUserContext();
@@ -151,6 +156,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
   const watchEndTime = watch('endTimeValue');
   const watchAddADestination = watch('addADestination');
   const watchDate = watch('dateValue');
+  const watchTitle = watch('title');
 
   const { fields, append } = useFieldArray<IFormCalendarEvent>({
     name: 'contacts',
@@ -308,13 +314,19 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
                 Add a title*
               </span>
             </label>
-            <input
-              {...register('title', { required: true })}
-              className={`input input-bordered w-full ${
-                errors.title ? 'input-error' : ''
-              }`}
-              placeholder="What is the event about"
-              type="text"
+            <MuiAutocomplete
+              className="w-full"
+              freeSolo
+              id="title"
+              options={titleOptions}
+              renderInput={(params: any) => (
+                <TextField
+                  {...params}
+                  {...register('title', { required: true })}
+                  placeholder="What is the event about"
+                />
+              )}
+              value={watchTitle}
             />
           </div>
           <div className="flex">

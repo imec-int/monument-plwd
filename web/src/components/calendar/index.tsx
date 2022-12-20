@@ -65,6 +65,11 @@ export const Calendar: React.FC<ICalendar> = ({
     }));
   }, [data]);
 
+  const titleOptions = useMemo(() => {
+    // Fetch all past event titles and remove duplicates
+    return Array.from(new Set(data.map((e: IEvent) => e.title)));
+  }, [data]);
+
   const fetchCalendarEvents = () => mutate(`/api/calendar-events/${plwd.id}`);
 
   const fieldProps = {
@@ -120,6 +125,7 @@ export const Calendar: React.FC<ICalendar> = ({
           plwd={plwd}
           selectedEvent={selectedEvent}
           setSelectedEvent={setSelectedEvent}
+          titleOptions={titleOptions || []}
         />
       ) : null}
       <FullCalendar
