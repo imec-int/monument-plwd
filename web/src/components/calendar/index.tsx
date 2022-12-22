@@ -16,20 +16,6 @@ import { useCalendarEvents } from 'src/hooks/useCalendarEvents';
 import { usePermissions } from 'src/hooks/usePermissions';
 import dayjs from 'dayjs';
 
-const styles = {
-  section: {
-    fontSize: '18px',
-    color: '#292b2c',
-    backgroundColor: '#fff',
-    padding: '0 20px',
-  },
-  wrapper: {
-    textAlign: 'center',
-    margin: '0 auto',
-    marginTop: '50px',
-  },
-};
-
 export const Calendar: React.FC<ICalendar> = ({
   initialView,
   height,
@@ -63,11 +49,6 @@ export const Calendar: React.FC<ICalendar> = ({
         repeat: e.repeat,
       },
     }));
-  }, [data]);
-
-  const titleOptions = useMemo(() => {
-    // Fetch all past event titles and remove duplicates
-    return Array.from(new Set(data.map((e: IEvent) => e.title)));
   }, [data]);
 
   const fetchCalendarEvents = () => mutate(`/api/calendar-events/${plwd.id}`);
@@ -119,13 +100,13 @@ export const Calendar: React.FC<ICalendar> = ({
     <div className="card w-full p-8 shadow-xl">
       {selectedEvent ? (
         <ModalEventDetails
+          allEvents={data}
           caretakers={caretakers}
           externalContacts={externalContacts}
           fetchCalendarEvents={fetchCalendarEvents}
           plwd={plwd}
           selectedEvent={selectedEvent}
           setSelectedEvent={setSelectedEvent}
-          titleOptions={titleOptions || []}
         />
       ) : null}
       <FullCalendar

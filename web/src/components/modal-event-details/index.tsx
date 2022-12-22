@@ -7,7 +7,7 @@ import {
 import { InfoIcon } from '@components/icons/InfoIcon';
 import { RepeatEvent } from '@constants';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { IModalEventDetails } from '@interfaces';
+import { IEvent, IModalEventDetails } from '@interfaces';
 import {
   Autocomplete as MuiAutocomplete,
   TextField,
@@ -18,7 +18,7 @@ import dayjs from 'dayjs';
 import { CustomError } from 'lib/CustomError';
 import { fetchWrapper } from 'lib/fetch';
 import { useSnackbar } from 'notistack';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import Autocomplete from 'react-google-autocomplete';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { useAppUserContext } from 'src/hooks/useAppUserContext';
@@ -91,7 +91,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
   plwd,
   selectedEvent,
   setSelectedEvent,
-  titleOptions,
+  allEvents,
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { user } = useAppUserContext();
@@ -157,6 +157,18 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
   const watchAddADestination = watch('addADestination');
   const watchDate = watch('dateValue');
   const watchTitle = watch('title');
+
+  const titleOptions = useMemo(() => {
+    const options = allEvents.map((e: IEvent) => {
+      return {
+        ...e,
+        key: e.id,
+        label: e.title,
+      };
+    });
+
+    return options;
+  }, [allEvents]);
 
   const { fields, append } = useFieldArray<IFormCalendarEvent>({
     name: 'contacts',
@@ -301,6 +313,20 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
     }
   }, [watchDate, setValue]); // eslint-disable-line
 
+  const onTitleChange = (event: any, value: any) => {
+    if (value) {
+      const selectedEvent = allEvents.find((e) => e.id === value.id);
+      if (selectedEvent) {
+        setValue('startTimeValue', selectedEvent.startTime);
+        setValue('endTimeValue', selectedEvent.endTime);
+        setValue('addADestination', Boolean(selectedEvent?.address));
+        // TODO: Set Value for address
+        // TODO: Set value for contacts
+        // setValue('contacts', selectedEvent.contacts);
+      }
+    }
+  };
+
   return (
     <div>
       <Modal boxClassName="max-w-5xl" onSubmit={handleSubmit(onSubmit)}>
@@ -318,6 +344,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
               className="w-full"
               freeSolo
               id="title"
+              onChange={onTitleChange}
               options={titleOptions}
               renderInput={(params: any) => (
                 <TextField
