@@ -317,12 +317,32 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
     if (value) {
       const selectedEvent = allEvents.find((e) => e.id === value.id);
       if (selectedEvent) {
+        const selectedEventAddress = selectedEvent?.address;
         setValue('startTimeValue', selectedEvent.startTime);
         setValue('endTimeValue', selectedEvent.endTime);
-        setValue('addADestination', Boolean(selectedEvent?.address));
-        // TODO: Set Value for address
-        // TODO: Set value for contacts
-        // setValue('contacts', selectedEvent.contacts);
+        if (selectedEventAddress) {
+          const selectedEventContacts = defaultContacts.map((c: any) => {
+            // go through selectedEvent.externalContacts to see if the current default conotact should be checked or not
+            const selectedEventExternalContactExists =
+              selectedEvent.externalContacts.find(
+                (ec: any) => ec.id === c.externalContactId
+              );
+            const selectedEventCarecircleMemberExists =
+              selectedEvent.carecircleMembers.find(
+                (ec: any) => ec.id === c.caretakerId
+              );
+
+            return {
+              ...c,
+              checked:
+                !!selectedEventExternalContactExists ||
+                !!selectedEventCarecircleMemberExists,
+            };
+          });
+          setValue('addADestination', true);
+          setValue('address', selectedEventAddress);
+          setValue('contacts', selectedEventContacts);
+        }
       }
     }
   };
