@@ -13,7 +13,7 @@ export interface IModalEventDetails {
   plwd: IPlwd;
   selectedEvent: any;
   setSelectedEvent: any;
-  titleOptions: string[];
+  allEvents: any[];
 }
 
 export interface ICalendar {
