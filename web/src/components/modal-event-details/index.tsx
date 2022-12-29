@@ -1,6 +1,7 @@
 import {
   Modal,
   ModalContact,
+  ModalEventConfirm,
   ModalEventDelete,
   TableContacts,
 } from '@components';
@@ -186,6 +187,12 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
     close: closeDeleteModal,
   } = useModal();
 
+  const {
+    isVisible: isConfirmModalVisible,
+    open: openConfirmModal,
+    close: closeConfirmModal,
+  } = useModal();
+
   const onClose = () => {
     setSelectedEvent(null);
   };
@@ -220,20 +227,20 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
 
   const onSubmit = async (data: IFormCalendarEvent) => {
     try {
-      const carecircleMemberIds = data.addADestination
+      const carecircleMemberIds = data.address
         ? data.contacts
             .filter((c) => c.checked && c.caretakerId)
             .map((c) => c.caretakerId)
         : [];
 
-      const externalContactIds = data.addADestination
+      const externalContactIds = data.address
         ? data.contacts
             .filter((c) => c.checked && c.externalContactId)
             .map((c) => c.externalContactId)
         : [];
 
       const event = {
-        address: data.addADestination ? data.address : null,
+        address: data.address ? data.address : null,
         carecircleMemberIds,
         externalContactIds,
         date: data.dateValue,
@@ -274,6 +281,14 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
           variant: 'error',
         }
       );
+    }
+  };
+
+  const onSubmitWithChecks = async (data: IFormCalendarEvent) => {
+    if (data.address) {
+      await onSubmit(data);
+    } else {
+      openConfirmModal();
     }
   };
 
@@ -349,7 +364,10 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
 
   return (
     <div>
-      <Modal boxClassName="max-w-5xl" onSubmit={handleSubmit(onSubmit)}>
+      <Modal
+        boxClassName="max-w-5xl"
+        onSubmit={handleSubmit(onSubmitWithChecks)}
+      >
         <h3 className="font-bold text-lg">Event Details</h3>
         <div className="w-full">
           <div className="form-control w-full">
@@ -461,82 +479,68 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
               </p>
             ) : null}
           </div>
-          <div className="form-control w-min mt-4">
-            <label className="label cursor-pointer w-max">
-              <span className="label-text mr-4">Add a destination</span>
-              <input
-                {...register('addADestination')}
-                className="toggle toggle-secondary"
-                type="checkbox"
+          <>
+            <div className="form-control w-full">
+              <label className="label">
+                <span
+                  className={`label-text ${errors.address ? 'text-error' : ''}`}
+                >
+                  Destination
+                </span>
+              </label>
+              <Controller
+                control={control}
+                name="address"
+                render={({ field: { value, onChange } }) => (
+                  <Autocomplete
+                    apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+                    className={`input input-bordered w-full ${
+                      errors.address ? 'input-error' : ''
+                    }`}
+                    defaultValue={value?.description}
+                    language="en"
+                    onPlaceSelected={(place) => {
+                      onChange({
+                        description: place.formatted_address,
+                        geometry: {
+                          location: {
+                            lat: place.geometry.location.lat(),
+                            lng: place.geometry.location.lng(),
+                          },
+                        },
+                      });
+                    }}
+                    options={{
+                      types: ['address'],
+                    }}
+                    placeholder="Search address"
+                  />
+                )}
               />
-            </label>
-          </div>
-          {watchAddADestination ? (
-            <>
               <div className="form-control w-full">
                 <label className="label">
-                  <span
-                    className={`label-text ${
-                      errors.address ? 'text-error' : ''
-                    }`}
+                  <Tooltip
+                    title={`The contacts who will receive a notification when ${plwd.firstName} ${plwd.lastName} is more than 10 minutes late for this calendar event`}
                   >
-                    Destination
-                  </span>
+                    <span className="label-text flex">
+                      Contact Persons
+                      <InfoIcon />
+                    </span>
+                  </Tooltip>
                 </label>
-                <Controller
-                  control={control}
-                  name="address"
-                  render={({ field: { value, onChange } }) => (
-                    <Autocomplete
-                      apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
-                      className={`input input-bordered w-full ${
-                        errors.address ? 'input-error' : ''
-                      }`}
-                      defaultValue={value?.description}
-                      language="en"
-                      onPlaceSelected={(place) => {
-                        onChange({
-                          description: place.formatted_address,
-                          geometry: {
-                            location: {
-                              lat: place.geometry.location.lat(),
-                              lng: place.geometry.location.lng(),
-                            },
-                          },
-                        });
-                      }}
-                      options={{
-                        types: ['address'],
-                      }}
-                      placeholder="Search address"
-                    />
-                  )}
-                />
-                <div className="form-control w-full">
-                  <label className="label">
-                    <Tooltip
-                      title={`The contacts who will receive a notification when ${plwd.firstName} ${plwd.lastName} is more than 10 minutes late for this calendar event`}
-                    >
-                      <span className="label-text flex">
-                        Contact Persons
-                        <InfoIcon />
-                      </span>
-                    </Tooltip>
-                  </label>
-                  <div className="flex">
-                    <button
-                      className="btn w-32 mb-4"
-                      onClick={openContactModal}
-                      type="button"
-                    >
-                      Add new
-                    </button>
-                  </div>
+                <div className="flex">
+                  <button
+                    className="btn w-32 mb-4"
+                    onClick={openContactModal}
+                    type="button"
+                  >
+                    Add new
+                  </button>
                 </div>
               </div>
-              <TableContacts fields={fields} register={register} />
-            </>
-          ) : null}
+            </div>
+            <TableContacts fields={fields} register={register} />
+          </>
         </div>
         <div className="modal-action items-center">
           {hasErrors ? (
@@ -579,6 +583,12 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
           onClose={closeDeleteModal}
           plwdId={plwd.id}
           refetch={fetchCalendarEvents}
+        />
+      ) : null}
+      {isConfirmModalVisible ? (
+        <ModalEventConfirm
+          onClose={closeConfirmModal}
+          onSubmit={handleSubmit(onSubmit)}
         />
       ) : null}
     </div>

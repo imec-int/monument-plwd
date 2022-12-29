@@ -25,6 +25,7 @@ export { Modal, ModalActions } from './modal';
 export { ModalAffiliation } from './modal-affiliation';
 export { ModalContact } from './modal-contact';
 export { ModalContactDelete } from './modal-contact-delete';
+export { ModalEventConfirm } from './modal-event-confirm';
 export { ModalEventDelete } from './modal-event-delete';
 export { ModalEventDetails } from './modal-event-details';
 
