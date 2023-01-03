@@ -12,6 +12,7 @@ import { Affiliation, ICarecircleMemberBody } from '../models/CarecircleMember';
 import { PlwdRepository } from '../repositories/PlwdRepository';
 import { MailServiceInterface } from '../services/MailService';
 import { pictureValidationSchema } from '../utils/validation';
+import { CalendarEventRepository } from 'src/repositories/CalendarEventRepository';
 
 const requestUserContext = yup
     .object({
@@ -82,6 +83,7 @@ export class CarecircleMemberAuthorizationService {
 
 export class CarecircleMemberController {
     constructor(
+        private calendarEventRepository: CalendarEventRepository,
         private carecircleMemberRepository: CarecircleMemberRepository,
         private userRepository: UserRepository,
         private plwdRepository: PlwdRepository,
@@ -118,11 +120,12 @@ export class CarecircleMemberController {
 
             if (carecircleMembership.affiliation === Affiliation.PRIMARY_CARETAKER) {
                 ctx.status = 403;
-                ctx.body = 'Not allowed to delete a primary caretaker from a carecirlce';
+                ctx.body = 'Not allowed to delete a primary caretaker from a carecircle';
 
                 return;
             }
 
+            await this.calendarEventRepository.deleteByCarecircleMemberId(id);
             await this.carecircleMemberRepository.removeMember(plwdId, id);
 
             ctx.status = 200;

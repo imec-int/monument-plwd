@@ -475,7 +475,7 @@ describe('CarecircleMemberController', () => {
             `/carecircle-member/${plwd.id}/${createdCaretakerMembership.id}`
         );
         expect(deleteResponse.status).toEqual(403);
-        expect(deleteResponse.text).toEqual('Not allowed to delete a primary caretaker from a carecirlce');
+        expect(deleteResponse.text).toEqual('Not allowed to delete a primary caretaker from a carecircle');
 
         await carecircleMemberRepository.removeMemberByUserId(plwd.id, caretaker.id);
     });
