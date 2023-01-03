@@ -241,6 +241,7 @@ export const authenticatedRoutes = ({
      */
     const carecircleMemberAuthorizationService = new CarecircleMemberAuthorizationService(authService);
     const carecircleMemberController = new CarecircleMemberController(
+        calendarEventRepository,
         carecircleMemberRepository,
         userRepository,
         plwdRepository,

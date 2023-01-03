@@ -7,6 +7,7 @@ import { mapToCarecircleViewModel } from './CarecircleMemberRepository';
 
 export interface CalendarEventRepository {
     deleteById(id: string): Promise<void>;
+    deleteByCarecircleMemberId(id: string): Promise<void>;
     get(): Promise<CalendarEventWithContacts[]>;
     getById(id: string): Promise<CalendarEventWithContacts>;
     getByPlwdId(plwdId: string): Promise<CalendarEventWithContacts[]>;
@@ -254,9 +255,16 @@ const getOngoingEventsByPlwdId = (knex: Knex) => {
     };
 };
 
+const deleteByCarecircleMemberId = (knex: Knex) => {
+    return async (carecircleMemberId: string) => {
+        await knex('calendar_events_carecircle_members').del().where('carecircle_member_id', carecircleMemberId);
+    };
+};
+
 const createCalendarEventRepository = (knex: Knex) => {
     return {
         deleteById: deleteById(knex),
+        deleteByCarecircleMemberId: deleteByCarecircleMemberId(knex),
         get: get(knex),
         getById: getById(knex),
         getByPlwdId: getByPlwdId(knex),

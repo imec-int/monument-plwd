@@ -394,6 +394,44 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
               value={watchTitle}
             />
           </div>
+          <div>
+            <label className="label">
+              <span
+                className={`label-text ${errors.address ? 'text-error' : ''}`}
+              >
+                Destination
+              </span>
+            </label>
+            <Controller
+              control={control}
+              name="address"
+              render={({ field: { value, onChange } }) => (
+                <Autocomplete
+                  apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+                  className={`input input-bordered w-full ${
+                    errors.address ? 'input-error' : ''
+                  }`}
+                  defaultValue={value?.description}
+                  language="en"
+                  onPlaceSelected={(place) => {
+                    onChange({
+                      description: place.formatted_address,
+                      geometry: {
+                        location: {
+                          lat: place.geometry.location.lat(),
+                          lng: place.geometry.location.lng(),
+                        },
+                      },
+                    });
+                  }}
+                  options={{
+                    types: ['address'],
+                  }}
+                  placeholder="Search address"
+                />
+              )}
+            />
+          </div>
           <div className="flex">
             <div className="mr-4">
               <label className="label">
@@ -481,59 +519,21 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
           </div>
           <>
             <div className="form-control w-full">
-              <label className="label">
-                <span
-                  className={`label-text ${errors.address ? 'text-error' : ''}`}
+              <p className="text-md mt-6 mb-4">
+                Who should get a notification when&nbsp;{' '}
+                <strong>
+                  {plwd.firstName} {plwd.lastName}
+                </strong>{' '}
+                &nbsp;is late for the appointment ?
+              </p>
+              <div className="flex">
+                <button
+                  className="btn w-32 mb-4"
+                  onClick={openContactModal}
+                  type="button"
                 >
-                  Destination
-                </span>
-              </label>
-              <Controller
-                control={control}
-                name="address"
-                render={({ field: { value, onChange } }) => (
-                  <Autocomplete
-                    apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
-                    className={`input input-bordered w-full ${
-                      errors.address ? 'input-error' : ''
-                    }`}
-                    defaultValue={value?.description}
-                    language="en"
-                    onPlaceSelected={(place) => {
-                      onChange({
-                        description: place.formatted_address,
-                        geometry: {
-                          location: {
-                            lat: place.geometry.location.lat(),
-                            lng: place.geometry.location.lng(),
-                          },
-                        },
-                      });
-                    }}
-                    options={{
-                      types: ['address'],
-                    }}
-                    placeholder="Search address"
-                  />
-                )}
-              />
-              <div className="form-control w-full">
-                <p className="text-md mt-6 mb-4">
-                  Who should get a notification when&nbsp;{' '}
-                  <strong>
-                    {plwd.firstName} {plwd.lastName}
-                  </strong>{' '}
-                  &nbsp;is late for the appointment ?
-                </p>
-                <div className="flex">
-                  <button
-                    className="btn w-32 mb-4"
-                    onClick={openContactModal}
-                    type="button"
-                  >
-                    Add new
-                  </button>
-                </div>
+                  Add new
+                </button>
               </div>
             </div>
             <TableContacts fields={fields} register={register} />
