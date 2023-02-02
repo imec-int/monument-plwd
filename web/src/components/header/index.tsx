@@ -12,6 +12,19 @@ interface IHeader {
   tabTitle?: string;
 }
 
+const Logo = ({ url }: { url: string }) => (
+  <Link href={url}>
+    <div className="cursor-pointer">
+      <Image
+        alt="Monument logo"
+        height="64"
+        src="/images/interreg-logo.svg"
+        width="200"
+      />
+    </div>
+  </Link>
+);
+
 export const Header: React.FC<IHeader> = ({ tabTitle, isPublic }) => {
   const { t } = useTranslation('common');
   const { user, plwd, hasAccessToMultipleCarecircles } = useAppUserContext();
@@ -53,29 +66,11 @@ export const Header: React.FC<IHeader> = ({ tabTitle, isPublic }) => {
         <title>{tabTitle || 'Monument'}</title>
       </Head>
       {isPublic ? (
-        <Link href="/">
-          <div className="cursor-pointer">
-            <Image
-              alt="Monument logo"
-              layout="fill"
-              objectFit="contain"
-              src="/images/interreg-logo.svg"
-            />
-          </div>
-        </Link>
+        <Logo url="/" />
       ) : (
         <>
           <div className="flex-1">
-            <Link href={basePath}>
-              <div className="cursor-pointer">
-                <Image
-                  alt="Monument logo"
-                  height="64"
-                  src="/images/interreg-logo.svg"
-                  width="200"
-                />
-              </div>
-            </Link>
+            <Logo url={basePath} />
           </div>
           <div>
             <div className="dropdown dropdown-end ml-2">
