@@ -1,7 +1,7 @@
-const withPlugins = require('next-compose-plugins');
 const nextTranslate = require('next-translate');
 
-const redirects = {
+/** @type {import('next').NextConfig} */
+module.exports = nextTranslate({
   async redirects() {
     return [
       {
@@ -11,10 +11,6 @@ const redirects = {
       },
     ];
   },
-};
-
-/** @type {import('next').NextConfig} */
-module.exports = withPlugins([[nextTranslate], [redirects]], {
   reactStrictMode: true,
   // https://nextjs.org/docs/advanced-features/output-file-tracing#automatically-copying-traced-files-experimental
   // and https://github.com/vercel/next.js/pull/32258
