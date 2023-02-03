@@ -9,6 +9,7 @@ export const LinkGoogleMap: React.FC<ILinkGoogleMap> = ({ lat, lng }) => {
   return (
     <Link
       href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
+      legacyBehavior
       passHref
     >
       <a

@@ -36,7 +36,11 @@ const Help = () => {
                 <br />
                 You may update it via the{' '}
                 {canManageCarecircle ? (
-                  <Link href={`/plwd/${plwd.id}/profile`} passHref>
+                  <Link
+                    href={`/plwd/${plwd.id}/profile`}
+                    legacyBehavior
+                    passHref
+                  >
                     <a className="link link-secondary">Profile</a>
                   </Link>
                 ) : (

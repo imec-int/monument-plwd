@@ -17,12 +17,6 @@ const CarecircleMember = (member: ICarecircleMember) => {
           {member.user.phone}
         </a>
       </p>
-      {/* <p>
-        Email:{' '}
-        <a className="link link-secondary" href={`mailto:${member.user.email}`}>
-          {member.user.email}
-        </a>
-      </p> */}
     </div>
   );
 };
