@@ -332,7 +332,7 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
         setValue('endTimeValue', selectedEvent.endTime);
         // Reset the date explictly to today this will allow the useEffect
         // to set the startTime and endTime values to the correct DateTime
-        setValue('dateValue', dayjs().toDate());
+        setValue('dateValue', new Date());
         if (selectedEventAddress) {
           const selectedEventContacts = defaultContacts.map((c: any) => {
             // go through selectedEvent.externalContacts to see if the current default conotact should be checked or not
