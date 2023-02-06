@@ -5,15 +5,10 @@ import {
   ModalEventDelete,
   TableContacts,
 } from '@components';
-import { InfoIcon } from '@components/icons/InfoIcon';
 import { RepeatEvent } from '@constants';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { IEvent, IModalEventDetails } from '@interfaces';
-import {
-  Autocomplete as MuiAutocomplete,
-  TextField,
-  Tooltip,
-} from '@mui/material';
+import { Autocomplete as MuiAutocomplete, TextField } from '@mui/material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { CustomError } from 'lib/CustomError';
@@ -155,20 +150,20 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
 
   const watchStartTime = watch('startTimeValue');
   const watchEndTime = watch('endTimeValue');
-  const watchAddADestination = watch('addADestination');
   const watchDate = watch('dateValue');
   const watchTitle = watch('title');
 
+  // Note -> this causes following warning:
+  // Warning: Encountered two children with the same key, `Event name`.
+  // Keys should be unique so that components maintain their identity across updates.
+  // Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+  // Since we can't set the key prop ourselves I don't think this is fixable in an easy way...
   const titleOptions = useMemo(() => {
-    const options = allEvents.map((e: IEvent) => {
-      return {
-        ...e,
-        key: e.id,
-        label: e.title,
-      };
-    });
-
-    return options;
+    return allEvents.map((e: IEvent) => ({
+      ...e,
+      key: e.id, // Does nothing (see above)
+      label: e.title,
+    }));
   }, [allEvents]);
 
   const { fields, append } = useFieldArray<IFormCalendarEvent>({
@@ -335,6 +330,9 @@ export const ModalEventDetails: React.FC<IModalEventDetails> = ({
         const selectedEventAddress = selectedEvent?.address;
         setValue('startTimeValue', selectedEvent.startTime);
         setValue('endTimeValue', selectedEvent.endTime);
+        // Reset the date explictly to today this will allow the useEffect
+        // to set the startTime and endTime values to the correct DateTime
+        setValue('dateValue', new Date());
         if (selectedEventAddress) {
           const selectedEventContacts = defaultContacts.map((c: any) => {
             // go through selectedEvent.externalContacts to see if the current default conotact should be checked or not
