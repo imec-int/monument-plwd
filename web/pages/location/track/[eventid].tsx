@@ -57,25 +57,26 @@ const LocationTrack: React.FC = () => {
   }, [eventid]);
 
   const today = dayjs().startOf('day').format('Do MMMM');
+  const [currentLocation] = locations;
 
   return (
     <Container className="min-h-screen">
       <Header isPublic tabTitle="Monument - Location" />
-      {!locations && isLoading && (
+      {isLoading && !currentLocation ? (
         <p>
           <span aria-label="loading" role="img">
             ⏳
           </span>
           Loading...
         </p>
-      )}
-      {(!locations || !locations.length) && !isLoading && (
+      ) : null}
+      {!currentLocation && !isLoading ? (
         <p>
-          Oops... It seems the event is not active or there is no locations from
-          the watch during the time of the event.
+          Oops... It seems the event is not active or there are no locations
+          from the watch during the time of the event.
         </p>
-      )}
-      {locations[0] && (
+      ) : null}
+      {currentLocation && (
         <div>
           {isLost && (
             <div className="alert shadow-lg mb-4 mt-0">
@@ -110,15 +111,21 @@ const LocationTrack: React.FC = () => {
           )}
           <h2 className="card-title mb-2">Last known location</h2>
           <div className="flex gap-2">
-            <p className="mb-4">{locations[0].address}</p>
+            <p className="mb-4">
+              {currentLocation.address}(
+              {currentLocation.timestamp
+                ? dayjs(currentLocation.timestamp).format('DD-MM-YYYY HH:mm:ss')
+                : '-'}
+              )
+            </p>
             <LinkGoogleMap
-              lat={locations[0]?.location.lat}
-              lng={locations[0]?.location.lng}
+              lat={currentLocation.location.lat}
+              lng={currentLocation.location.lng}
             />
           </div>
           <div className="w-full flex flex-col md:flex-row gap-4 mb-8 h-full md:h-[420px]">
             <div className="flex-grow h-[320px] md:h-full rounded-xl overflow-hidden shadow-xl w-full">
-              <Map currentLocation={locations[0]} locations={locations} />
+              <Map currentLocation={currentLocation} locations={locations} />
             </div>
             <div className="max-w-md">
               <div className="card w-full h-full bg-base-100 shadow-xl overflow-scroll">
