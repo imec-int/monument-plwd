@@ -72,8 +72,8 @@ const LocationTrack: React.FC = () => {
       ) : null}
       {!currentLocation && !isLoading ? (
         <p>
-          Oops... It seems the event is not active or there is no locations from
-          the watch during the time of the event.
+          Oops... It seems the event is not active or there are no locations
+          from the watch during the time of the event.
         </p>
       ) : null}
       {currentLocation && (
